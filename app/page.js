@@ -503,10 +503,7 @@ export default function HomePage() {
             </div>
 
             <div className="detailItem">
-              <span>
-                05
-              </span>
-
+             
             </div>
           </div>
         </div>
