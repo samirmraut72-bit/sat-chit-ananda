@@ -2309,3 +2309,60 @@ a.artistBackButton:hover {
     height: 19px;
   }
 }
+.artistSocialLinks {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin: 30px 0 24px;
+}
+
+.artistSocialIconLink {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  text-decoration: none;
+  transition:
+    transform 0.2s ease,
+    opacity 0.2s ease;
+}
+
+.artistSocialIconLink svg {
+  display: block;
+  width: 36px;
+  height: 36px;
+  overflow: visible;
+}
+
+.artistSocialIconLink:hover {
+  transform: translateY(-2px) scale(1.1);
+  opacity: 0.88;
+}
+
+.artistSocialIconLink:focus-visible {
+  outline: 3px solid rgba(242, 182, 50, 0.55);
+  outline-offset: 5px;
+  border-radius: 8px;
+}
+
+@media (max-width: 768px) {
+  .artistSocialLinks {
+    gap: 14px;
+    margin: 26px 0 21px;
+  }
+
+  .artistSocialIconLink {
+    width: 35px;
+    height: 35px;
+  }
+
+  .artistSocialIconLink svg {
+    width: 33px;
+    height: 33px;
+  }
+}

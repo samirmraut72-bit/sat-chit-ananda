@@ -96,20 +96,56 @@ Along the way, he also collaborated with artists such as Shaurav Bhattarai.`,
 function InstagramIcon() {
   return (
     <svg
-      viewBox="0 0 24 24"
+      className="instagramSocialIcon"
+      viewBox="0 0 48 48"
       aria-hidden="true"
       focusable="false"
     >
+      <defs>
+        <radialGradient
+          id="instagramGradient"
+          cx="30%"
+          cy="105%"
+          r="115%"
+        >
+          <stop offset="0%" stopColor="#ffd600" />
+          <stop offset="28%" stopColor="#ff7a00" />
+          <stop offset="52%" stopColor="#ff0169" />
+          <stop offset="78%" stopColor="#d300c5" />
+          <stop offset="100%" stopColor="#7638fa" />
+        </radialGradient>
+      </defs>
+
       <rect
-        x="3"
-        y="3"
-        width="18"
-        height="18"
-        rx="5"
-        ry="5"
+        x="4"
+        y="4"
+        width="40"
+        height="40"
+        rx="11"
+        fill="url(#instagramGradient)"
       />
-      <circle cx="12" cy="12" r="4.25" />
-      <circle cx="17.5" cy="6.5" r="1" className="socialIconFill" />
+
+      <rect
+        x="13"
+        y="13"
+        width="22"
+        height="22"
+        rx="7"
+        fill="none"
+        stroke="#ffffff"
+        strokeWidth="3"
+      />
+
+      <circle
+        cx="24"
+        cy="24"
+        r="5.5"
+        fill="none"
+        stroke="#ffffff"
+        strokeWidth="3"
+      />
+
+      <circle cx="32.5" cy="15.8" r="2" fill="#ffffff" />
     </svg>
   );
 }
@@ -117,11 +153,33 @@ function InstagramIcon() {
 function TikTokIcon() {
   return (
     <svg
-      viewBox="0 0 24 24"
+      className="tiktokSocialIcon"
+      viewBox="0 0 48 48"
       aria-hidden="true"
       focusable="false"
     >
-      <path d="M14.5 3v11.2a4.8 4.8 0 1 1-4.1-4.75v3.1a1.9 1.9 0 1 0 1.1 1.72V3h3c.35 2.1 1.55 3.5 3.5 4.25v3.05a8.1 8.1 0 0 1-3.5-1.55V3Z" />
+      <path
+        d="M27.5 8v21.3a8.7 8.7 0 1 1-7.3-8.6v5.3a3.6 3.6 0 1 0 2.1 3.3V8h5.2c.7 4.4 3.2 7 7.5 8.5v5.2a14.2 14.2 0 0 1-7.5-3.1V8Z"
+        fill="none"
+        stroke="#25f4ee"
+        strokeWidth="5"
+        strokeLinejoin="round"
+        transform="translate(-1.5, 1.5)"
+      />
+
+      <path
+        d="M27.5 8v21.3a8.7 8.7 0 1 1-7.3-8.6v5.3a3.6 3.6 0 1 0 2.1 3.3V8h5.2c.7 4.4 3.2 7 7.5 8.5v5.2a14.2 14.2 0 0 1-7.5-3.1V8Z"
+        fill="none"
+        stroke="#fe2c55"
+        strokeWidth="5"
+        strokeLinejoin="round"
+        transform="translate(1.5, -1.5)"
+      />
+
+      <path
+        d="M27.5 8v21.3a8.7 8.7 0 1 1-7.3-8.6v5.3a3.6 3.6 0 1 0 2.1 3.3V8h5.2c.7 4.4 3.2 7 7.5 8.5v5.2a14.2 14.2 0 0 1-7.5-3.1V8Z"
+        fill="#111111"
+      />
     </svg>
   );
 }
@@ -170,46 +228,50 @@ export default async function ArtistProfilePage({ params }) {
             ← Back to Artists
           </Link>
 
-          <p className="sectionEyebrow gold">Featured artist</p>
+          <p className="sectionEyebrow gold">
+            Featured artist
+          </p>
 
           <h1>{artist.name}</h1>
 
-          <p className="artistRole">{artist.role}</p>
+          <p className="artistRole">
+            {artist.role}
+          </p>
+
+          <div className="artistIntroduction">
+            {paragraphs.map((paragraph, index) => (
+              <p key={`${artist.name}-${index}`}>
+                {paragraph}
+              </p>
+            ))}
+          </div>
 
           <div className="artistSocialLinks">
             {artist.instagram && (
               <a
-                className="artistSocialButton instagramButton"
+                className="artistSocialIconLink"
                 href={artist.instagram}
                 target="_blank"
                 rel="noopener noreferrer"
-                aria-label={`${artist.name} on Instagram`}
+                aria-label={`Open ${artist.name} Instagram`}
                 title={`${artist.name} on Instagram`}
               >
                 <InstagramIcon />
-                <span>Instagram</span>
               </a>
             )}
 
             {artist.tiktok && (
               <a
-                className="artistSocialButton tiktokButton"
+                className="artistSocialIconLink"
                 href={artist.tiktok}
                 target="_blank"
                 rel="noopener noreferrer"
-                aria-label={`${artist.name} on TikTok`}
+                aria-label={`Open ${artist.name} TikTok`}
                 title={`${artist.name} on TikTok`}
               >
                 <TikTokIcon />
-                <span>TikTok</span>
               </a>
             )}
-          </div>
-
-          <div className="artistIntroduction">
-            {paragraphs.map((paragraph, index) => (
-              <p key={`${artist.name}-${index}`}>{paragraph}</p>
-            ))}
           </div>
 
           <div className="heroActions">
