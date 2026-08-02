@@ -99,29 +99,7 @@ select {
   text-align: center;
 }
 
-.hero::before {
-  border: 1px solid rgba(232, 173, 58, 0.28);
-  border-radius: 50%;
-  content: "";
-  height: min(70vw, 720px);
-  left: 50%;
-  position: absolute;
-  top: 50%;
-  transform: translate(-50%, -45%);
-  width: min(70vw, 720px);
-}
 
-.hero::after {
-  border: 1px dashed rgba(232, 173, 58, 0.18);
-  border-radius: 50%;
-  content: "";
-  height: min(58vw, 600px);
-  left: 50%;
-  position: absolute;
-  top: 50%;
-  transform: translate(-50%, -45%) rotate(8deg);
-  width: min(58vw, 600px);
-}
 
 .heroGlow {
   border-radius: 50%;
@@ -1781,11 +1759,6 @@ td code {
   }
 }
 @media (max-width: 768px) {
-  .hero::before,
-  .hero::after {
-    display: none;
-  }
-
   .heroFactsCircle {
     display: block;
     height: 360px;
