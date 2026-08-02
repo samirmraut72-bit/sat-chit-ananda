@@ -1771,3 +1771,6 @@ td code {
 .heroTitleBreak {
   display: block;
 }
+.anjuliProfileImage img {
+  object-position: center top;
+}

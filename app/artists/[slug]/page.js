@@ -42,7 +42,13 @@ Beyond his work as the lead male vocalist for Sat-Chit-Ānanda and a founding me
     role: "Lead Female Vocal",
     image: "/artists/anjuli-hamal1.jpg",
     introduction:
-      "Anjuli Hamal is a featured artist performing at Sat-Chit-Ānanda. Her introduction and musical journey will be added soon.",
+     `Anjuli Hamal is a vocalist, songwriter, and worship music artist proudly carrying the spirit and stories of Karnali, Nepal. Rooted in her culture and deeply connected to music, she found her calling in expressing emotions, devotion, and life through her voice and songwriting.
+
+Anjuli has been devoted to the study of classical music, training under the guidance of Guru Sanjeev Aale Magar for the past four years and continuing her musical journey under his mentorship. Her classical foundation has shaped her vocal discipline, musical expression, and understanding of the depth and beauty of music.
+
+Currently based in Australia, Anjuli is pursuing her musical dreams while continuing to grow as an artist. Her journey is one of dedication, faith, cultural roots, and an unwavering love for music.
+
+Through her voice and songs, Anjuli hopes to connect with people, preserve the essence of where she comes from, and create music that touches hearts and carries meaning beyond borders.`,
   },
 
   "om-b-shrestha": {
