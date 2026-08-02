@@ -60,44 +60,84 @@ async function sendVerificationEmail({
     body: JSON.stringify({
       from: "Sat-Chit-Ānanda <tickets@mail.satchitananda.com.au>",
       to: [email],
-      subject: "Verify your Sat-Chit-Ānanda registration",
+      subject: "A warm welcome to Sat-Chit-Ānanda",
       html: `
-        <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:32px;color:#29231f;">
-          <h1 style="font-size:28px;margin-bottom:16px;">Sat-Chit-Ānanda</h1>
+        <div style="font-family:Arial,sans-serif;max-width:620px;margin:0 auto;padding:36px 24px;color:#2f2925;background:#fffaf5;">
+          <div style="background:#ffffff;border-radius:18px;padding:36px;box-shadow:0 10px 30px rgba(0,0,0,0.08);">
 
-          <p>Namaste ${safeName},</p>
+            <p style="margin:0 0 10px;color:#a06b3d;font-size:13px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;">
+              Sat-Chit-Ānanda
+            </p>
 
-          <p>
-            Thank you for registering for Sat-Chit-Ānanda.
-            Please verify your email address to confirm your place.
-          </p>
+            <h1 style="font-size:30px;line-height:1.2;margin:0 0 18px;color:#2f2925;">
+              Thank you for registering
+            </h1>
 
-          <div style="margin:32px 0;">
-            <a
-              href="${verificationUrl}"
-              style="display:inline-block;background:#7a3f2b;color:#ffffff;text-decoration:none;padding:14px 24px;border-radius:8px;font-weight:bold;"
-            >
-              Verify my registration
-            </a>
+            <p style="font-size:17px;line-height:1.7;margin:0 0 18px;">
+              Namaste ${safeName},
+            </p>
+
+            <p style="font-size:16px;line-height:1.7;margin:0 0 18px;">
+              We are delighted to warmly welcome you to Sat-Chit-Ānanda,
+              an intimate evening of kirtan, music, devotion and community.
+            </p>
+
+            <p style="font-size:16px;line-height:1.7;margin:0 0 24px;">
+              Your registration has been received. Please verify your email
+              address using the button below to confirm your place and receive
+              your personal QR ticket.
+            </p>
+
+            <div style="margin:30px 0;text-align:center;">
+              <a
+                href="${verificationUrl}"
+                style="display:inline-block;background:#7a3f2b;color:#ffffff;text-decoration:none;padding:15px 28px;border-radius:10px;font-size:16px;font-weight:700;"
+              >
+                Verify email and receive QR ticket
+              </a>
+            </div>
+
+            <div style="background:#faf4ee;border-radius:12px;padding:20px;margin:26px 0;">
+              <p style="margin:0 0 10px;font-weight:700;color:#3b332d;">
+                Event details
+              </p>
+
+              <p style="margin:6px 0;font-size:15px;">
+                <strong>Date:</strong> Friday, 14 August 2026
+              </p>
+
+              <p style="margin:6px 0;font-size:15px;">
+                <strong>Time:</strong> 7:00 PM–9:00 PM
+              </p>
+
+              <p style="margin:6px 0;font-size:15px;">
+                <strong>Venue:</strong> Granville Community Centre
+              </p>
+            </div>
+
+            <p style="font-size:15px;line-height:1.7;margin:0 0 18px;">
+              We look forward to sharing this beautiful gathering with you.
+            </p>
+
+            <p style="font-size:15px;line-height:1.7;margin:0;">
+              With warmth,<br />
+              <strong>The Sat-Chit-Ānanda Team</strong>
+            </p>
+
+            <hr style="margin:32px 0;border:none;border-top:1px solid #e6ddd5;" />
+
+            <p style="font-size:13px;line-height:1.6;color:#766c65;margin:0 0 8px;">
+              This verification link will expire in 24 hours.
+            </p>
+
+            <p style="font-size:13px;line-height:1.6;color:#766c65;margin:0 0 8px;">
+              If the button does not work, copy and paste this link into your browser:
+            </p>
+
+            <p style="font-size:13px;line-height:1.6;word-break:break-all;color:#7a3f2b;margin:0;">
+              ${verificationUrl}
+            </p>
           </div>
-
-          <p>This verification link will expire in 24 hours.</p>
-
-          <p style="font-size:14px;color:#6b625c;">
-            If the button does not work, copy and paste this link into your browser:
-          </p>
-
-          <p style="font-size:14px;word-break:break-all;">
-            ${verificationUrl}
-          </p>
-
-          <hr style="margin:32px 0;border:none;border-top:1px solid #ddd6d0;" />
-
-          <p style="font-size:14px;color:#6b625c;">
-            Friday, 14 August 2026<br />
-            7:00 PM–9:00 PM<br />
-            Granville Community Centre
-          </p>
         </div>
       `,
     }),
@@ -281,7 +321,7 @@ export async function POST(request) {
         ticketQuantity: 1,
       },
       message:
-        "Please check your email and click the verification link to confirm your place.",
+        "Thank you for registering. Please check your email and verify your address to receive your QR ticket.",
     });
   } catch (error) {
     console.error("Unexpected registration error:", error);
