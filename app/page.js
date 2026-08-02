@@ -99,7 +99,9 @@ export default function HomePage() {
 
     return () => {
       active = false;
+
       window.clearInterval(interval);
+
       window.removeEventListener(
         "focus",
         refreshWhenFocused,
@@ -123,30 +125,56 @@ export default function HomePage() {
           </span>
         </Link>
 
-        <nav className="navLinks" aria-label="Main navigation">
-          <a href="#about">About</a>
-          <a href="#artists">Artists</a>
-          <a href="#details">Details</a>
+        <nav
+          className="navLinks"
+          aria-label="Main navigation"
+        >
+          <a href="#about">
+            About
+          </a>
 
-          <Link className="adminNavLink" href="/admin">
+          <a href="#artists">
+            Artists
+          </a>
+
+          <a href="#details">
+            Details
+          </a>
+
+          <Link
+            className="adminNavLink"
+            href="/admin"
+          >
             Admin Login
           </Link>
 
-          <Link className="navButton" href="/register">
+          <Link
+            className="navButton"
+            href="/register"
+          >
             Register
           </Link>
         </nav>
 
         <div className="mobileHeaderActions">
-          <a className="mobileHeaderButton" href="#artists">
+          <a
+            className="mobileHeaderButton"
+            href="#artists"
+          >
             Artists
           </a>
 
-          <Link className="mobileHeaderButton" href="/admin">
+          <Link
+            className="mobileHeaderButton"
+            href="/admin"
+          >
             Admin
           </Link>
 
-          <Link className="mobileRegisterButton" href="/register">
+          <Link
+            className="mobileRegisterButton"
+            href="/register"
+          >
             Register
           </Link>
         </div>
@@ -164,40 +192,62 @@ export default function HomePage() {
               className="heroNrnaLogo"
             />
 
-            <p>NRNA in collaboration with Project Beyond</p>
+            <p>
+              NRNA in collaboration with Project Beyond
+            </p>
           </div>
 
           <p className="eyebrow">
             An Intimate Kirtan Gathering Session
           </p>
 
-          <div className="ornament">✦ ॐ ✦</div>
+          <div className="ornament">
+            ✦ ॐ ✦
+          </div>
 
           <h1 className="heroTitle">
             Sat-Chit-{"\u0100"}nanda
           </h1>
 
           <p className="heroText">
-            An evening of sacred sound, collective chanting, stillness and
-            community.
+            An evening of sacred sound, collective chanting,
+            stillness and community.
           </p>
 
           <div className="heroFacts">
-            <div className="heroFactsCircle" aria-hidden="true" />
+            <div
+              className="heroFactsCircle"
+              aria-hidden="true"
+            />
 
             <div className="heroFactCard">
-              <span>Date</span>
-              <strong>Friday, 14 August 2026</strong>
+              <span>
+                Date
+              </span>
+
+              <strong>
+                Friday, 14 August 2026
+              </strong>
             </div>
 
             <div className="heroFactCard">
-              <span>Time</span>
-              <strong>6:45 PM – 9:00 PM</strong>
+              <span>
+                Time
+              </span>
+
+              <strong>
+                6:45 PM – 9:00 PM
+              </strong>
             </div>
 
             <div className="heroFactCard">
-              <span>Entry</span>
-              <strong>Free Registration</strong>
+              <span>
+                Entry
+              </span>
+
+              <strong>
+                Free Registration
+              </strong>
             </div>
           </div>
 
@@ -224,14 +274,15 @@ export default function HomePage() {
                     : `Available spots: ${availability.available}`}
                 </strong>
               ) : (
-                <strong>Checking available spots...</strong>
+                <strong>
+                  Checking available spots...
+                </strong>
               )}
 
-              <div
-	
-
               {availabilityError && (
-                <p>{availabilityError}</p>
+                <p>
+                  {availabilityError}
+                </p>
               )}
             </div>
           </div>
@@ -251,10 +302,15 @@ export default function HomePage() {
                 }
               }}
             >
-              {soldOut ? "Event Sold Out" : "Reserve a Spot"}
+              {soldOut
+                ? "Event Sold Out"
+                : "Reserve a Spot"}
             </Link>
 
-            <a className="secondaryButton" href="#details">
+            <a
+              className="secondaryButton"
+              href="#details"
+            >
               View Event Details
             </a>
           </div>
@@ -264,7 +320,9 @@ export default function HomePage() {
           </p>
         </div>
 
-        <div className="scrollHint">Scroll to discover ↓</div>
+        <div className="scrollHint">
+          Scroll to discover ↓
+        </div>
       </section>
 
       <section
@@ -275,43 +333,58 @@ export default function HomePage() {
 
         <div className="sectionGrid aboutBackgroundContent">
           <div>
-            <h2>A shared journey through mantra and music</h2>
+            <h2>
+              A shared journey through mantra and music
+            </h2>
           </div>
 
           <div className="bodyCopy">
             <p>
-              Sat-Chit-Ānanda is an initiative created with the sole aim of
-              bringing like-minded people together through devotional and
-              spiritually inspired music. In a time when people are constantly
-              rushing, stressed, and mentally overwhelmed, this gathering
-              offers a space to slow down, find calm, and reconnect with a
-              sense of positivity.
+              Sat-Chit-Ānanda is an initiative created with the
+              sole aim of bringing like-minded people together
+              through devotional and spiritually inspired music.
+              In a time when people are constantly rushing,
+              stressed, and mentally overwhelmed, this gathering
+              offers a space to slow down, find calm, and reconnect
+              with a sense of positivity.
             </p>
 
             <p>
-              It fosters a supportive community that values mental health and
-              healing through various forms of music, chants, and dance. In
-              essence, Sat-Chit-Ānanda provides a sacred sanctuary where
-              participants can immerse themselves in an uplifting experience,
-              cultivating mindfulness, peace, and inner balance in an intimate
-              setting.
+              It fosters a supportive community that values mental
+              health and healing through various forms of music,
+              chants, and dance. In essence, Sat-Chit-Ānanda
+              provides a sacred sanctuary where participants can
+              immerse themselves in an uplifting experience,
+              cultivating mindfulness, peace, and inner balance in
+              an intimate setting.
             </p>
 
             <p>
-              This initiative is a collective effort by Project Beyond and NRNA
-              to revive the spirit of community and healing through the power
-              of art—offering a space to pause and breathe amid the rush of
-              everyday life.
+              This initiative is a collective effort by Project
+              Beyond and NRNA to revive the spirit of community and
+              healing through the power of art—offering a space to
+              pause and breathe amid the rush of everyday life.
             </p>
           </div>
         </div>
       </section>
 
-      <section id="artists" className="section darkSection">
+      <section
+        id="artists"
+        className="section darkSection"
+      >
         <div className="sectionHeading centered">
-          <p className="sectionEyebrow gold">Featured artists</p>
-          <h2>Voices of the evening</h2>
-          <p>Select an artist to view their profile and introduction.</p>
+          <p className="sectionEyebrow gold">
+            Featured artists
+          </p>
+
+          <h2>
+            Voices of the evening
+          </h2>
+
+          <p>
+            Select an artist to view their profile and introduction.
+          </p>
         </div>
 
         <div className="artistGrid">
@@ -328,8 +401,13 @@ export default function HomePage() {
                 />
               </div>
 
-              <h3>{artist.name}</h3>
-              <p>Kirtan Artist</p>
+              <h3>
+                {artist.name}
+              </h3>
+
+              <p>
+                Kirtan Artist
+              </p>
 
               <span className="artistProfileLink">
                 View Profile →
@@ -339,61 +417,104 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section id="details" className="section detailSection">
+      <section
+        id="details"
+        className="section detailSection"
+      >
         <div className="detailCard">
           <div className="detailIntro">
-            <p className="sectionEyebrow">Event details</p>
-            <h2>Everything you need to know</h2>
+            <p className="sectionEyebrow">
+              Event details
+            </p>
+
+            <h2>
+              Everything you need to know
+            </h2>
 
             <p>
-              Admission is free. Each attendee must complete an individual
-              registration.
+              Admission is free. Each attendee must complete an
+              individual registration.
             </p>
           </div>
 
           <div className="detailList">
             <div className="detailItem">
-              <span>01</span>
+              <span>
+                01
+              </span>
 
               <div>
-                <small>Date</small>
-                <strong>Friday, 14 August 2026</strong>
+                <small>
+                  Date
+                </small>
+
+                <strong>
+                  Friday, 14 August 2026
+                </strong>
               </div>
             </div>
 
             <div className="detailItem">
-              <span>02</span>
+              <span>
+                02
+              </span>
 
               <div>
-                <small>Time</small>
-                <strong>6:45 PM – 9:00 PM</strong>
+                <small>
+                  Time
+                </small>
+
+                <strong>
+                  6:45 PM – 9:00 PM
+                </strong>
               </div>
             </div>
 
             <div className="detailItem">
-              <span>03</span>
+              <span>
+                03
+              </span>
 
               <div>
-                <small>Venue</small>
-                <strong>Granville Community Centre</strong>
+                <small>
+                  Venue
+                </small>
+
+                <strong>
+                  Granville Community Centre
+                </strong>
               </div>
             </div>
 
             <div className="detailItem">
-              <span>04</span>
+              <span>
+                04
+              </span>
 
               <div>
-                <small>Ticket price</small>
-                <strong>$0.00</strong>
+                <small>
+                  Ticket price
+                </small>
+
+                <strong>
+                  $0.00
+                </strong>
               </div>
             </div>
 
             <div className="detailItem">
-              <span>05</span>
+              <span>
+                05
+              </span>
 
               <div>
-                <small>Capacity</small>
-                <strong>150 attendees</strong>
+                <small>
+                  Capacity
+                </small>
+
+                <strong>
+                  150 attendees
+                </strong>
               </div>
             </div>
           </div>
@@ -402,7 +523,9 @@ export default function HomePage() {
 
       <section className="ctaSection">
         <div>
-          <p className="sectionEyebrow gold">Join the gathering</p>
+          <p className="sectionEyebrow gold">
+            Join the gathering
+          </p>
 
           <h2>
             {soldOut
@@ -441,8 +564,13 @@ export default function HomePage() {
 
       <footer className="footer">
         <div>
-          <strong>Sat-Chit-Ānanda</strong>
-          <p>14 August 2026 · Granville Community Centre</p>
+          <strong>
+            Sat-Chit-Ānanda
+          </strong>
+
+          <p>
+            14 August 2026 · Granville Community Centre
+          </p>
         </div>
 
         <div>
@@ -455,7 +583,10 @@ export default function HomePage() {
           </a>
         </div>
 
-        <Link className="adminLink" href="/admin">
+        <Link
+          className="adminLink"
+          href="/admin"
+        >
           Admin Login
         </Link>
       </footer>
