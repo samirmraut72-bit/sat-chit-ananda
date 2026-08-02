@@ -1,4 +1,7 @@
+"use client";
+
 import Link from "next/link";
+import { useEffect, useState } from "react";
 
 const artists = [
   {
@@ -38,7 +41,77 @@ const artists = [
   },
 ];
 
+async function getAvailability() {
+  const response = await fetch("/api/availability", {
+    method: "GET",
+    cache: "no-store",
+  });
+
+  const result = await response.json();
+
+  if (!response.ok) {
+    throw new Error(
+      result.error || "Availability could not be loaded.",
+    );
+  }
+
+  return result;
+}
+
 export default function HomePage() {
+  const [availability, setAvailability] = useState(null);
+  const [availabilityError, setAvailabilityError] = useState("");
+
+  useEffect(() => {
+    let active = true;
+
+    async function loadAvailability() {
+      try {
+        const result = await getAvailability();
+
+        if (active) {
+          setAvailability(result);
+          setAvailabilityError("");
+        }
+      } catch (error) {
+        console.error("Homepage availability error:", error);
+
+        if (active) {
+          setAvailabilityError(
+            "Live availability is temporarily unavailable.",
+          );
+        }
+      }
+    }
+
+    loadAvailability();
+
+    const interval = window.setInterval(
+      loadAvailability,
+      15000,
+    );
+
+    function refreshWhenFocused() {
+      loadAvailability();
+    }
+
+    window.addEventListener("focus", refreshWhenFocused);
+
+    return () => {
+      active = false;
+      window.clearInterval(interval);
+      window.removeEventListener(
+        "focus",
+        refreshWhenFocused,
+      );
+    };
+  }, []);
+
+  const soldOut =
+    availability?.soldOut === true ||
+    availability?.registrationOpen === false ||
+    availability?.available === 0;
+
   return (
     <main>
       <header className="siteHeader">
@@ -128,9 +201,61 @@ export default function HomePage() {
             </div>
           </div>
 
+          <div
+            className={
+              soldOut
+                ? "homeAvailability homeAvailabilitySoldOut"
+                : "homeAvailability"
+            }
+          >
+            <span className="homeAvailabilityPulse" />
+
+            <div>
+              <small>
+                {soldOut
+                  ? "Registration status"
+                  : "Live availability"}
+              </small>
+
+              {availability ? (
+                <strong>
+                  {soldOut
+                    ? "Event Sold Out"
+                    : `Available spots: ${availability.available}`}
+                </strong>
+              ) : (
+                <strong>Checking available spots...</strong>
+              )}
+
+              {availability && !soldOut && (
+                <p>
+                  {availability.registered} registered out of{" "}
+                  {availability.capacity}
+                </p>
+              )}
+
+              {availabilityError && (
+                <p>{availabilityError}</p>
+              )}
+            </div>
+          </div>
+
           <div className="heroActions">
-            <Link className="primaryButton" href="/register">
-              Reserve a Spot
+            <Link
+              className={
+                soldOut
+                  ? "primaryButton soldOutButton"
+                  : "primaryButton"
+              }
+              href={soldOut ? "#" : "/register"}
+              aria-disabled={soldOut}
+              onClick={(event) => {
+                if (soldOut) {
+                  event.preventDefault();
+                }
+              }}
+            >
+              {soldOut ? "Event Sold Out" : "Reserve a Spot"}
             </Link>
 
             <a className="secondaryButton" href="#details">
@@ -139,7 +264,7 @@ export default function HomePage() {
           </div>
 
           <p className="capacityNote">
-            Individual registration required · Maximum capacity 350
+            Individual registration required · Maximum capacity 150
           </p>
         </div>
 
@@ -266,6 +391,15 @@ export default function HomePage() {
                 <strong>$0.00</strong>
               </div>
             </div>
+
+            <div className="detailItem">
+              <span>05</span>
+
+              <div>
+                <small>Capacity</small>
+                <strong>150 attendees</strong>
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -273,12 +407,39 @@ export default function HomePage() {
       <section className="ctaSection">
         <div>
           <p className="sectionEyebrow gold">Join the gathering</p>
-          <h2>Reserve your free place today</h2>
-          <p>One registration reserves one place only.</p>
+
+          <h2>
+            {soldOut
+              ? "All available places have been reserved"
+              : "Reserve your free place today"}
+          </h2>
+
+          <p>
+            {availability && !soldOut
+              ? `${availability.available} places currently available.`
+              : soldOut
+                ? "Registration has reached maximum capacity."
+                : "One registration reserves one place only."}
+          </p>
         </div>
 
-        <Link className="primaryButton" href="/register">
-          Complete Registration
+        <Link
+          className={
+            soldOut
+              ? "primaryButton soldOutButton"
+              : "primaryButton"
+          }
+          href={soldOut ? "#" : "/register"}
+          aria-disabled={soldOut}
+          onClick={(event) => {
+            if (soldOut) {
+              event.preventDefault();
+            }
+          }}
+        >
+          {soldOut
+            ? "Event Sold Out"
+            : "Complete Registration"}
         </Link>
       </section>
 

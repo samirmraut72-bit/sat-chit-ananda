@@ -2527,6 +2527,82 @@ a.artistBackButton:hover {
     max-width: 280px;
   }
 }
+.liveAvailability {
+  display: flex;
+  align-items: flex-start;
+  gap: 13px;
+  margin: 24px 0;
+  padding: 17px 18px;
+  border: 1px solid rgba(242, 182, 50, 0.35);
+  border-radius: 14px;
+  background: rgba(242, 182, 50, 0.08);
+}
+
+.availabilityPulse {
+  width: 10px;
+  height: 10px;
+  flex: 0 0 10px;
+  margin-top: 7px;
+  border-radius: 50%;
+  background: #f2b632;
+  box-shadow: 0 0 0 0 rgba(242, 182, 50, 0.6);
+  animation: availabilityPulseAnimation 1.8s infinite;
+}
+
+.liveAvailability div {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.liveAvailability small {
+  color: rgba(255, 255, 255, 0.65);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.liveAvailability strong {
+  color: #ffffff;
+  font-size: 1.15rem;
+}
+
+.liveAvailability p {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.65);
+  font-size: 0.8rem;
+}
+
+.liveAvailabilitySoldOut {
+  border-color: rgba(220, 80, 80, 0.45);
+  background: rgba(220, 80, 80, 0.1);
+}
+
+.liveAvailabilitySoldOut .availabilityPulse {
+  background: #e16c6c;
+  box-shadow: none;
+  animation: none;
+}
+
+@keyframes availabilityPulseAnimation {
+  0% {
+    box-shadow: 0 0 0 0 rgba(242, 182, 50, 0.55);
+  }
+
+  70% {
+    box-shadow: 0 0 0 9px rgba(242, 182, 50, 0);
+  }
+
+  100% {
+    box-shadow: 0 0 0 0 rgba(242, 182, 50, 0);
+  }
+}
+
+.submitButton:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
 
 .registrationTeamMember strong {
   color: #ffffff;
@@ -2569,5 +2645,98 @@ a.artistBackButton:hover {
   .registrationAdminCredit {
     align-items: center;
     text-align: center;
+  }
+}
+.homeAvailability {
+  display: inline-flex;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 13px;
+  min-width: 270px;
+  margin: 27px auto 2px;
+  padding: 16px 20px;
+  border: 1px solid rgba(242, 182, 50, 0.42);
+  border-radius: 14px;
+  background: rgba(25, 15, 10, 0.62);
+  backdrop-filter: blur(8px);
+  text-align: left;
+}
+
+.homeAvailabilityPulse {
+  width: 10px;
+  height: 10px;
+  flex: 0 0 10px;
+  margin-top: 7px;
+  border-radius: 50%;
+  background: #f2b632;
+  box-shadow: 0 0 0 0 rgba(242, 182, 50, 0.6);
+  animation: homeAvailabilityPulseAnimation 1.8s infinite;
+}
+
+.homeAvailability > div {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.homeAvailability small {
+  color: rgba(255, 255, 255, 0.68);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+.homeAvailability strong {
+  color: #ffffff;
+  font-size: 1.08rem;
+}
+
+.homeAvailability p {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.67);
+  font-size: 0.78rem;
+}
+
+.homeAvailabilitySoldOut {
+  border-color: rgba(225, 108, 108, 0.5);
+  background: rgba(90, 25, 25, 0.45);
+}
+
+.homeAvailabilitySoldOut .homeAvailabilityPulse {
+  background: #e16c6c;
+  box-shadow: none;
+  animation: none;
+}
+
+.soldOutButton {
+  cursor: not-allowed;
+  opacity: 0.58;
+  pointer-events: auto;
+}
+
+@keyframes homeAvailabilityPulseAnimation {
+  0% {
+    box-shadow: 0 0 0 0 rgba(242, 182, 50, 0.55);
+  }
+
+  70% {
+    box-shadow: 0 0 0 9px rgba(242, 182, 50, 0);
+  }
+
+  100% {
+    box-shadow: 0 0 0 0 rgba(242, 182, 50, 0);
+  }
+}
+
+@media (max-width: 600px) {
+  .homeAvailability {
+    width: min(100%, 310px);
+    min-width: 0;
+    padding: 14px 17px;
+  }
+
+  .homeAvailability strong {
+    font-size: 1rem;
   }
 }
