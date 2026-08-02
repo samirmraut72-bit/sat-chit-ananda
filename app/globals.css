@@ -1914,3 +1914,53 @@ td code {
     letter-spacing: 0.04em;
   }
 }
+.nrnaHeaderGroup,
+.nrnaHeaderText,
+.siteHeader .nrnaLogo {
+  display: none !important;
+}
+
+.heroCollaboration {
+  position: relative;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 0 auto 20px;
+}
+
+.heroNrnaLogo {
+  display: block;
+  width: 66px !important;
+  height: 66px !important;
+  max-width: 66px !important;
+  max-height: 66px !important;
+  object-fit: contain;
+  border-radius: 50%;
+}
+
+.heroCollaboration p {
+  margin: 8px 0 0;
+  color: #f2b632;
+  font-size: 0.72rem;
+  font-weight: 700;
+  line-height: 1.35;
+  letter-spacing: 0.06em;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+@media (max-width: 768px) {
+  .heroNrnaLogo {
+    width: 54px !important;
+    height: 54px !important;
+    max-width: 54px !important;
+    max-height: 54px !important;
+  }
+
+  .heroCollaboration p {
+    max-width: 260px;
+    font-size: 0.62rem;
+    letter-spacing: 0.035em;
+  }
+}

@@ -43,18 +43,6 @@ export default function HomePage() {
     <main>
       <header className="siteHeader">
         <Link className="brand" href="/">
-          <div className="nrnaHeaderGroup">
-            <img
-              src="/artists/NRNA.jpg"
-              alt="NRNA logo"
-              className="nrnaLogo"
-            />
-
-            <span className="nrnaHeaderText">
-              NRNA in collaboration with Project Beyond
-            </span>
-          </div>
-
           <span className="brandMark">ॐ</span>
 
           <span className="brandName">
@@ -224,6 +212,7 @@ export default function HomePage() {
 
               <h3>{artist.name}</h3>
               <p>Kirtan Artist</p>
+
               <span className="artistProfileLink">
                 View Profile →
               </span>
