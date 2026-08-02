@@ -2095,3 +2095,52 @@ a.artistBackButton:hover {
     font-size: 0.86rem;
   }
 }
+.registerCollaboration {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  margin: 22px auto 28px;
+  text-align: center;
+}
+
+.registerNrnaLogo {
+  display: block;
+  width: 66px !important;
+  height: 66px !important;
+  max-width: 66px !important;
+  max-height: 66px !important;
+  object-fit: contain;
+  border-radius: 50%;
+}
+
+.registerCollaboration p {
+  margin: 8px 0 0;
+  color: #f2b632;
+  font-size: 0.72rem;
+  font-weight: 700;
+  line-height: 1.35;
+  letter-spacing: 0.06em;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+@media (max-width: 768px) {
+  .registerCollaboration {
+    margin: 18px auto 24px;
+  }
+
+  .registerNrnaLogo {
+    width: 54px !important;
+    height: 54px !important;
+    max-width: 54px !important;
+    max-height: 54px !important;
+  }
+
+  .registerCollaboration p {
+    max-width: 260px;
+    font-size: 0.62rem;
+    letter-spacing: 0.035em;
+  }
+}

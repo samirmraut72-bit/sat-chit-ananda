@@ -53,6 +53,7 @@ export default function RegisterPage() {
       }
 
       setRegistration(result.registration);
+
       window.scrollTo({
         top: 0,
         behavior: "smooth",
@@ -79,14 +80,15 @@ export default function RegisterPage() {
           <h1>Welcome, {registration.fullName}</h1>
 
           <p className="confirmationLead">
-            Your individual place at Sat-Chit-Ananda has been reserved.
+            Your individual place at Sat-Chit-{"\u0100"}nanda has been
+            reserved.
           </p>
 
           <div className="ticket">
             <div className="ticketTop">
               <div>
                 <small>EVENT</small>
-                <strong>Sat-Chit-Ananda</strong>
+                <strong>Sat-Chit-{"\u0100"}nanda</strong>
               </div>
 
               <span className="freeBadge">FREE</span>
@@ -150,6 +152,16 @@ export default function RegisterPage() {
             ← Back to event
           </Link>
 
+          <div className="registerCollaboration">
+            <img
+              src="/artists/NRNA.jpg"
+              alt="NRNA logo"
+              className="registerNrnaLogo"
+            />
+
+            <p>NRNA in collaboration with Project Beyond</p>
+          </div>
+
           <p className="sectionEyebrow gold">Free registration</p>
 
           <h1>Reserve a Spot</h1>
@@ -191,6 +203,7 @@ export default function RegisterPage() {
           <form onSubmit={handleSubmit} noValidate>
             <label>
               <span>Full name</span>
+
               <input
                 name="fullName"
                 value={form.fullName}
@@ -203,6 +216,7 @@ export default function RegisterPage() {
 
             <label>
               <span>Email address</span>
+
               <input
                 name="email"
                 type="email"
@@ -216,6 +230,7 @@ export default function RegisterPage() {
 
             <label>
               <span>Mobile number</span>
+
               <input
                 name="phone"
                 type="tel"
@@ -241,6 +256,7 @@ export default function RegisterPage() {
 
             <label className="honeypot" aria-hidden="true">
               Website
+
               <input
                 name="website"
                 value={form.website}
