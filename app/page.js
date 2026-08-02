@@ -507,12 +507,6 @@ export default function HomePage() {
                 05
               </span>
 
-              <div>
-                <small>
-                  Capacity
-                </small>
-
-              </div>
             </div>
           </div>
         </div>
