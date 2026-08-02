@@ -125,7 +125,7 @@ export default async function TicketPage({ params }) {
           </p>
 
           <p>
-            <strong>Time:</strong> 7:00 PM–9:00 PM
+            <strong>Time:</strong> 6:45 PM–9:00 PM
           </p>
 
           <p>
