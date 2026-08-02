@@ -1964,3 +1964,8 @@ td code {
     letter-spacing: 0.035em;
   }
 }
+.nrnaHeaderGroup,
+.nrnaHeaderText,
+.siteHeader .nrnaLogo {
+  display: none !important;
+}
