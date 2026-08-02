@@ -512,9 +512,6 @@ export default function HomePage() {
                   Capacity
                 </small>
 
-                <strong>
-                  150 attendees
-                </strong>
               </div>
             </div>
           </div>
