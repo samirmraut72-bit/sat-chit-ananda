@@ -1768,3 +1768,6 @@ td code {
     transform: translate(-50%, -50%);
   }
 }
+.heroTitleBreak {
+  display: block;
+}
