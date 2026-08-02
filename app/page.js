@@ -41,17 +41,19 @@ const artists = [
 export default function HomePage() {
   return (
     <main>
-      <div className="collaborationBanner">
-        Presented by NRNA in collaboration with Project Beyond
-      </div>
-
       <header className="siteHeader">
         <Link className="brand" href="/">
-          <img
-            src="/artists/NRNA.jpg"
-            alt="NRNA logo"
-            className="nrnaLogo"
-          />
+          <div className="nrnaHeaderGroup">
+            <img
+              src="/artists/NRNA.jpg"
+              alt="NRNA logo"
+              className="nrnaLogo"
+            />
+
+            <span className="nrnaHeaderText">
+              NRNA in collaboration with Project Beyond
+            </span>
+          </div>
 
           <span className="brandMark">ॐ</span>
 
@@ -94,6 +96,16 @@ export default function HomePage() {
         <div className="heroGlow heroGlowTwo" />
 
         <div className="heroContent">
+          <div className="heroCollaboration">
+            <img
+              src="/artists/NRNA.jpg"
+              alt="NRNA logo"
+              className="heroNrnaLogo"
+            />
+
+            <p>NRNA in collaboration with Project Beyond</p>
+          </div>
+
           <p className="eyebrow">
             An Intimate Kirtan Gathering Session
           </p>
@@ -102,7 +114,9 @@ export default function HomePage() {
 
           <h1>
             Sat-Chit-
-            <span className="heroTitleBreak">{"\u0100nanda"}</span>
+            <span className="heroTitleBreak">
+              {"\u0100nanda"}
+            </span>
           </h1>
 
           <p className="heroText">
@@ -210,7 +224,9 @@ export default function HomePage() {
 
               <h3>{artist.name}</h3>
               <p>Kirtan Artist</p>
-              <span className="artistProfileLink">View Profile →</span>
+              <span className="artistProfileLink">
+                View Profile →
+              </span>
             </Link>
           ))}
         </div>
@@ -291,7 +307,9 @@ export default function HomePage() {
             Samir.m.raut72@gmail.com
           </a>
 
-          <a href="tel:+61415950600">0415 950 600</a>
+          <a href="tel:+61415950600">
+            0415 950 600
+          </a>
         </div>
 
         <Link className="adminLink" href="/admin">
