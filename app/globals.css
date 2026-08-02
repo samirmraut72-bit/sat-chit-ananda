@@ -2144,3 +2144,88 @@ a.artistBackButton:hover {
     letter-spacing: 0.035em;
   }
 }
+.registerCollaboration {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  margin: 22px auto 28px;
+  text-align: center;
+}
+
+.registerNrnaLogo {
+  display: block;
+  width: 66px !important;
+  height: 66px !important;
+  max-width: 66px !important;
+  max-height: 66px !important;
+  object-fit: contain;
+  border-radius: 50%;
+}
+
+.registerCollaboration p {
+  margin: 8px 0 0;
+  color: #f2b632;
+  font-size: 0.72rem;
+  font-weight: 700;
+  line-height: 1.35;
+  letter-spacing: 0.06em;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.registrationCredit {
+  width: 100%;
+  padding: 24px 20px 30px;
+  text-align: center;
+}
+
+.registrationCredit p {
+  margin: 0 0 6px;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.78rem;
+}
+
+.registrationCredit a {
+  color: #f2b632;
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.registrationCredit a:hover {
+  color: #ffffff;
+  text-decoration: underline;
+}
+
+@media (max-width: 768px) {
+  .registerCollaboration {
+    margin: 18px auto 24px;
+  }
+
+  .registerNrnaLogo {
+    width: 54px !important;
+    height: 54px !important;
+    max-width: 54px !important;
+    max-height: 54px !important;
+  }
+
+  .registerCollaboration p {
+    max-width: 260px;
+    font-size: 0.62rem;
+    letter-spacing: 0.035em;
+  }
+
+  .registrationCredit {
+    padding: 20px 14px 26px;
+  }
+
+  .registrationCredit p {
+    font-size: 0.72rem;
+  }
+
+  .registrationCredit a {
+    font-size: 0.76rem;
+  }
+}

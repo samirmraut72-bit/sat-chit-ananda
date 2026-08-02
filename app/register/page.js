@@ -140,6 +140,14 @@ export default function RegisterPage() {
             </Link>
           </div>
         </section>
+
+        <footer className="registrationCredit">
+          <p>Website and registration support by Sameer Raut</p>
+
+          <a href="mailto:Samir.m.raut72@gmail.com">
+            Samir.m.raut72@gmail.com
+          </a>
+        </footer>
       </main>
     );
   }
@@ -248,11 +256,7 @@ export default function RegisterPage() {
               <p>Every attendee must complete their own registration.</p>
             </div>
 
-            <input
-              name="ticketQuantity"
-              type="hidden"
-              value="1"
-            />
+            <input name="ticketQuantity" type="hidden" value="1" />
 
             <label className="honeypot" aria-hidden="true">
               Website
@@ -315,6 +319,14 @@ export default function RegisterPage() {
           </form>
         </div>
       </section>
+
+      <footer className="registrationCredit">
+        <p>Website and registration support by Sameer Raut</p>
+
+        <a href="mailto:Samir.m.raut72@gmail.com">
+          Samir.m.raut72@gmail.com
+        </a>
+      </footer>
     </main>
   );
 }
