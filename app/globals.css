@@ -1774,3 +1774,29 @@ td code {
 .anjuliProfileImage img {
   object-position: center top;
 }
+.siteHeader .brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.siteHeader .nrnaLogo {
+  display: block;
+  width: 52px !important;
+  height: 52px !important;
+  max-width: 52px !important;
+  max-height: 52px !important;
+  object-fit: contain;
+  flex: 0 0 52px;
+  border-radius: 50%;
+}
+
+@media (max-width: 768px) {
+  .siteHeader .nrnaLogo {
+    width: 38px !important;
+    height: 38px !important;
+    max-width: 38px !important;
+    max-height: 38px !important;
+    flex-basis: 38px;
+  }
+}
