@@ -1780,3 +1780,18 @@ td code {
     padding: 10px 14px;
   }
 }
+@media (max-width: 768px) {
+  .hero::before,
+  .hero::after {
+    display: none;
+  }
+
+  .heroFactsCircle {
+    display: block;
+    height: 360px;
+    width: 360px;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+  }
+}
