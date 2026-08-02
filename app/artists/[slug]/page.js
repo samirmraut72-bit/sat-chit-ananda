@@ -34,12 +34,12 @@ Beyond his work as the lead male vocalist for Sat-Chit-Ānanda and a founding me
     role: "Bassist",
     image: "/artists/nischal-bista1.jpg",
     introduction:
-      "Nischal Bista is a featured artist performing at Sat-Chit-Ānanda. His introduction and musical journey will be added soon.",
+      "Nischal Bista’s relationship with music spans over 24 years, anchored by a deep-rooted connection to the bass guitar. Starting at sixteen, learning basic chords while hauling equipment for local bands, Nischal carved out his own path by choosing the low frequencies of the bass over the traditional guitar. Through changing chapters, evolving bands, and life’s unpredictable beats, his instrument has remained a constant anchor. Today, Nischal creates, records, and performs with a voice built on authentic emotion and decades of dedicated storytelling.",
   },
 
   "anjuli-hamal": {
     name: "Anjuli Hamal",
-    role: "Lead Female Vocal",
+    role: "Lead Female Vocal/Harmonium",
     image: "/artists/anjuli-hamal1.jpg",
     introduction:
      `Anjuli Hamal is a vocalist, songwriter, and worship music artist proudly carrying the spirit and stories of Karnali, Nepal. Rooted in her culture and deeply connected to music, she found her calling in expressing emotions, devotion, and life through her voice and songwriting.
