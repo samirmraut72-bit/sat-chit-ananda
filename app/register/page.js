@@ -152,7 +152,7 @@ export default function RegisterPage() {
 
           <p className="sectionEyebrow gold">Free registration</p>
 
-          <h1>Reserve your place</h1>
+          <h1>Reserve a Spot</h1>
 
           <p>
             Each attendee must complete their own individual registration.

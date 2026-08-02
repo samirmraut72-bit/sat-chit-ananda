@@ -2033,3 +2033,23 @@ td code {
     font-size: 0.9rem;
   }
 }
+.artistBackButton {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 22px !important;
+  border: 2px solid #ffffff !important;
+  border-radius: 999px !important;
+  background-color: #ffffff !important;
+  color: #4a1714 !important;
+  font-weight: 800 !important;
+  text-decoration: none !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.28) !important;
+}
+
+.artistBackButton:hover {
+  background-color: #f2b632 !important;
+  border-color: #f2b632 !important;
+  color: #24130f !important;
+  transform: translateY(-2px);
+}
