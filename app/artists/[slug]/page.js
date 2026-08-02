@@ -20,6 +20,7 @@ Whether crafting soaring synth solos, providing rich harmonic backdrops, or impr
     image: "/artists/aadesh1.jpg",
     instagram: "https://www.instagram.com/aadesh_poudel/",
     tiktok: "https://www.tiktok.com/@aadeshpoudel01",
+    spotify: "https://open.spotify.com/artist/6erlKE4IyGIKx8nPDdLTpf",
     introduction: `Aadesh is a Kathmandu-born, Sydney-based singer-songwriter whose sound sits at the intersection of soulful storytelling and deep reflection. His musical journey began at home under the guidance of his mother, laying a rich foundational grounding that he later expanded through years of self-taught exploration across genres.
 
 A seeker and meditator at heart, Aadesh infuses his work with a spiritual depth that makes his versatile voice uniquely his own. After winning over audiences on Nepal Idol, he brought his music to stages across Australia and Nepal, touring and performing alongside notable artists.
@@ -184,6 +185,43 @@ function TikTokIcon() {
   );
 }
 
+function SpotifyIcon() {
+  return (
+    <svg
+      className="spotifySocialIcon"
+      viewBox="0 0 48 48"
+      aria-hidden="true"
+      focusable="false"
+    >
+      <circle cx="24" cy="24" r="22" fill="#1DB954" />
+
+      <path
+        d="M13 18.5c7.7-2.1 17.3-1.3 23.4 2"
+        fill="none"
+        stroke="#111111"
+        strokeWidth="3.5"
+        strokeLinecap="round"
+      />
+
+      <path
+        d="M14.5 24.5c6.8-1.7 14.8-1.1 20.4 1.8"
+        fill="none"
+        stroke="#111111"
+        strokeWidth="3.2"
+        strokeLinecap="round"
+      />
+
+      <path
+        d="M16 30.2c5.7-1.3 12.1-.8 17 1.5"
+        fill="none"
+        stroke="#111111"
+        strokeWidth="3"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
+
 export function generateStaticParams() {
   return Object.keys(artists).map((slug) => ({
     slug,
@@ -270,6 +308,19 @@ export default async function ArtistProfilePage({ params }) {
                 title={`${artist.name} on TikTok`}
               >
                 <TikTokIcon />
+              </a>
+            )}
+
+            {artist.spotify && (
+              <a
+                className="artistSocialIconLink"
+                href={artist.spotify}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={`Open ${artist.name} Spotify`}
+                title={`${artist.name} on Spotify`}
+              >
+                <SpotifyIcon />
               </a>
             )}
           </div>
