@@ -93,7 +93,10 @@ export default function RegisterPage() {
           setAvailabilityError("");
         }
       } catch (loadError) {
-        console.error("Availability loading error:", loadError);
+        console.error(
+          "Availability loading error:",
+          loadError,
+        );
 
         if (active) {
           setAvailabilityError(
@@ -114,11 +117,16 @@ export default function RegisterPage() {
       loadAvailability();
     }
 
-    window.addEventListener("focus", refreshWhenFocused);
+    window.addEventListener(
+      "focus",
+      refreshWhenFocused,
+    );
 
     return () => {
       active = false;
+
       window.clearInterval(interval);
+
       window.removeEventListener(
         "focus",
         refreshWhenFocused,
@@ -148,6 +156,7 @@ export default function RegisterPage() {
       setError(
         "The event has reached its maximum capacity.",
       );
+
       return;
     }
 
@@ -169,12 +178,15 @@ export default function RegisterPage() {
 
       if (!response.ok) {
         throw new Error(
-          result.error || "Registration could not be completed.",
+          result.error ||
+            "Registration could not be completed.",
         );
       }
 
       try {
-        const latestAvailability = await getAvailability();
+        const latestAvailability =
+          await getAvailability();
+
         setAvailability(latestAvailability);
       } catch (availabilityRefreshError) {
         console.error(
@@ -204,7 +216,9 @@ export default function RegisterPage() {
     return (
       <main className="registrationShell">
         <section className="confirmationCard">
-          <div className="successIcon">✓</div>
+          <div className="successIcon">
+            ✓
+          </div>
 
           <p className="sectionEyebrow">
             Registration received
@@ -215,15 +229,17 @@ export default function RegisterPage() {
           </h1>
 
           <p className="confirmationLead">
-            Your place at Sat-Chit-{"\u0100"}nanda has been
-            reserved. Please check your email and verify your
-            address to receive your QR ticket.
+            Your place at Sat-Chit-{"\u0100"}nanda has
+            been reserved. Please check your email and
+            verify your address to receive your QR ticket.
           </p>
 
           <div className="ticket">
             <div className="ticketTop">
               <div>
-                <small>EVENT</small>
+                <small>
+                  EVENT
+                </small>
 
                 <strong>
                   Sat-Chit-{"\u0100"}nanda
@@ -237,35 +253,61 @@ export default function RegisterPage() {
 
             <div className="ticketGrid">
               <div>
-                <small>Date</small>
-                <strong>14 Aug 2026</strong>
+                <small>
+                  Date
+                </small>
+
+                <strong>
+                  14 Aug 2026
+                </strong>
               </div>
 
               <div>
-                <small>Time</small>
-                <strong>7:00–9:00 PM</strong>
+                <small>
+                  Time
+                </small>
+
+                <strong>
+                  6:45–9:00 PM
+                </strong>
               </div>
 
               <div>
-                <small>Reservation</small>
-                <strong>1 attendee</strong>
+                <small>
+                  Reservation
+                </small>
+
+                <strong>
+                  1 attendee
+                </strong>
               </div>
 
               <div>
-                <small>Total</small>
-                <strong>$0.00</strong>
+                <small>
+                  Total
+                </small>
+
+                <strong>
+                  $0.00
+                </strong>
               </div>
             </div>
 
             <div className="ticketCode">
-              <small>REGISTRATION CODE</small>
-              <strong>{registration.code}</strong>
+              <small>
+                REGISTRATION CODE
+              </small>
+
+              <strong>
+                {registration.code}
+              </strong>
             </div>
           </div>
 
           <p className="smallPrint">
-            Please check your inbox and verify your email address.
-            Your QR ticket will be sent after verification.
+            Please check your inbox and verify your email
+            address. Your QR ticket will be sent after
+            verification.
           </p>
 
           <div className="confirmationActions">
@@ -323,8 +365,9 @@ export default function RegisterPage() {
           </h1>
 
           <p>
-            Each attendee must complete their own individual
-            registration. One registration reserves one place only.
+            Each attendee must complete their own
+            individual registration. One registration
+            reserves one place only.
           </p>
 
           <div
@@ -355,22 +398,19 @@ export default function RegisterPage() {
                 </strong>
               )}
 
-              {availability && !soldOut && (
-                <p>
-                  {availability.registered} registered out of{" "}
-                  {availability.capacity}
-                </p>
-              )}
-
               {availabilityError && (
-                <p>{availabilityError}</p>
+                <p>
+                  {availabilityError}
+                </p>
               )}
             </div>
           </div>
 
           <div className="miniDetails">
             <div>
-              <small>Date</small>
+              <small>
+                Date
+              </small>
 
               <strong>
                 Friday, 14 August 2026
@@ -378,31 +418,19 @@ export default function RegisterPage() {
             </div>
 
             <div>
-              <small>Time</small>
+              <small>
+                Time
+              </small>
 
               <strong>
-                7:00 PM – 9:00 PM
+                6:45 PM – 9:00 PM
               </strong>
             </div>
 
             <div>
-              <small>Venue</small>
-
-              <strong>
-                Granville Community Centre
-              </strong>
-            </div>
-
-            <div>
-              <small>Address</small>
-
-              <strong>
-                1 Memorial Drive, Granville NSW 2142
-              </strong>
-            </div>
-
-            <div>
-              <small>Price</small>
+              <small>
+                Price
+              </small>
 
               <strong>
                 Free individual registration
@@ -488,7 +516,8 @@ export default function RegisterPage() {
               </strong>
 
               <p>
-                Every attendee must complete their own registration.
+                Every attendee must complete their own
+                registration.
               </p>
             </div>
 
@@ -523,9 +552,9 @@ export default function RegisterPage() {
               />
 
               <span>
-                I agree that the organiser may use these details
-                for registration confirmation and important event
-                updates.
+                I agree that the organiser may use these
+                details for registration confirmation and
+                important event updates.
               </span>
             </label>
 
@@ -543,8 +572,8 @@ export default function RegisterPage() {
                 className="errorMessage"
                 role="alert"
               >
-                The event has reached its maximum capacity of 150
-                attendees.
+                The event has reached its maximum capacity
+                of 150 attendees.
               </div>
             )}
 
