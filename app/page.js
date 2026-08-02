@@ -1,4 +1,4 @@
-﻿import Link from "next/link";
+import Link from "next/link";
 
 const artists = [
   {
@@ -43,8 +43,11 @@ export default function HomePage() {
     <main>
       <header className="siteHeader">
         <Link className="brand" href="/">
-          <span className="brandMark">à¥</span>
-          <span>Sat-Chit-Ä€nanda</span>
+          <span className="brandMark">ॐ</span>
+          <h1>
+           Sat-Chit-
+           <span className="heroTitleBreak">{"\u0100nanda"}</span>
+          </h1>
         </Link>
 
         <nav className="navLinks" aria-label="Main navigation">
@@ -85,9 +88,9 @@ export default function HomePage() {
             An Intimate Kirtan Gathering Session
           </p>
 
-          <div className="ornament">âœ¦ à¥ âœ¦</div>
+          <div className="ornament">✦ ॐ ✦</div>
 
-          <h1>Sat-Chit-Ä€nanda</h1>
+          <h1>Sat-Chit-Ānanda</h1>
 
           <p className="heroText">
             An evening of sacred sound, collective chanting, stillness and
@@ -104,7 +107,7 @@ export default function HomePage() {
 
             <div className="heroFactCard">
               <span>Time</span>
-              <strong>7:00 PM â€“ 9:00 PM</strong>
+              <strong>7:00 PM – 9:00 PM</strong>
             </div>
 
             <div className="heroFactCard">
@@ -124,11 +127,11 @@ export default function HomePage() {
           </div>
 
           <p className="capacityNote">
-            Individual registration required Â· Maximum capacity 350
+            Individual registration required · Maximum capacity 350
           </p>
         </div>
 
-        <div className="scrollHint">Scroll to discover â†“</div>
+        <div className="scrollHint">Scroll to discover ↓</div>
       </section>
 
       <section
@@ -144,7 +147,7 @@ export default function HomePage() {
 
           <div className="bodyCopy">
             <p>
-              Sat-Chit-Ä€nanda is an initiative created with the sole aim of
+              Sat-Chit-Ānanda is an initiative created with the sole aim of
               bringing like-minded people together through devotional and
               spiritually inspired music. In a time when people are constantly
               rushing, stressed, and mentally overwhelmed, this gathering
@@ -155,7 +158,7 @@ export default function HomePage() {
             <p>
               It fosters a supportive community that values mental health and
               healing through various forms of music, chants, and dance. In
-              essence, Sat-Chit-Ä€nanda provides a sacred sanctuary where
+              essence, Sat-Chit-Ānanda provides a sacred sanctuary where
               participants can immerse themselves in an uplifting experience,
               cultivating mindfulness, peace, and inner balance in an intimate
               setting.
@@ -164,7 +167,7 @@ export default function HomePage() {
             <p>
               This initiative is a collective effort by Project Beyond and NRNA
               to revive the spirit of community and healing through the power
-              of artâ€”offering a space to pause and breathe amid the rush of
+              of art—offering a space to pause and breathe amid the rush of
               everyday life.
             </p>
           </div>
@@ -188,13 +191,13 @@ export default function HomePage() {
               <div className="artistPortrait">
                 <img
                   src={artist.image}
-                  alt={`${artist.name} performing at Sat-Chit-Ä€nanda`}
+                  alt={`${artist.name} performing at Sat-Chit-Ānanda`}
                 />
               </div>
 
               <h3>{artist.name}</h3>
               <p>Kirtan Artist</p>
-              <span className="artistProfileLink">View Profile â†’</span>
+              <span className="artistProfileLink">View Profile →</span>
             </Link>
           ))}
         </div>
@@ -227,7 +230,7 @@ export default function HomePage() {
 
               <div>
                 <small>Time</small>
-                <strong>7:00 PM â€“ 9:00 PM</strong>
+                <strong>7:00 PM – 9:00 PM</strong>
               </div>
             </div>
 
@@ -266,8 +269,8 @@ export default function HomePage() {
 
       <footer className="footer">
         <div>
-          <strong>Sat-Chit-Ä€nanda</strong>
-          <p>14 August 2026 Â· Granville Community Centre</p>
+          <strong>Sat-Chit-Ānanda</strong>
+          <p>14 August 2026 · Granville Community Centre</p>
         </div>
 
         <div>
