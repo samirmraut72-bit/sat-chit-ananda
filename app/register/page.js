@@ -33,7 +33,7 @@ function RegistrationTeamFooter() {
   return (
     <footer className="registrationTeamFooter">
       <div className="registrationTeamMember registrationVenue">
-        <strong>Granville Community Centre</strong>
+        <strong>The Granville Centre</strong>
 
         <a
           href="https://www.google.com/maps/search/?api=1&query=1+Memorial+Drive+Granville+NSW+2142"
