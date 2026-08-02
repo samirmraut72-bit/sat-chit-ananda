@@ -2,24 +2,9 @@ import Link from "next/link";
 
 const artists = [
   {
-    name: "Rozan Subedi",
-    slug: "rozan-subedi",
-    image: "/artists/rozan-subedi.jpg",
-  },
-  {
     name: "Aadesh",
     slug: "aadesh",
     image: "/artists/aadesh.jpg",
-  },
-  {
-    name: "Sabin Ghising",
-    slug: "sabin-ghising",
-    image: "/artists/sabin-ghising.jpg",
-  },
-  {
-    name: "Nischal Bista",
-    slug: "nischal-bista",
-    image: "/artists/nischal-bista.jpg",
   },
   {
     name: "Anjuli Hamal",
@@ -27,9 +12,24 @@ const artists = [
     image: "/artists/anjuli-hamal.jpg",
   },
   {
+    name: "Sabin Ghising",
+    slug: "sabin-ghising",
+    image: "/artists/sabin-ghising.jpg",
+  },
+  {
+    name: "Rozan Subedi",
+    slug: "rozan-subedi",
+    image: "/artists/rozan-subedi.jpg",
+  },
+  {
     name: "Om B Shrestha",
     slug: "om-b-shrestha",
     image: "/artists/om-b-shrestha.jpg",
+  },
+  {
+    name: "Nischal Bista",
+    slug: "nischal-bista",
+    image: "/artists/nischal-bista.jpg",
   },
   {
     name: "Aantariksha Dahal",
@@ -119,7 +119,7 @@ export default function HomePage() {
 
             <div className="heroFactCard">
               <span>Time</span>
-              <strong>6:45 PM – 9:00 PM</strong>
+              <strong>7:00 PM – 9:00 PM</strong>
             </div>
 
             <div className="heroFactCard">
@@ -203,7 +203,7 @@ export default function HomePage() {
               <div className="artistPortrait">
                 <img
                   src={artist.image}
-                  alt={`${artist.name} performing at Sat-Chit-Ānanda`}
+                  alt={`${artist.name} performing at Sat-Chit-\u0100nanda`}
                 />
               </div>
 
