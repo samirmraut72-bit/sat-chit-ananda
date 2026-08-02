@@ -12,6 +12,37 @@ const initialForm = {
   website: "",
 };
 
+function RegistrationTeamFooter() {
+  return (
+    <footer className="registrationTeamFooter">
+      <div className="registrationTeamMember">
+        <strong>Bijay Ghimire (NRNA)</strong>
+        <span>NRNA NSW SCC Treasurer</span>
+
+        <a href="tel:+61432801786">
+          0432 801 786
+        </a>
+      </div>
+
+      <div className="registrationTeamMember">
+        <strong>Bharat Poudel (Event Manager)</strong>
+
+        <a href="tel:+61478930416">
+          0478 930 416
+        </a>
+      </div>
+
+      <div className="registrationTeamMember registrationAdminCredit">
+        <strong>Admin Sameer Raut</strong>
+
+        <a href="mailto:Samir.m.raut72@gmail.com">
+          Samir.m.raut72@gmail.com
+        </a>
+      </div>
+    </footer>
+  );
+}
+
 export default function RegisterPage() {
   const [form, setForm] = useState(initialForm);
   const [error, setError] = useState("");
@@ -75,9 +106,13 @@ export default function RegisterPage() {
         <section className="confirmationCard">
           <div className="successIcon">✓</div>
 
-          <p className="sectionEyebrow">Registration confirmed</p>
+          <p className="sectionEyebrow">
+            Registration confirmed
+          </p>
 
-          <h1>Welcome, {registration.fullName}</h1>
+          <h1>
+            Welcome, {registration.fullName}
+          </h1>
 
           <p className="confirmationLead">
             Your individual place at Sat-Chit-{"\u0100"}nanda has been
@@ -88,10 +123,14 @@ export default function RegisterPage() {
             <div className="ticketTop">
               <div>
                 <small>EVENT</small>
-                <strong>Sat-Chit-{"\u0100"}nanda</strong>
+                <strong>
+                  Sat-Chit-{"\u0100"}nanda
+                </strong>
               </div>
 
-              <span className="freeBadge">FREE</span>
+              <span className="freeBadge">
+                FREE
+              </span>
             </div>
 
             <div className="ticketGrid">
@@ -135,19 +174,16 @@ export default function RegisterPage() {
               Print Confirmation
             </button>
 
-            <Link className="secondaryButton" href="/">
+            <Link
+              className="secondaryButton"
+              href="/"
+            >
               Return Home
             </Link>
           </div>
         </section>
 
-        <footer className="registrationCredit">
-          <p>Website and registration support by Sameer Raut</p>
-
-          <a href="mailto:Samir.m.raut72@gmail.com">
-            Samir.m.raut72@gmail.com
-          </a>
-        </footer>
+        <RegistrationTeamFooter />
       </main>
     );
   }
@@ -156,7 +192,10 @@ export default function RegisterPage() {
     <main className="registrationShell">
       <section className="registrationLayout">
         <aside className="registrationInfo">
-          <Link className="backLink" href="/">
+          <Link
+            className="backLink"
+            href="/"
+          >
             ← Back to event
           </Link>
 
@@ -167,12 +206,18 @@ export default function RegisterPage() {
               className="registerNrnaLogo"
             />
 
-            <p>NRNA in collaboration with Project Beyond</p>
+            <p>
+              NRNA in collaboration with Project Beyond
+            </p>
           </div>
 
-          <p className="sectionEyebrow gold">Free registration</p>
+          <p className="sectionEyebrow gold">
+            Free registration
+          </p>
 
-          <h1>Reserve a Spot</h1>
+          <h1>
+            Reserve a Spot
+          </h1>
 
           <p>
             Each attendee must complete their own individual registration.
@@ -182,35 +227,53 @@ export default function RegisterPage() {
           <div className="miniDetails">
             <div>
               <small>Date</small>
-              <strong>Friday, 14 August 2026</strong>
+              <strong>
+                Friday, 14 August 2026
+              </strong>
             </div>
 
             <div>
               <small>Time</small>
-              <strong>7:00 PM – 9:00 PM</strong>
+              <strong>
+                7:00 PM – 9:00 PM
+              </strong>
             </div>
 
             <div>
               <small>Venue</small>
-              <strong>Granville Community Centre</strong>
+              <strong>
+                Granville Community Centre
+              </strong>
             </div>
 
             <div>
               <small>Price</small>
-              <strong>Free individual registration</strong>
+              <strong>
+                Free individual registration
+              </strong>
             </div>
           </div>
         </aside>
 
         <div className="formCard">
           <div className="formHeading">
-            <p>Attendee details</p>
-            <span>Live registration</span>
+            <p>
+              Attendee details
+            </p>
+
+            <span>
+              Live registration
+            </span>
           </div>
 
-          <form onSubmit={handleSubmit} noValidate>
+          <form
+            onSubmit={handleSubmit}
+            noValidate
+          >
             <label>
-              <span>Full name</span>
+              <span>
+                Full name
+              </span>
 
               <input
                 name="fullName"
@@ -223,7 +286,9 @@ export default function RegisterPage() {
             </label>
 
             <label>
-              <span>Email address</span>
+              <span>
+                Email address
+              </span>
 
               <input
                 name="email"
@@ -237,7 +302,9 @@ export default function RegisterPage() {
             </label>
 
             <label>
-              <span>Mobile number</span>
+              <span>
+                Mobile number
+              </span>
 
               <input
                 name="phone"
@@ -251,14 +318,29 @@ export default function RegisterPage() {
             </label>
 
             <div className="singleReservationNotice">
-              <span>Reservation</span>
-              <strong>1 attendee</strong>
-              <p>Every attendee must complete their own registration.</p>
+              <span>
+                Reservation
+              </span>
+
+              <strong>
+                1 attendee
+              </strong>
+
+              <p>
+                Every attendee must complete their own registration.
+              </p>
             </div>
 
-            <input name="ticketQuantity" type="hidden" value="1" />
+            <input
+              name="ticketQuantity"
+              type="hidden"
+              value="1"
+            />
 
-            <label className="honeypot" aria-hidden="true">
+            <label
+              className="honeypot"
+              aria-hidden="true"
+            >
               Website
 
               <input
@@ -285,25 +367,43 @@ export default function RegisterPage() {
             </label>
 
             {error && (
-              <div className="errorMessage" role="alert">
+              <div
+                className="errorMessage"
+                role="alert"
+              >
                 {error}
               </div>
             )}
 
             <div className="orderSummary">
               <div>
-                <span>Ticket price</span>
-                <strong>$0.00</strong>
+                <span>
+                  Ticket price
+                </span>
+
+                <strong>
+                  $0.00
+                </strong>
               </div>
 
               <div>
-                <span>Reservation</span>
-                <strong>1 attendee</strong>
+                <span>
+                  Reservation
+                </span>
+
+                <strong>
+                  1 attendee
+                </strong>
               </div>
 
               <div className="orderTotal">
-                <span>Total</span>
-                <strong>$0.00</strong>
+                <span>
+                  Total
+                </span>
+
+                <strong>
+                  $0.00
+                </strong>
               </div>
             </div>
 
@@ -320,13 +420,7 @@ export default function RegisterPage() {
         </div>
       </section>
 
-      <footer className="registrationCredit">
-        <p>Website and registration support by Sameer Raut</p>
-
-        <a href="mailto:Samir.m.raut72@gmail.com">
-          Samir.m.raut72@gmail.com
-        </a>
-      </footer>
+      <RegistrationTeamFooter />
     </main>
   );
 }

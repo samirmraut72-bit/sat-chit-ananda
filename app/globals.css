@@ -2427,3 +2427,62 @@ a.artistBackButton:hover {
     height: 33px;
   }
 }
+.registrationTeamFooter {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  width: min(1100px, calc(100% - 40px));
+  margin: 30px auto 0;
+  padding: 24px 28px 30px;
+  border-top: 1px solid rgba(242, 182, 50, 0.3);
+  gap: 28px;
+}
+
+.registrationTeamMember {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.registrationTeamMember strong {
+  color: #ffffff;
+  font-size: 0.9rem;
+}
+
+.registrationTeamMember span {
+  color: rgba(255, 255, 255, 0.62);
+  font-size: 0.76rem;
+}
+
+.registrationTeamMember a {
+  color: #f2b632;
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.registrationTeamMember a:hover {
+  color: #ffffff;
+  text-decoration: underline;
+}
+
+.registrationAdminCredit {
+  align-items: flex-end;
+  text-align: right;
+}
+
+@media (max-width: 768px) {
+  .registrationTeamFooter {
+    grid-template-columns: 1fr;
+    width: calc(100% - 28px);
+    margin-top: 24px;
+    padding: 22px 14px 28px;
+    gap: 22px;
+    text-align: center;
+  }
+
+  .registrationTeamMember,
+  .registrationAdminCredit {
+    align-items: center;
+    text-align: center;
+  }
+}
