@@ -15,6 +15,18 @@ const initialForm = {
 function RegistrationTeamFooter() {
   return (
     <footer className="registrationTeamFooter">
+      <div className="registrationTeamMember registrationVenue">
+        <strong>Granville Community Centre</strong>
+
+        <a
+          href="https://www.google.com/maps/search/?api=1&query=1+Memorial+Drive+Granville+NSW+2142"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          1 Memorial Drive, Granville NSW 2142
+        </a>
+      </div>
+
       <div className="registrationTeamMember">
         <strong>Bijay Ghimire (NRNA)</strong>
         <span>NRNA NSW SCC Treasurer</span>
@@ -123,6 +135,7 @@ export default function RegisterPage() {
             <div className="ticketTop">
               <div>
                 <small>EVENT</small>
+
                 <strong>
                   Sat-Chit-{"\u0100"}nanda
                 </strong>
@@ -227,6 +240,7 @@ export default function RegisterPage() {
           <div className="miniDetails">
             <div>
               <small>Date</small>
+
               <strong>
                 Friday, 14 August 2026
               </strong>
@@ -234,6 +248,7 @@ export default function RegisterPage() {
 
             <div>
               <small>Time</small>
+
               <strong>
                 7:00 PM – 9:00 PM
               </strong>
@@ -241,13 +256,23 @@ export default function RegisterPage() {
 
             <div>
               <small>Venue</small>
+
               <strong>
                 Granville Community Centre
               </strong>
             </div>
 
             <div>
+              <small>Address</small>
+
+              <strong>
+                1 Memorial Drive, Granville NSW 2142
+              </strong>
+            </div>
+
+            <div>
               <small>Price</small>
+
               <strong>
                 Free individual registration
               </strong>

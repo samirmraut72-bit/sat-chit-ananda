@@ -2442,6 +2442,91 @@ a.artistBackButton:hover {
   flex-direction: column;
   gap: 6px;
 }
+.registrationTeamFooter {
+  display: grid;
+  grid-template-columns: 1.3fr 1fr 1fr 1fr;
+  width: min(1250px, calc(100% - 40px));
+  margin: 30px auto 0;
+  padding: 24px 28px 30px;
+  border-top: 1px solid rgba(242, 182, 50, 0.3);
+  gap: 28px;
+}
+
+.registrationTeamMember {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.registrationTeamMember strong {
+  color: #ffffff;
+  font-size: 0.9rem;
+}
+
+.registrationTeamMember span {
+  color: rgba(255, 255, 255, 0.62);
+  font-size: 0.76rem;
+}
+
+.registrationTeamMember a {
+  color: #f2b632;
+  font-size: 0.82rem;
+  font-weight: 700;
+  line-height: 1.45;
+  text-decoration: none;
+}
+
+.registrationTeamMember a:hover {
+  color: #ffffff;
+  text-decoration: underline;
+}
+
+.registrationVenue {
+  align-items: flex-start;
+  text-align: left;
+}
+
+.registrationVenue a {
+  max-width: 235px;
+}
+
+.registrationAdminCredit {
+  align-items: flex-end;
+  text-align: right;
+}
+
+@media (max-width: 950px) {
+  .registrationTeamFooter {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .registrationAdminCredit {
+    align-items: flex-start;
+    text-align: left;
+  }
+}
+
+@media (max-width: 600px) {
+  .registrationTeamFooter {
+    grid-template-columns: 1fr;
+    width: calc(100% - 28px);
+    margin-top: 24px;
+    padding: 22px 14px 28px;
+    gap: 22px;
+    text-align: center;
+  }
+
+  .registrationTeamMember,
+  .registrationVenue,
+  .registrationAdminCredit {
+    align-items: center;
+    text-align: center;
+  }
+
+  .registrationVenue a {
+    max-width: 280px;
+  }
+}
 
 .registrationTeamMember strong {
   color: #ffffff;
