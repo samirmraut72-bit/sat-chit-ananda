@@ -12,7 +12,7 @@ const artists = {
 
   aadesh: {
     name: "Aadesh",
-    role: "Singer/Song-writer",
+    role: "Lead Male Vocal",
     image: "/artists/aadesh1.jpg",
     introduction: `Aadesh is a Kathmandu-born, Sydney-based singer-songwriter whose sound sits at the intersection of soulful storytelling and deep reflection. His musical journey began at home under the guidance of his mother, laying a rich foundational grounding that he later expanded through years of self-taught exploration across genres.
 
@@ -31,7 +31,7 @@ Beyond his work as the lead male vocalist for Sat-Chit-Ānanda and a founding me
 
   "nischal-bista": {
     name: "Nischal Bista",
-    role: "Kirtan Artist",
+    role: "Bassist",
     image: "/artists/nischal-bista1.jpg",
     introduction:
       "Nischal Bista is a featured artist performing at Sat-Chit-Ānanda. His introduction and musical journey will be added soon.",
@@ -39,7 +39,7 @@ Beyond his work as the lead male vocalist for Sat-Chit-Ānanda and a founding me
 
   "anjuli-hamal": {
     name: "Anjuli Hamal",
-    role: "Kirtan Artist",
+    role: "Lead Female Vocal",
     image: "/artists/anjuli-hamal1.jpg",
     introduction:
       "Anjuli Hamal is a featured artist performing at Sat-Chit-Ānanda. Her introduction and musical journey will be added soon.",
@@ -60,7 +60,7 @@ Currently performing with Project Beyond, Omchaa Drums continues to explore new 
 
   "aantariksha-dahal": {
     name: "Aantariksha Dahal",
-    role: "Kirtan Artist",
+    role: "Guitarist",
     image: "/artists/aantariksha-dahal1.jpg",
     introduction:
       
