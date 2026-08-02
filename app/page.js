@@ -130,7 +130,7 @@ export default function HomePage() {
 
           <div className="heroActions">
             <Link className="primaryButton" href="/register">
-              Reserve Your Place
+              Reserve a Spot
             </Link>
 
             <a className="secondaryButton" href="#details">
