@@ -43,7 +43,6 @@ export default function HomePage() {
     <main>
       <header className="siteHeader">
         <Link className="brand" href="/">
-
           <span className="brandMark">ॐ</span>
           <span>Sat-Chit-Ānanda</span>
         </Link>
