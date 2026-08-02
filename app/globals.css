@@ -1592,3 +1592,191 @@ td code {
     0 2px 6px rgba(0, 0, 0, 0.95),
     0 1px 2px rgba(0, 0, 0, 1);
 }
+/* Homepage navigation additions */
+
+.adminNavLink {
+  color: rgba(255, 255, 255, 0.82);
+}
+
+.mobileHeaderActions {
+  display: none;
+}
+
+/* Decorative circle centred behind the event information */
+
+.heroFacts {
+  overflow: visible;
+  position: relative;
+}
+
+.heroFactsCircle {
+  background: transparent !important;
+  border: 1px solid rgba(232, 173, 58, 0.38) !important;
+  border-radius: 50%;
+  height: 390px;
+  left: 50%;
+  padding: 0 !important;
+  pointer-events: none;
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 390px;
+  z-index: 0;
+}
+
+.heroFactCard {
+  position: relative;
+  z-index: 1;
+}
+
+/* Mobile homepage header and event cards */
+
+@media (max-width: 768px) {
+  .siteHeader {
+    align-items: center;
+    gap: 12px;
+    padding: 13px 14px;
+  }
+
+  .brand {
+    flex-shrink: 0;
+    font-size: 15px;
+    gap: 8px;
+  }
+
+  .brandMark {
+    height: 34px;
+    width: 34px;
+  }
+
+  .navLinks {
+    display: none;
+  }
+
+  .mobileHeaderActions {
+    align-items: center;
+    display: flex;
+    gap: 6px;
+    margin-left: auto;
+  }
+
+  .mobileHeaderButton,
+  .mobileRegisterButton {
+    align-items: center;
+    border-radius: 999px;
+    display: inline-flex;
+    font-size: 11px;
+    font-weight: 700;
+    justify-content: center;
+    min-height: 34px;
+    padding: 0 10px;
+    white-space: nowrap;
+  }
+
+  .mobileHeaderButton {
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: rgba(255, 255, 255, 0.9);
+  }
+
+  .mobileRegisterButton {
+    border: 1px solid var(--gold);
+    color: var(--gold-light);
+  }
+
+  .hero {
+    min-height: auto;
+    padding-bottom: 80px;
+    padding-top: 145px;
+  }
+
+  .heroFacts {
+    display: grid;
+    gap: 12px;
+    grid-template-columns: 1fr;
+    margin-top: 45px;
+    overflow: visible;
+    position: relative;
+  }
+
+  .heroFactsCircle {
+    height: 390px;
+    left: 50%;
+    top: 50%;
+    width: 390px;
+  }
+
+  .heroFactCard {
+    background: rgba(255, 255, 255, 0.07);
+    border: 1px solid rgba(255, 255, 255, 0.17);
+    min-height: 138px;
+    padding: 28px 18px;
+  }
+}
+
+@media (max-width: 430px) {
+  .siteHeader {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+
+  .brand {
+    font-size: 14px;
+  }
+
+  .brandMark {
+    height: 32px;
+    width: 32px;
+  }
+
+  .mobileHeaderActions {
+    gap: 4px;
+  }
+
+  .mobileHeaderButton,
+  .mobileRegisterButton {
+    font-size: 10px;
+    min-height: 32px;
+    padding: 0 8px;
+  }
+
+  .heroFactsCircle {
+    height: 350px;
+    width: 350px;
+  }
+}
+
+@media (max-width: 370px) {
+  .brand > span:last-child {
+    max-width: 92px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .mobileHeaderButton,
+  .mobileRegisterButton {
+    padding: 0 7px;
+  }
+}
+.artistBackButton {
+  align-items: center;
+  color: #7a3f2b;
+  display: inline-flex;
+  font-size: 14px;
+  font-weight: 800;
+  margin-bottom: 28px;
+  width: fit-content;
+}
+
+.artistBackButton:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 768px) {
+  .artistBackButton {
+    background: #f2e5d6;
+    border-radius: 999px;
+    margin-bottom: 24px;
+    padding: 10px 14px;
+  }
+}

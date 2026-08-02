@@ -52,10 +52,28 @@ export default function HomePage() {
           <a href="#artists">Artists</a>
           <a href="#details">Details</a>
 
+          <Link className="adminNavLink" href="/admin">
+            Admin Login
+          </Link>
+
           <Link className="navButton" href="/register">
             Register
           </Link>
         </nav>
+
+        <div className="mobileHeaderActions">
+          <a className="mobileHeaderButton" href="#artists">
+            Artists
+          </a>
+
+          <Link className="mobileHeaderButton" href="/admin">
+            Admin
+          </Link>
+
+          <Link className="mobileRegisterButton" href="/register">
+            Register
+          </Link>
+        </div>
       </header>
 
       <section className="hero">
@@ -77,17 +95,19 @@ export default function HomePage() {
           </p>
 
           <div className="heroFacts">
-            <div>
+            <div className="heroFactsCircle" aria-hidden="true" />
+
+            <div className="heroFactCard">
               <span>Date</span>
               <strong>Friday, 14 August 2026</strong>
             </div>
 
-            <div>
+            <div className="heroFactCard">
               <span>Time</span>
               <strong>7:00 PM – 9:00 PM</strong>
             </div>
 
-            <div>
+            <div className="heroFactCard">
               <span>Entry</span>
               <strong>Free Registration</strong>
             </div>
@@ -111,41 +131,45 @@ export default function HomePage() {
         <div className="scrollHint">Scroll to discover ↓</div>
       </section>
 
-<section id="about" className="section lightSection aboutBackgroundSection">
-  <div className="aboutBackgroundOverlay" />
+      <section
+        id="about"
+        className="section lightSection aboutBackgroundSection"
+      >
+        <div className="aboutBackgroundOverlay" />
 
-  <div className="sectionGrid aboutBackgroundContent">
-    <div>
+        <div className="sectionGrid aboutBackgroundContent">
+          <div>
+            <h2>A shared journey through mantra and music</h2>
+          </div>
 
-      <h2>A shared journey through mantra and music</h2>
-    </div>
+          <div className="bodyCopy">
+            <p>
+              Sat-Chit-Ānanda is an initiative created with the sole aim of
+              bringing like-minded people together through devotional and
+              spiritually inspired music. In a time when people are constantly
+              rushing, stressed, and mentally overwhelmed, this gathering
+              offers a space to slow down, find calm, and reconnect with a
+              sense of positivity.
+            </p>
 
-    <div className="bodyCopy">
-      <p>
-        Sat-Chit-Ānanda is an initiative created with the sole aim of bringing
-        like-minded people together through devotional and spiritually inspired
-        music. In a time when people are constantly rushing, stressed, and
-        mentally overwhelmed, this gathering offers a space to slow down, find
-        calm, and reconnect with a sense of positivity.
-      </p>
+            <p>
+              It fosters a supportive community that values mental health and
+              healing through various forms of music, chants, and dance. In
+              essence, Sat-Chit-Ānanda provides a sacred sanctuary where
+              participants can immerse themselves in an uplifting experience,
+              cultivating mindfulness, peace, and inner balance in an intimate
+              setting.
+            </p>
 
-      <p>
-        It fosters a supportive community that values mental health and healing
-        through various forms of music, chants, and dance. In essence,
-        Sat-Chit-Ānanda provides a sacred sanctuary where participants can
-        immerse themselves in an uplifting experience, cultivating mindfulness,
-        peace, and inner balance in an intimate setting.
-      </p>
-
-      <p>
-        This initiative is a collective effort by Project Beyond and NRNA to
-        revive the spirit of community and healing through the power of
-        art—offering a space to pause and breathe amid the rush of everyday
-        life.
-      </p>
-    </div>
-  </div>
-</section>
+            <p>
+              This initiative is a collective effort by Project Beyond and NRNA
+              to revive the spirit of community and healing through the power
+              of art—offering a space to pause and breathe amid the rush of
+              everyday life.
+            </p>
+          </div>
+        </div>
+      </section>
 
       <section id="artists" className="section darkSection">
         <div className="sectionHeading centered">
@@ -255,7 +279,7 @@ export default function HomePage() {
         </div>
 
         <Link className="adminLink" href="/admin">
-          Admin
+          Admin Login
         </Link>
       </footer>
     </main>
