@@ -107,11 +107,11 @@ async function sendVerificationEmail({
               </p>
 
               <p style="margin:6px 0;font-size:15px;">
-                <strong>Time:</strong> 7:00 PM–9:00 PM
+                <strong>Time:</strong> 6:45 PM–9:00 PM
               </p>
 
               <p style="margin:6px 0;font-size:15px;">
-                <strong>Venue:</strong> Granville Community Centre
+                <strong>Venue:</strong> The Granville Centre
               </p>
             </div>
 
@@ -145,7 +145,10 @@ async function sendVerificationEmail({
 
   if (!response.ok) {
     const resendError = await response.text();
-    throw new Error(`Resend email error: ${resendError}`);
+
+    throw new Error(
+      `Resend email error: ${resendError}`,
+    );
   }
 
   return response.json();
@@ -167,8 +170,10 @@ export async function POST(request) {
         fullName: "Please enter your full name.",
         email: "Please enter a valid email address.",
         phone: "Please enter a valid mobile number.",
-        ticketQuantity: "Only one place can be reserved per registration.",
-        consent: "Please accept the registration agreement.",
+        ticketQuantity:
+          "Only one place can be reserved per registration.",
+        consent:
+          "Please accept the registration agreement.",
       };
 
       const field = issue?.path?.[0];
@@ -179,7 +184,9 @@ export async function POST(request) {
             friendlyMessages[field] ||
             "Please check the information and try again.",
         },
-        { status: 400 },
+        {
+          status: 400,
+        },
       );
     }
 
@@ -192,25 +199,42 @@ export async function POST(request) {
 
     const supabase = createAdminClient();
 
-    const registrationCode = makeRegistrationCode();
-    const verificationToken = makeVerificationToken();
+    const registrationCode =
+      makeRegistrationCode();
+
+    const verificationToken =
+      makeVerificationToken();
+
     const verificationExpiresAt = new Date(
       Date.now() + 24 * 60 * 60 * 1000,
     ).toISOString();
 
-    const email = parsed.data.email.toLowerCase();
+    const email =
+      parsed.data.email.toLowerCase();
 
-    const { data, error } = await supabase.rpc("register_for_event", {
-      p_event_slug: "sat-chit-ananda-2026",
-      p_registration_code: registrationCode,
-      p_full_name: parsed.data.fullName,
-      p_email: email,
-      p_phone: parsed.data.phone,
-      p_ticket_quantity: 1,
-    });
+    const { data, error } = await supabase.rpc(
+      "register_for_event",
+      {
+        p_event_slug:
+          "sat-chit-ananda-2026",
+        p_registration_code:
+          registrationCode,
+        p_full_name:
+          parsed.data.fullName,
+        p_email:
+          email,
+        p_phone:
+          parsed.data.phone,
+        p_ticket_quantity:
+          1,
+      },
+    );
 
     if (error) {
-      console.error("Registration database error:", error);
+      console.error(
+        "Registration database error:",
+        error,
+      );
 
       if (error.code === "23505") {
         return NextResponse.json(
@@ -218,97 +242,150 @@ export async function POST(request) {
             error:
               "This email address or mobile number has already been registered.",
           },
-          { status: 409 },
+          {
+            status: 409,
+          },
         );
       }
 
-      if (error.message.includes("ONE_RESERVATION_ONLY")) {
+      if (
+        error.message.includes(
+          "ONE_RESERVATION_ONLY",
+        )
+      ) {
         return NextResponse.json(
           {
-            error: "Only one place can be reserved per registration.",
+            error:
+              "Only one place can be reserved per registration.",
           },
-          { status: 400 },
+          {
+            status: 400,
+          },
         );
       }
 
-      if (error.message.includes("CAPACITY_EXCEEDED")) {
+      if (
+        error.message.includes(
+          "CAPACITY_EXCEEDED",
+        )
+      ) {
         return NextResponse.json(
           {
-            error: "The event has reached its maximum capacity.",
+            error:
+              "The event has reached its maximum capacity.",
           },
-          { status: 409 },
+          {
+            status: 409,
+          },
         );
       }
 
-      if (error.message.includes("REGISTRATION_CLOSED")) {
+      if (
+        error.message.includes(
+          "REGISTRATION_CLOSED",
+        )
+      ) {
         return NextResponse.json(
           {
-            error: "Registration is currently closed.",
+            error:
+              "Registration is currently closed.",
           },
-          { status: 409 },
+          {
+            status: 409,
+          },
         );
       }
 
       return NextResponse.json(
         {
-          error: "Registration could not be completed. Please try again.",
+          error:
+            "Registration could not be completed. Please try again.",
         },
-        { status: 500 },
+        {
+          status: 500,
+        },
       );
     }
 
-    const result = Array.isArray(data) ? data[0] : data;
+    const result = Array.isArray(data)
+      ? data[0]
+      : data;
 
     const { error: tokenError } = await supabase
       .from("registrations")
       .update({
         email_verified: false,
-        verification_token: verificationToken,
-        verification_expires_at: verificationExpiresAt,
+        verification_token:
+          verificationToken,
+        verification_expires_at:
+          verificationExpiresAt,
         qr_token: null,
       })
-      .eq("registration_code", registrationCode);
+      .eq(
+        "registration_code",
+        registrationCode,
+      );
 
     if (tokenError) {
-      console.error("Verification token database error:", tokenError);
+      console.error(
+        "Verification token database error:",
+        tokenError,
+      );
 
       await supabase
         .from("registrations")
         .delete()
-        .eq("registration_code", registrationCode);
+        .eq(
+          "registration_code",
+          registrationCode,
+        );
 
       return NextResponse.json(
         {
-          error: "Registration could not be prepared for verification.",
+          error:
+            "Registration could not be prepared for verification.",
         },
-        { status: 500 },
+        {
+          status: 500,
+        },
       );
     }
 
     const verificationUrl =
       `https://satchitananda.com.au/api/verify-email?token=` +
-      encodeURIComponent(verificationToken);
+      encodeURIComponent(
+        verificationToken,
+      );
 
     try {
       await sendVerificationEmail({
         email,
-        fullName: parsed.data.fullName,
+        fullName:
+          parsed.data.fullName,
         verificationUrl,
       });
     } catch (emailError) {
-      console.error("Verification email error:", emailError);
+      console.error(
+        "Verification email error:",
+        emailError,
+      );
 
       await supabase
         .from("registrations")
         .delete()
-        .eq("registration_code", registrationCode);
+        .eq(
+          "registration_code",
+          registrationCode,
+        );
 
       return NextResponse.json(
         {
           error:
             "We could not send the verification email. Please try again.",
         },
-        { status: 500 },
+        {
+          status: 500,
+        },
       );
     }
 
@@ -316,21 +393,30 @@ export async function POST(request) {
       success: true,
       verificationPending: true,
       registration: {
-        code: result.registration_code,
-        fullName: result.full_name,
-        ticketQuantity: 1,
+        code:
+          result.registration_code,
+        fullName:
+          result.full_name,
+        ticketQuantity:
+          1,
       },
       message:
         "Thank you for registering. Please check your email and verify your address to receive your QR ticket.",
     });
   } catch (error) {
-    console.error("Unexpected registration error:", error);
+    console.error(
+      "Unexpected registration error:",
+      error,
+    );
 
     return NextResponse.json(
       {
-        error: "An unexpected error occurred. Please try again.",
+        error:
+          "An unexpected error occurred. Please try again.",
       },
-      { status: 500 },
+      {
+        status: 500,
+      },
     );
   }
 }
