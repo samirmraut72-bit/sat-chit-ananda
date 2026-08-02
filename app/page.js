@@ -566,7 +566,7 @@ export default function HomePage() {
           </strong>
 
           <p>
-            14 August 2026 · Granville Community Centre
+            14 August 2026 · The Granville Centre
           </p>
         </div>
 
