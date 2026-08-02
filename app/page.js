@@ -192,7 +192,7 @@ export default function HomePage() {
 
             <div className="heroFactCard">
               <span>Time</span>
-              <strong>7:00 PM – 9:00 PM</strong>
+              <strong>6:45 PM – 9:00 PM</strong>
             </div>
 
             <div className="heroFactCard">
@@ -227,12 +227,8 @@ export default function HomePage() {
                 <strong>Checking available spots...</strong>
               )}
 
-              {availability && !soldOut && (
-                <p>
-                  {availability.registered} registered out of{" "}
-                  {availability.capacity}
-                </p>
-              )}
+              <div
+	
 
               {availabilityError && (
                 <p>{availabilityError}</p>
@@ -264,7 +260,7 @@ export default function HomePage() {
           </div>
 
           <p className="capacityNote">
-            Individual registration required · Maximum capacity 150
+            Individual registration required.
           </p>
         </div>
 
@@ -370,7 +366,7 @@ export default function HomePage() {
 
               <div>
                 <small>Time</small>
-                <strong>7:00 PM – 9:00 PM</strong>
+                <strong>6:45 PM – 9:00 PM</strong>
               </div>
             </div>
 
