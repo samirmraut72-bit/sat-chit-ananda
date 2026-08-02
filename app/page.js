@@ -100,11 +100,8 @@ export default function HomePage() {
 
           <div className="ornament">✦ ॐ ✦</div>
 
-          <h1>
-            Sat-Chit-
-            <span className="heroTitleBreak">
-              {"\u0100nanda"}
-            </span>
+          <h1 className="heroTitle">
+            Sat-Chit-{"\u0100"}nanda
           </h1>
 
           <p className="heroText">
