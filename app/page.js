@@ -119,7 +119,7 @@ export default function HomePage() {
 
             <div className="heroFactCard">
               <span>Time</span>
-              <strong>7:00 PM – 9:00 PM</strong>
+              <strong>6:45 PM – 9:00 PM</strong>
             </div>
 
             <div className="heroFactCard">
