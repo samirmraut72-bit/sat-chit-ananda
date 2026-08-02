@@ -481,7 +481,7 @@ export default function HomePage() {
                 </small>
 
                 <strong>
-                  Granville Community Centre
+                  The Granville Centre
                 </strong>
               </div>
             </div>
