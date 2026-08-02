@@ -32,7 +32,9 @@ export default async function TicketPage({ params }) {
     notFound();
   }
 
-  const ticketUrl = `https://satchitananda.com.au/ticket/${registration.qr_token}`;
+  const ticketUrl =
+    `https://satchitananda.com.au/ticket/` +
+    registration.qr_token;
 
   const qrCode = await QRCode.toDataURL(ticketUrl, {
     width: 320,
@@ -77,7 +79,7 @@ export default async function TicketPage({ params }) {
             color: "#29231f",
           }}
         >
-          Sat-Chit-Ānanda
+          Sat-Chit-{"\u0100"}nanda
         </h1>
 
         <p
@@ -92,7 +94,7 @@ export default async function TicketPage({ params }) {
 
         <img
           src={qrCode}
-          alt="Sat-Chit-Ānanda QR ticket"
+          alt="Sat-Chit-Ananda QR ticket"
           width="320"
           height="320"
           style={{
@@ -112,7 +114,8 @@ export default async function TicketPage({ params }) {
           }}
         >
           <p>
-            <strong>Name:</strong> {registration.full_name}
+            <strong>Name:</strong>{" "}
+            {registration.full_name}
           </p>
 
           <p>
@@ -121,15 +124,23 @@ export default async function TicketPage({ params }) {
           </p>
 
           <p>
-            <strong>Date:</strong> Friday, 14 August 2026
+            <strong>Date:</strong>{" "}
+            Friday, 14 August 2026
           </p>
 
           <p>
-            <strong>Time:</strong> 6:45 PM–9:00 PM
+            <strong>Time:</strong>{" "}
+            6:45 PM–9:00 PM
           </p>
 
           <p>
-            <strong>Venue:</strong> Granville Community Centre
+            <strong>Venue:</strong>{" "}
+            The Granville Centre
+          </p>
+
+          <p>
+            <strong>Address:</strong>{" "}
+            1 Memorial Drive, Granville NSW 2142
           </p>
         </div>
 
