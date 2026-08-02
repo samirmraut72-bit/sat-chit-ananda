@@ -41,13 +41,23 @@ const artists = [
 export default function HomePage() {
   return (
     <main>
+      <div className="collaborationBanner">
+        Presented by NRNA in collaboration with Project Beyond
+      </div>
+
       <header className="siteHeader">
         <Link className="brand" href="/">
+          <img
+            src="/artists/NRNA.jpg"
+            alt="NRNA logo"
+            className="nrnaLogo"
+          />
+
           <span className="brandMark">ॐ</span>
-          <h1>
-           Sat-Chit-
-           <span className="heroTitleBreak">{"\u0100nanda"}</span>
-          </h1>
+
+          <span className="brandName">
+            Sat-Chit-{"\u0100"}nanda
+          </span>
         </Link>
 
         <nav className="navLinks" aria-label="Main navigation">
@@ -90,7 +100,10 @@ export default function HomePage() {
 
           <div className="ornament">✦ ॐ ✦</div>
 
-          <h1>Sat-Chit-Ānanda</h1>
+          <h1>
+            Sat-Chit-
+            <span className="heroTitleBreak">{"\u0100nanda"}</span>
+          </h1>
 
           <p className="heroText">
             An evening of sacred sound, collective chanting, stillness and
