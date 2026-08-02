@@ -30,7 +30,7 @@ export default async function AdminPage() {
   const { data: registrations, error } = await supabase
     .from("registrations")
     .select(
-      "id, registration_code, full_name, email, phone, ticket_quantity, status, checked_in, created_at",
+      "id, registration_code, full_name, email, phone, ticket_quantity, status, checked_in, created_at, email_verified, qr_token",
     )
     .order("created_at", { ascending: false });
 

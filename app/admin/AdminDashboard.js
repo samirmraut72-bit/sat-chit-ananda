@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 export default function AdminDashboard({
   initialRegistrations,
@@ -10,6 +10,12 @@ export default function AdminDashboard({
   const [registrations, setRegistrations] = useState(initialRegistrations);
   const [query, setQuery] = useState("");
   const [updatingId, setUpdatingId] = useState("");
+  const [scannerActive, setScannerActive] = useState(false);
+  const [scanMessage, setScanMessage] = useState("");
+  const [scanType, setScanType] = useState("");
+
+  const scannerRef = useRef(null);
+  const processingRef = useRef(false);
 
   const filtered = useMemo(() => {
     const term = query.trim().toLowerCase();
@@ -42,7 +48,7 @@ export default function AdminDashboard({
     .filter((item) => item.checked_in)
     .reduce((sum, item) => sum + Number(item.ticket_quantity), 0);
 
-  async function toggleCheckIn(registration) {
+  async function updateCheckIn(registration, checkedIn) {
     setUpdatingId(registration.id);
 
     try {
@@ -51,7 +57,7 @@ export default function AdminDashboard({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           registrationId: registration.id,
-          checkedIn: !registration.checked_in,
+          checkedIn,
         }),
       });
 
@@ -68,16 +74,164 @@ export default function AdminDashboard({
             : item,
         ),
       );
+
+      return result.checkedIn;
+    } finally {
+      setUpdatingId("");
+    }
+  }
+
+  async function toggleCheckIn(registration) {
+    try {
+      await updateCheckIn(registration, !registration.checked_in);
     } catch (error) {
       window.alert(
         error instanceof Error
           ? error.message
           : "Check-in could not be updated.",
       );
-    } finally {
-      setUpdatingId("");
     }
   }
+
+  function extractQrToken(decodedText) {
+    try {
+      const url = new URL(decodedText);
+      const parts = url.pathname.split("/").filter(Boolean);
+
+      if (parts[0] === "ticket" && parts[1]) {
+        return parts[1];
+      }
+    } catch {
+      const parts = decodedText.split("/").filter(Boolean);
+      return parts.at(-1) || "";
+    }
+
+    return "";
+  }
+
+  async function handleSuccessfulScan(decodedText) {
+    if (processingRef.current) return;
+
+    processingRef.current = true;
+
+    try {
+      const qrToken = extractQrToken(decodedText);
+
+      if (!qrToken) {
+        setScanType("error");
+        setScanMessage("Invalid QR ticket.");
+        return;
+      }
+
+      const registration = registrations.find(
+        (item) => item.qr_token === qrToken,
+      );
+
+      if (!registration) {
+        setScanType("error");
+        setScanMessage("Ticket not found in the registration database.");
+        return;
+      }
+
+      if (!registration.email_verified) {
+        setScanType("error");
+        setScanMessage(
+          `${registration.full_name}'s email has not been verified.`,
+        );
+        return;
+      }
+
+      if (registration.status !== "confirmed") {
+        setScanType("error");
+        setScanMessage(
+          `${registration.full_name}'s registration is not confirmed.`,
+        );
+        return;
+      }
+
+      if (registration.checked_in) {
+        setScanType("warning");
+        setScanMessage(
+          `${registration.full_name} has already been checked in.`,
+        );
+        return;
+      }
+
+      await updateCheckIn(registration, true);
+
+      setScanType("success");
+      setScanMessage(
+        `${registration.full_name} checked in successfully. Code: ${registration.registration_code}`,
+      );
+    } catch (error) {
+      setScanType("error");
+      setScanMessage(
+        error instanceof Error
+          ? error.message
+          : "The QR ticket could not be processed.",
+      );
+    } finally {
+      window.setTimeout(() => {
+        processingRef.current = false;
+      }, 1800);
+    }
+  }
+
+  async function startScanner() {
+    setScanMessage("");
+    setScanType("");
+
+    try {
+      const { Html5Qrcode } = await import("html5-qrcode");
+
+      const scanner = new Html5Qrcode("admin-qr-reader");
+      scannerRef.current = scanner;
+
+      await scanner.start(
+        { facingMode: "environment" },
+        {
+          fps: 10,
+          qrbox: { width: 250, height: 250 },
+        },
+        handleSuccessfulScan,
+        () => {},
+      );
+
+      setScannerActive(true);
+    } catch (error) {
+      scannerRef.current = null;
+      setScannerActive(false);
+      setScanType("error");
+      setScanMessage(
+        "Camera could not start. Allow camera permission and try again.",
+      );
+
+      console.error("QR scanner error:", error);
+    }
+  }
+
+  async function stopScanner() {
+    try {
+      if (scannerRef.current?.isScanning) {
+        await scannerRef.current.stop();
+      }
+
+      scannerRef.current?.clear();
+    } catch (error) {
+      console.error("Could not stop QR scanner:", error);
+    } finally {
+      scannerRef.current = null;
+      setScannerActive(false);
+    }
+  }
+
+  useEffect(() => {
+    return () => {
+      if (scannerRef.current?.isScanning) {
+        scannerRef.current.stop().catch(() => {});
+      }
+    };
+  }, []);
 
   function exportCsv() {
     const headers = [
@@ -87,6 +241,7 @@ export default function AdminDashboard({
       "Phone",
       "Places",
       "Status",
+      "Email Verified",
       "Checked In",
       "Created At",
     ];
@@ -98,6 +253,7 @@ export default function AdminDashboard({
       item.phone,
       item.ticket_quantity,
       item.status,
+      item.email_verified ? "Yes" : "No",
       item.checked_in ? "Yes" : "No",
       item.created_at,
     ]);
@@ -136,9 +292,11 @@ export default function AdminDashboard({
           <a href="/" className="adminActionLink">
             View public website
           </a>
+
           <button onClick={exportCsv} disabled={!registrations.length}>
             Export CSV
           </button>
+
           <form action="/auth/signout" method="post">
             <button className="dangerButton" type="submit">
               Sign out
@@ -152,18 +310,77 @@ export default function AdminDashboard({
           <small>Registrations</small>
           <strong>{activeRegistrations.length}</strong>
         </article>
+
         <article>
           <small>Reserved places</small>
           <strong>{reservedPlaces}</strong>
         </article>
+
         <article>
           <small>Remaining capacity</small>
           <strong>{Math.max(350 - reservedPlaces, 0)}</strong>
         </article>
+
         <article>
           <small>Checked in</small>
           <strong>{checkedInPlaces}</strong>
         </article>
+      </section>
+
+      <section
+        className="adminTableCard"
+        style={{ marginBottom: "24px", padding: "24px" }}
+      >
+        <div className="tableToolbar">
+          <div>
+            <h2>QR ticket scanner</h2>
+            <p>Scan an attendee’s confirmed ticket to check them in.</p>
+          </div>
+
+          <button
+            type="button"
+            onClick={scannerActive ? stopScanner : startScanner}
+          >
+            {scannerActive ? "Stop scanner" : "Start scanner"}
+          </button>
+        </div>
+
+        <div
+          id="admin-qr-reader"
+          style={{
+            maxWidth: "480px",
+            margin: scannerActive ? "24px auto 0" : "0 auto",
+            overflow: "hidden",
+            borderRadius: "14px",
+          }}
+        />
+
+        {scanMessage ? (
+          <div
+            style={{
+              maxWidth: "620px",
+              margin: "20px auto 0",
+              padding: "16px",
+              borderRadius: "10px",
+              textAlign: "center",
+              fontWeight: "700",
+              background:
+                scanType === "success"
+                  ? "#e7f7ed"
+                  : scanType === "warning"
+                    ? "#fff4d6"
+                    : "#fde8e8",
+              color:
+                scanType === "success"
+                  ? "#176b37"
+                  : scanType === "warning"
+                    ? "#805b00"
+                    : "#9b1c1c",
+            }}
+          >
+            {scanMessage}
+          </div>
+        ) : null}
       </section>
 
       <section className="adminTableCard">
@@ -195,6 +412,7 @@ export default function AdminDashboard({
                   <th />
                 </tr>
               </thead>
+
               <tbody>
                 {filtered.map((item) => (
                   <tr key={item.id}>
@@ -204,14 +422,18 @@ export default function AdminDashboard({
                         {new Date(item.created_at).toLocaleString("en-AU")}
                       </small>
                     </td>
+
                     <td>
                       <span>{item.email}</span>
                       <small>{item.phone}</small>
                     </td>
+
                     <td>
                       <code>{item.registration_code}</code>
                     </td>
+
                     <td>{item.ticket_quantity}</td>
+
                     <td>
                       <span
                         className={
@@ -222,7 +444,14 @@ export default function AdminDashboard({
                       >
                         {item.checked_in ? "Checked in" : "Registered"}
                       </span>
+
+                      <small>
+                        {item.email_verified
+                          ? "Email verified"
+                          : "Email unverified"}
+                      </small>
                     </td>
+
                     <td>
                       <button
                         className="tableButton"
