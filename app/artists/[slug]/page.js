@@ -63,7 +63,10 @@ Currently performing with Project Beyond, Omchaa Drums continues to explore new 
     role: "Kirtan Artist",
     image: "/artists/aantariksha-dahal1.jpg",
     introduction:
-      "Aantariksha Dahal is a featured artist performing at Sat-Chit-Ānanda. The artist introduction and musical journey will be added soon.",
+      
+ `Antariksha’s love for music began in childhood, long before he ever picked up a real guitar. After years of playing “air guitar,” he started learning guitar in 2016 and soon formed a band with friends, performing at cafés and venues across Biratnagar, Nepal.
+
+In 2019, he co-founded the original rock band Mrityunjaya Nepal, dedicated to creating original music and reviving the local rock scene. Together, they helped establish Yogi’s Rock Bar, organized numerous live performances, founded a music institute where each band member taught their area of expertise, and later built MTJ Pub—a space where music, creativity, and community come together. Along the way, he also collaborated with artists such as Shaurav Bhattarai.`,
   },
 };
 
