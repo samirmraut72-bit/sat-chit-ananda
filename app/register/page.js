@@ -45,19 +45,19 @@ function RegistrationTeamFooter() {
       </div>
 
       <div className="registrationTeamMember">
+        <strong>Bharat Poudel (Event Manager)</strong>
+
+        <a href="tel:+61478930416">
+          0478 930 416
+        </a>
+      </div>
+
+      <div className="registrationTeamMember">
         <strong>Bijay Ghimire (NRNA)</strong>
         <span>NRNA NSW SCC Treasurer</span>
 
         <a href="tel:+61432801786">
           0432 801 786
-        </a>
-      </div>
-
-      <div className="registrationTeamMember">
-        <strong>Bharat Poudel (Event Manager)</strong>
-
-        <a href="tel:+61478930416">
-          0478 930 416
         </a>
       </div>
 
