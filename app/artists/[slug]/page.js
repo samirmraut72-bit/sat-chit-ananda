@@ -20,7 +20,10 @@ Whether crafting soaring synth solos, providing rich harmonic backdrops, or impr
     image: "/artists/aadesh1.jpg",
     instagram: "https://www.instagram.com/aadesh_poudel/",
     tiktok: "https://www.tiktok.com/@aadeshpoudel01",
-    spotify: "https://open.spotify.com/artist/6erlKE4IyGIKx8nPDdLTpf",
+    spotify:
+      "https://open.spotify.com/artist/6erlKE4IyGIKx8nPDdLTpf",
+    youtube:
+      "https://youtube.com/@aadeshpoudel2602?si=vCQXqlUv4M7aDkBo",
     introduction: `Aadesh is a Kathmandu-born, Sydney-based singer-songwriter whose sound sits at the intersection of soulful storytelling and deep reflection. His musical journey began at home under the guidance of his mother, laying a rich foundational grounding that he later expanded through years of self-taught exploration across genres.
 
 A seeker and meditator at heart, Aadesh infuses his work with a spiritual depth that makes his versatile voice uniquely his own. After winning over audiences on Nepal Idol, he brought his music to stages across Australia and Nepal, touring and performing alongside notable artists.
@@ -92,6 +95,19 @@ In 2019, he co-founded the original rock band Mrityunjaya Nepal, dedicated to cr
 
 Along the way, he also collaborated with artists such as Shaurav Bhattarai.`,
   },
+
+  avi: {
+    name: "Avishek Kumar",
+    role: "Tabla Artist",
+    image: "/artists/avi1.jpg",
+    instagram:
+      "https://www.instagram.com/__aviiishek?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==",
+    introduction: `Avi was born and raised in Sydney and began learning the tabla at the age of six. At just eight years old, he performed his first solo recital under the guidance of Guruji Balram Dass.
+
+He later became a disciple of Ustad Aman Pal, a distinguished musician from the Punjab Gharana who is currently based in London. Through these teachings and blessings, Avi has developed a distinctive and versatile style of tabla playing, allowing him to perform across a wide range of Hindustani musical genres.
+
+Over the years, Avi has accompanied numerous local and international artists. He has performed in both small and large ensembles at concerts, cultural programs, and private events across Australia.`,
+  },
 };
 
 function InstagramIcon() {
@@ -146,7 +162,12 @@ function InstagramIcon() {
         strokeWidth="3"
       />
 
-      <circle cx="32.5" cy="15.8" r="2" fill="#ffffff" />
+      <circle
+        cx="32.5"
+        cy="15.8"
+        r="2"
+        fill="#ffffff"
+      />
     </svg>
   );
 }
@@ -193,7 +214,12 @@ function SpotifyIcon() {
       aria-hidden="true"
       focusable="false"
     >
-      <circle cx="24" cy="24" r="22" fill="#1DB954" />
+      <circle
+        cx="24"
+        cy="24"
+        r="22"
+        fill="#1DB954"
+      />
 
       <path
         d="M13 18.5c7.7-2.1 17.3-1.3 23.4 2"
@@ -222,13 +248,40 @@ function SpotifyIcon() {
   );
 }
 
+function YouTubeIcon() {
+  return (
+    <svg
+      className="youtubeSocialIcon"
+      viewBox="0 0 48 48"
+      aria-hidden="true"
+      focusable="false"
+    >
+      <rect
+        x="3"
+        y="9"
+        width="42"
+        height="30"
+        rx="9"
+        fill="#FF0000"
+      />
+
+      <path
+        d="M20 17.5L33 24L20 30.5V17.5Z"
+        fill="#FFFFFF"
+      />
+    </svg>
+  );
+}
+
 export function generateStaticParams() {
   return Object.keys(artists).map((slug) => ({
     slug,
   }));
 }
 
-export default async function ArtistProfilePage({ params }) {
+export default async function ArtistProfilePage({
+  params,
+}) {
   const { slug } = await params;
   const artist = artists[slug];
 
@@ -243,12 +296,23 @@ export default async function ArtistProfilePage({ params }) {
   return (
     <main className="artistProfilePage">
       <header className="siteHeader">
-        <Link className="brand" href="/">
-          <span className="brandMark">ॐ</span>
-          <span>Sat-Chit-{"\u0100"}nanda</span>
+        <Link
+          className="brand"
+          href="/"
+        >
+          <span className="brandMark">
+            ॐ
+          </span>
+
+          <span>
+            Sat-Chit-{"\u0100"}nanda
+          </span>
         </Link>
 
-        <Link className="navButton" href="/#artists">
+        <Link
+          className="navButton"
+          href="/#artists"
+        >
           All Artists
         </Link>
       </header>
@@ -262,7 +326,10 @@ export default async function ArtistProfilePage({ params }) {
         </div>
 
         <div className="artistProfileContent">
-          <Link className="artistBackButton" href="/#artists">
+          <Link
+            className="artistBackButton"
+            href="/#artists"
+          >
             ← Back to Artists
           </Link>
 
@@ -270,7 +337,9 @@ export default async function ArtistProfilePage({ params }) {
             Featured artist
           </p>
 
-          <h1>{artist.name}</h1>
+          <h1>
+            {artist.name}
+          </h1>
 
           <p className="artistRole">
             {artist.role}
@@ -323,14 +392,33 @@ export default async function ArtistProfilePage({ params }) {
                 <SpotifyIcon />
               </a>
             )}
+
+            {artist.youtube && (
+              <a
+                className="artistSocialIconLink"
+                href={artist.youtube}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={`Open ${artist.name} YouTube`}
+                title={`${artist.name} on YouTube`}
+              >
+                <YouTubeIcon />
+              </a>
+            )}
           </div>
 
           <div className="heroActions">
-            <Link className="primaryButton" href="/register">
+            <Link
+              className="primaryButton"
+              href="/register"
+            >
               Reserve a Spot
             </Link>
 
-            <Link className="artistBackButton" href="/#artists">
+            <Link
+              className="artistBackButton"
+              href="/#artists"
+            >
               ← Back to Artists
             </Link>
           </div>

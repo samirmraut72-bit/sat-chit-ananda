@@ -2740,3 +2740,65 @@ a.artistBackButton:hover {
     font-size: 1rem;
   }
 }
+.footerBrandBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.footerFollowRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 4px;
+}
+
+.footerFollowText {
+  color: #d9c8b4;
+  font-size: 0.9rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+}
+
+.footerSocials {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.footerSocialIconLink {
+  display: inline-flex;
+  width: 34px;
+  height: 34px;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border: 1px solid rgba(232, 177, 58, 0.4);
+  border-radius: 50%;
+  text-decoration: none;
+  transition:
+    transform 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.footerSocialIconLink svg {
+  width: 25px;
+  height: 25px;
+  display: block;
+}
+
+.footerSocialIconLink:hover {
+  border-color: #e8b13a;
+  transform: translateY(-2px);
+}
+
+@media (max-width: 700px) {
+  .footerFollowRow {
+    justify-content: center;
+  }
+
+  .footerBrandBlock {
+    align-items: center;
+    text-align: center;
+  }
+}

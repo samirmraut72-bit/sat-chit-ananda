@@ -8,36 +8,49 @@ const artists = [
     name: "Aadesh",
     slug: "aadesh",
     image: "/artists/aadesh.jpg",
+    role: "Kirtan Artist",
   },
   {
     name: "Anjuli Hamal",
     slug: "anjuli-hamal",
     image: "/artists/anjuli-hamal.jpg",
+    role: "Kirtan Artist",
   },
   {
     name: "Sabin Ghising",
     slug: "sabin-ghising",
     image: "/artists/sabin-ghising.jpg",
+    role: "Kirtan Artist",
   },
   {
     name: "Rozan Subedi",
     slug: "rozan-subedi",
     image: "/artists/rozan-subedi.jpg",
+    role: "Kirtan Artist",
   },
   {
     name: "Om B Shrestha",
     slug: "om-b-shrestha",
     image: "/artists/om-b-shrestha.jpg",
+    role: "Kirtan Artist",
   },
   {
     name: "Nischal Bista",
     slug: "nischal-bista",
     image: "/artists/nischal-bista.jpg",
+    role: "Kirtan Artist",
   },
   {
     name: "Aantariksha Dahal",
     slug: "aantariksha-dahal",
     image: "/artists/aantariksha-dahal.jpg",
+    role: "Kirtan Artist",
+  },
+  {
+    name: "AVI",
+    slug: "avi",
+    image: "/artists/avi.jpg",
+    role: "Tabla Artist",
   },
 ];
 
@@ -58,9 +71,113 @@ async function getAvailability() {
   return result;
 }
 
+function FooterInstagramIcon() {
+  return (
+    <svg
+      viewBox="0 0 48 48"
+      aria-hidden="true"
+      focusable="false"
+    >
+      <defs>
+        <radialGradient
+          id="footerInstagramGradient"
+          cx="30%"
+          cy="105%"
+          r="115%"
+        >
+          <stop offset="0%" stopColor="#ffd600" />
+          <stop offset="28%" stopColor="#ff7a00" />
+          <stop offset="52%" stopColor="#ff0169" />
+          <stop offset="78%" stopColor="#d300c5" />
+          <stop offset="100%" stopColor="#7638fa" />
+        </radialGradient>
+      </defs>
+
+      <rect
+        x="4"
+        y="4"
+        width="40"
+        height="40"
+        rx="11"
+        fill="url(#footerInstagramGradient)"
+      />
+
+      <rect
+        x="13"
+        y="13"
+        width="22"
+        height="22"
+        rx="7"
+        fill="none"
+        stroke="#ffffff"
+        strokeWidth="3"
+      />
+
+      <circle
+        cx="24"
+        cy="24"
+        r="5.5"
+        fill="none"
+        stroke="#ffffff"
+        strokeWidth="3"
+      />
+
+      <circle
+        cx="32.5"
+        cy="15.8"
+        r="2"
+        fill="#ffffff"
+      />
+    </svg>
+  );
+}
+
+function FooterTikTokIcon() {
+  return (
+    <svg
+      viewBox="0 0 48 48"
+      aria-hidden="true"
+      focusable="false"
+    >
+      <rect
+        x="4"
+        y="4"
+        width="40"
+        height="40"
+        rx="11"
+        fill="#111111"
+      />
+
+      <path
+        d="M27.5 10v18.4a7.5 7.5 0 1 1-6.4-7.4v4.8a2.9 2.9 0 1 0 1.7 2.6V10h4.7c.7 3.9 2.9 6.2 6.8 7.5v4.7a12.9 12.9 0 0 1-6.8-2.8V10Z"
+        fill="none"
+        stroke="#25f4ee"
+        strokeWidth="4"
+        strokeLinejoin="round"
+        transform="translate(-1.2, 1.2)"
+      />
+
+      <path
+        d="M27.5 10v18.4a7.5 7.5 0 1 1-6.4-7.4v4.8a2.9 2.9 0 1 0 1.7 2.6V10h4.7c.7 3.9 2.9 6.2 6.8 7.5v4.7a12.9 12.9 0 0 1-6.8-2.8V10Z"
+        fill="none"
+        stroke="#fe2c55"
+        strokeWidth="4"
+        strokeLinejoin="round"
+        transform="translate(1.2, -1.2)"
+      />
+
+      <path
+        d="M27.5 10v18.4a7.5 7.5 0 1 1-6.4-7.4v4.8a2.9 2.9 0 1 0 1.7 2.6V10h4.7c.7 3.9 2.9 6.2 6.8 7.5v4.7a12.9 12.9 0 0 1-6.8-2.8V10Z"
+        fill="#ffffff"
+      />
+    </svg>
+  );
+}
+
 export default function HomePage() {
   const [availability, setAvailability] = useState(null);
-  const [availabilityError, setAvailabilityError] = useState("");
+  const [availabilityError, setAvailabilityError] =
+    useState("");
 
   useEffect(() => {
     let active = true;
@@ -74,7 +191,10 @@ export default function HomePage() {
           setAvailabilityError("");
         }
       } catch (error) {
-        console.error("Homepage availability error:", error);
+        console.error(
+          "Homepage availability error:",
+          error,
+        );
 
         if (active) {
           setAvailabilityError(
@@ -95,7 +215,10 @@ export default function HomePage() {
       loadAvailability();
     }
 
-    window.addEventListener("focus", refreshWhenFocused);
+    window.addEventListener(
+      "focus",
+      refreshWhenFocused,
+    );
 
     return () => {
       active = false;
@@ -129,17 +252,11 @@ export default function HomePage() {
           className="navLinks"
           aria-label="Main navigation"
         >
-          <a href="#about">
-            About
-          </a>
+          <a href="#about">About</a>
 
-          <a href="#artists">
-            Artists
-          </a>
+          <a href="#artists">Artists</a>
 
-          <a href="#details">
-            Details
-          </a>
+          <a href="#details">Details</a>
 
           <Link
             className="adminNavLink"
@@ -221,9 +338,7 @@ export default function HomePage() {
             />
 
             <div className="heroFactCard">
-              <span>
-                Date
-              </span>
+              <span>Date</span>
 
               <strong>
                 Friday, 14 August 2026
@@ -231,9 +346,7 @@ export default function HomePage() {
             </div>
 
             <div className="heroFactCard">
-              <span>
-                Time
-              </span>
+              <span>Time</span>
 
               <strong>
                 6:45 PM – 9:00 PM
@@ -241,9 +354,7 @@ export default function HomePage() {
             </div>
 
             <div className="heroFactCard">
-              <span>
-                Entry
-              </span>
+              <span>Entry</span>
 
               <strong>
                 Free Registration
@@ -280,9 +391,7 @@ export default function HomePage() {
               )}
 
               {availabilityError && (
-                <p>
-                  {availabilityError}
-                </p>
+                <p>{availabilityError}</p>
               )}
             </div>
           </div>
@@ -342,28 +451,29 @@ export default function HomePage() {
             <p>
               Sat-Chit-Ānanda is an initiative created with the
               sole aim of bringing like-minded people together
-              through devotional and spiritually inspired music.
-              In a time when people are constantly rushing,
-              stressed, and mentally overwhelmed, this gathering
-              offers a space to slow down, find calm, and reconnect
-              with a sense of positivity.
+              through devotional and spiritually inspired
+              music. In a time when people are constantly
+              rushing, stressed, and mentally overwhelmed, this
+              gathering offers a space to slow down, find calm,
+              and reconnect with a sense of positivity.
             </p>
 
             <p>
-              It fosters a supportive community that values mental
-              health and healing through various forms of music,
-              chants, and dance. In essence, Sat-Chit-Ānanda
-              provides a sacred sanctuary where participants can
-              immerse themselves in an uplifting experience,
-              cultivating mindfulness, peace, and inner balance in
-              an intimate setting.
+              It fosters a supportive community that values
+              mental health and healing through various forms
+              of music, chants, and dance. In essence,
+              Sat-Chit-Ānanda provides a sacred sanctuary where
+              participants can immerse themselves in an
+              uplifting experience, cultivating mindfulness,
+              peace, and inner balance in an intimate setting.
             </p>
 
             <p>
               This initiative is a collective effort by Project
-              Beyond and NRNA to revive the spirit of community and
-              healing through the power of art—offering a space to
-              pause and breathe amid the rush of everyday life.
+              Beyond and NRNA to revive the spirit of community
+              and healing through the power of art—offering a
+              space to pause and breathe amid the rush of
+              everyday life.
             </p>
           </div>
         </div>
@@ -383,7 +493,8 @@ export default function HomePage() {
           </h2>
 
           <p>
-            Select an artist to view their profile and introduction.
+            Select an artist to view their profile and
+            introduction.
           </p>
         </div>
 
@@ -401,13 +512,9 @@ export default function HomePage() {
                 />
               </div>
 
-              <h3>
-                {artist.name}
-              </h3>
+              <h3>{artist.name}</h3>
 
-              <p>
-                Kirtan Artist
-              </p>
+              <p>{artist.role}</p>
 
               <span className="artistProfileLink">
                 View Profile →
@@ -439,14 +546,10 @@ export default function HomePage() {
 
           <div className="detailList">
             <div className="detailItem">
-              <span>
-                01
-              </span>
+              <span>01</span>
 
               <div>
-                <small>
-                  Date
-                </small>
+                <small>Date</small>
 
                 <strong>
                   Friday, 14 August 2026
@@ -455,14 +558,10 @@ export default function HomePage() {
             </div>
 
             <div className="detailItem">
-              <span>
-                02
-              </span>
+              <span>02</span>
 
               <div>
-                <small>
-                  Time
-                </small>
+                <small>Time</small>
 
                 <strong>
                   6:45 PM – 9:00 PM
@@ -471,14 +570,10 @@ export default function HomePage() {
             </div>
 
             <div className="detailItem">
-              <span>
-                03
-              </span>
+              <span>03</span>
 
               <div>
-                <small>
-                  Venue
-                </small>
+                <small>Venue</small>
 
                 <strong>
                   The Granville Centre
@@ -487,23 +582,13 @@ export default function HomePage() {
             </div>
 
             <div className="detailItem">
-              <span>
-                04
-              </span>
+              <span>04</span>
 
               <div>
-                <small>
-                  Ticket price
-                </small>
+                <small>Ticket price</small>
 
-                <strong>
-                  $0.00
-                </strong>
+                <strong>$0.00</strong>
               </div>
-            </div>
-
-            <div className="detailItem">
-             
             </div>
           </div>
         </div>
@@ -546,12 +631,42 @@ export default function HomePage() {
         >
           {soldOut
             ? "Event Sold Out"
-            : "Complete Registration"}
+            : "Reserve a spot"}
         </Link>
       </section>
 
       <footer className="footer">
-        <div>
+        <div className="footerBrandBlock">
+          <div className="footerFollowRow">
+            <span className="footerFollowText">
+              Follow for more
+            </span>
+
+            <div className="footerSocials">
+              <a
+                className="footerSocialIconLink"
+                href="https://www.instagram.com/theproject_beyond?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw=="
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Follow Project Beyond on Instagram"
+                title="Project Beyond on Instagram"
+              >
+                <FooterInstagramIcon />
+              </a>
+
+              <a
+                className="footerSocialIconLink"
+                href="https://www.tiktok.com/@project_beyond_1?is_from_webapp=1&sender_device=pc"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Follow Project Beyond on TikTok"
+                title="Project Beyond on TikTok"
+              >
+                <FooterTikTokIcon />
+              </a>
+            </div>
+          </div>
+
           <strong>
             Sat-Chit-Ānanda
           </strong>
