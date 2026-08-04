@@ -54,7 +54,10 @@ function RegistrationTeamFooter() {
 
       <div className="registrationTeamMember">
         <strong>Bijay Ghimire (NRNA)</strong>
-        <span>NRNA NSW SCC Treasurer</span>
+
+        <span>
+          NRNA NSW SCC Treasurer
+        </span>
 
         <a href="tel:+61432801786">
           0432 801 786
@@ -79,7 +82,8 @@ export default function RegisterPage() {
   const [submitting, setSubmitting] = useState(false);
 
   const [availability, setAvailability] = useState(null);
-  const [availabilityError, setAvailabilityError] = useState("");
+  const [availabilityError, setAvailabilityError] =
+    useState("");
 
   useEffect(() => {
     let active = true;
@@ -140,11 +144,15 @@ export default function RegisterPage() {
     availability?.available === 0;
 
   function updateField(event) {
-    const { name, value, type, checked } = event.target;
+    const { name, value, type, checked } =
+      event.target;
 
     setForm((current) => ({
       ...current,
-      [name]: type === "checkbox" ? checked : value,
+      [name]:
+        type === "checkbox"
+          ? checked
+          : value,
     }));
   }
 
@@ -154,7 +162,7 @@ export default function RegisterPage() {
 
     if (soldOut) {
       setError(
-        "The event has reached its maximum capacity.",
+        "Registration is currently full. Final registration will be opening soon.",
       );
 
       return;
@@ -163,16 +171,20 @@ export default function RegisterPage() {
     setSubmitting(true);
 
     try {
-      const response = await fetch("/api/register", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+      const response = await fetch(
+        "/api/register",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type":
+              "application/json",
+          },
+          body: JSON.stringify({
+            ...form,
+            ticketQuantity: "1",
+          }),
         },
-        body: JSON.stringify({
-          ...form,
-          ticketQuantity: "1",
-        }),
-      });
+      );
 
       const result = await response.json();
 
@@ -187,15 +199,21 @@ export default function RegisterPage() {
         const latestAvailability =
           await getAvailability();
 
-        setAvailability(latestAvailability);
-      } catch (availabilityRefreshError) {
+        setAvailability(
+          latestAvailability,
+        );
+      } catch (
+        availabilityRefreshError
+      ) {
         console.error(
           "Availability refresh error:",
           availabilityRefreshError,
         );
       }
 
-      setRegistration(result.registration);
+      setRegistration(
+        result.registration,
+      );
 
       window.scrollTo({
         top: 0,
@@ -225,13 +243,16 @@ export default function RegisterPage() {
           </p>
 
           <h1>
-            Thank you, {registration.fullName}
+            Thank you,{" "}
+            {registration.fullName}
           </h1>
 
           <p className="confirmationLead">
-            Your place at Sat-Chit-{"\u0100"}nanda has
-            been reserved. Please check your email and
-            verify your address to receive your QR ticket.
+            Your place at Sat-Chit-
+            {"\u0100"}nanda has been
+            reserved. Please check your
+            email and verify your address
+            to receive your QR ticket.
           </p>
 
           <div className="ticket">
@@ -242,7 +263,8 @@ export default function RegisterPage() {
                 </small>
 
                 <strong>
-                  Sat-Chit-{"\u0100"}nanda
+                  Sat-Chit-
+                  {"\u0100"}nanda
                 </strong>
               </div>
 
@@ -305,8 +327,9 @@ export default function RegisterPage() {
           </div>
 
           <p className="smallPrint">
-            Please check your inbox and verify your email
-            address. Your QR ticket will be sent after
+            Please check your inbox and
+            verify your email address. Your
+            QR ticket will be sent after
             verification.
           </p>
 
@@ -314,7 +337,9 @@ export default function RegisterPage() {
             <button
               className="primaryButton buttonReset"
               type="button"
-              onClick={() => window.print()}
+              onClick={() =>
+                window.print()
+              }
             >
               Print Confirmation
             </button>
@@ -352,7 +377,8 @@ export default function RegisterPage() {
             />
 
             <p>
-              NRNA in collaboration with Project Beyond
+              NRNA in collaboration with
+              Project Beyond
             </p>
           </div>
 
@@ -365,8 +391,9 @@ export default function RegisterPage() {
           </h1>
 
           <p>
-            Each attendee must complete their own
-            individual registration. One registration
+            Each attendee must complete
+            their own individual
+            registration. One registration
             reserves one place only.
           </p>
 
@@ -387,14 +414,24 @@ export default function RegisterPage() {
               </small>
 
               {availability ? (
-                <strong>
-                  {soldOut
-                    ? "Sold out"
-                    : `Available spots: ${availability.available}`}
-                </strong>
+                <>
+                  <strong>
+                    {soldOut
+                      ? "Registration Full"
+                      : `Available spots: ${availability.available}`}
+                  </strong>
+
+                  {soldOut && (
+                    <p className="finalRegistrationNotice">
+                      Final Registration
+                      Opening Soon
+                    </p>
+                  )}
+                </>
               ) : (
                 <strong>
-                  Checking available spots...
+                  Checking available
+                  spots...
                 </strong>
               )}
 
@@ -433,7 +470,8 @@ export default function RegisterPage() {
               </small>
 
               <strong>
-                Free individual registration
+                Free individual
+                registration
               </strong>
             </div>
           </div>
@@ -447,7 +485,7 @@ export default function RegisterPage() {
 
             <span>
               {soldOut
-                ? "Registration full"
+                ? "Registration Full"
                 : "Live registration"}
             </span>
           </div>
@@ -516,7 +554,8 @@ export default function RegisterPage() {
               </strong>
 
               <p>
-                Every attendee must complete their own
+                Every attendee must
+                complete their own
                 registration.
               </p>
             </div>
@@ -552,9 +591,10 @@ export default function RegisterPage() {
               />
 
               <span>
-                I agree that the organiser may use these
-                details for registration confirmation and
-                important event updates.
+                I agree that the organiser
+                may use these details for
+                registration confirmation
+                and important event updates.
               </span>
             </label>
 
@@ -572,8 +612,9 @@ export default function RegisterPage() {
                 className="errorMessage"
                 role="alert"
               >
-                The event has reached its maximum capacity
-                of 150 attendees.
+                Registration is currently
+                full. Final registration
+                will be opening soon.
               </div>
             )}
 
@@ -612,10 +653,12 @@ export default function RegisterPage() {
             <button
               className="submitButton"
               type="submit"
-              disabled={submitting || soldOut}
+              disabled={
+                submitting || soldOut
+              }
             >
               {soldOut
-                ? "Event Sold Out"
+                ? "Registration Full"
                 : submitting
                   ? "Completing registration..."
                   : "Complete Free Registration"}

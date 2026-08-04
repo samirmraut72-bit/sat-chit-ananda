@@ -253,9 +253,7 @@ export default function HomePage() {
           aria-label="Main navigation"
         >
           <a href="#about">About</a>
-
           <a href="#artists">Artists</a>
-
           <a href="#details">Details</a>
 
           <Link
@@ -379,11 +377,19 @@ export default function HomePage() {
               </small>
 
               {availability ? (
-                <strong>
-                  {soldOut
-                    ? "Event Sold Out"
-                    : `Available spots: ${availability.available}`}
-                </strong>
+                <>
+                  <strong>
+                    {soldOut
+                      ? "Registration Full"
+                      : `Available spots: ${availability.available}`}
+                  </strong>
+
+                  {soldOut && (
+                    <p className="finalRegistrationNotice">
+                      Final Registration Opening Soon
+                    </p>
+                  )}
+                </>
               ) : (
                 <strong>
                   Checking available spots...
@@ -412,7 +418,7 @@ export default function HomePage() {
               }}
             >
               {soldOut
-                ? "Event Sold Out"
+                ? "Registration Full"
                 : "Reserve a Spot"}
             </Link>
 
@@ -513,7 +519,6 @@ export default function HomePage() {
               </div>
 
               <h3>{artist.name}</h3>
-
               <p>{artist.role}</p>
 
               <span className="artistProfileLink">
@@ -610,7 +615,7 @@ export default function HomePage() {
             {availability && !soldOut
               ? `${availability.available} places currently available.`
               : soldOut
-                ? "Registration has reached maximum capacity."
+                ? "Final registration will be opening soon."
                 : "One registration reserves one place only."}
           </p>
         </div>
@@ -630,8 +635,8 @@ export default function HomePage() {
           }}
         >
           {soldOut
-            ? "Event Sold Out"
-            : "Reserve a spot"}
+            ? "Registration Full"
+            : "Reserve a Spot"}
         </Link>
       </section>
 

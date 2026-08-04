@@ -2802,3 +2802,11 @@ a.artistBackButton:hover {
     text-align: center;
   }
 }
+.finalRegistrationNotice {
+  margin: 7px 0 0;
+  color: #f2c46d;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  line-height: 1.4;
+}
