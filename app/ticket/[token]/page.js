@@ -5,12 +5,32 @@ import { createAdminClient } from "@/lib/supabase/admin";
 
 export const dynamic = "force-dynamic";
 
-export default async function TicketPage({ params }) {
+const EVENT_EXPIRY =
+  new Date(
+    "2026-08-15T00:00:00+10:00",
+  ).getTime();
+
+export default async function TicketPage({
+  params,
+}) {
   const { token } = await params;
 
-  const supabase = createAdminClient();
+  /*
+    After 12:00 AM on 15 August 2026
+    Sydney time, the QR ticket page is no
+    longer accessible.
+  */
+  if (Date.now() >= EVENT_EXPIRY) {
+    notFound();
+  }
 
-  const { data: registration, error } = await supabase
+  const supabase =
+    createAdminClient();
+
+  const {
+    data: registration,
+    error,
+  } = await supabase
     .from("registrations")
     .select(`
       registration_code,
@@ -18,9 +38,13 @@ export default async function TicketPage({ params }) {
       email,
       phone,
       email_verified,
-      qr_token
+      qr_token,
+      verification_expires_at
     `)
-    .eq("qr_token", token)
+    .eq(
+      "qr_token",
+      token,
+    )
     .maybeSingle();
 
   if (
@@ -32,14 +56,33 @@ export default async function TicketPage({ params }) {
     notFound();
   }
 
+  /*
+    Extra database-level expiry check.
+
+    This keeps the behaviour consistent
+    with the verification link expiry.
+  */
+  if (
+    registration.verification_expires_at &&
+    new Date(
+      registration.verification_expires_at,
+    ).getTime() <= Date.now()
+  ) {
+    notFound();
+  }
+
   const ticketUrl =
     `https://satchitananda.com.au/ticket/` +
     registration.qr_token;
 
-  const qrCode = await QRCode.toDataURL(ticketUrl, {
-    width: 320,
-    margin: 2,
-  });
+  const qrCode =
+    await QRCode.toDataURL(
+      ticketUrl,
+      {
+        width: 320,
+        margin: 2,
+      },
+    );
 
   return (
     <main
@@ -47,7 +90,8 @@ export default async function TicketPage({ params }) {
         minHeight: "100vh",
         background: "#f5efe8",
         padding: "40px 20px",
-        fontFamily: "Arial, sans-serif",
+        fontFamily:
+          "Arial, sans-serif",
       }}
     >
       <div
@@ -57,7 +101,8 @@ export default async function TicketPage({ params }) {
           background: "#ffffff",
           borderRadius: "18px",
           padding: "36px",
-          boxShadow: "0 12px 40px rgba(0,0,0,0.10)",
+          boxShadow:
+            "0 12px 40px rgba(0,0,0,0.10)",
           textAlign: "center",
         }}
       >
@@ -119,8 +164,12 @@ export default async function TicketPage({ params }) {
           </p>
 
           <p>
-            <strong>Registration code:</strong>{" "}
-            {registration.registration_code}
+            <strong>
+              Registration code:
+            </strong>{" "}
+            {
+              registration.registration_code
+            }
           </p>
 
           <p>
@@ -140,7 +189,8 @@ export default async function TicketPage({ params }) {
 
           <p>
             <strong>Address:</strong>{" "}
-            1 Memorial Drive, Granville NSW 2142
+            1 Memorial Drive,
+            Granville NSW 2142
           </p>
         </div>
 
@@ -151,7 +201,20 @@ export default async function TicketPage({ params }) {
             color: "#746a63",
           }}
         >
-          Please show this QR ticket at the entrance.
+          Please show this QR ticket
+          at the entrance.
+        </p>
+
+        <p
+          style={{
+            marginTop: "10px",
+            fontSize: "13px",
+            color: "#8a817b",
+          }}
+        >
+          This ticket remains accessible
+          until 12:00 AM on
+          15 August 2026.
         </p>
 
         <a
