@@ -17,7 +17,8 @@ async function sendTicketEmail({
   registrationCode,
   qrToken,
 }) {
-  const resendApiKey = process.env.RESEND_API_KEY;
+  const resendApiKey =
+    process.env.RESEND_API_KEY;
 
   if (!resendApiKey) {
     throw new Error(
@@ -25,9 +26,8 @@ async function sendTicketEmail({
     );
   }
 
-  const safeName = escapeHtml(
-    fullName || "Guest",
-  );
+  const safeName =
+    escapeHtml(fullName || "Guest");
 
   const safeRegistrationCode =
     escapeHtml(registrationCode || "");
@@ -40,6 +40,7 @@ async function sendTicketEmail({
     "https://api.resend.com/emails",
     {
       method: "POST",
+
       headers: {
         Authorization:
           `Bearer ${resendApiKey}`,
@@ -165,6 +166,7 @@ async function sendTicketEmail({
                   margin:26px 0;
                 "
               >
+
                 <p
                   style="
                     margin:0 0 10px;
@@ -233,6 +235,7 @@ async function sendTicketEmail({
                     `
                     : ""
                 }
+
               </div>
 
               <p
@@ -293,6 +296,7 @@ async function sendTicketEmail({
               >
                 ${ticketUrl}
               </p>
+
             </div>
           </div>
         `,
@@ -314,17 +318,27 @@ async function sendTicketEmail({
 
 function wait(milliseconds) {
   return new Promise((resolve) =>
-    setTimeout(resolve, milliseconds),
+    setTimeout(
+      resolve,
+      milliseconds,
+    ),
   );
 }
 
 export async function POST(request) {
   try {
     const body =
-      await request.json().catch(() => ({}));
+      await request
+        .json()
+        .catch(() => ({}));
 
-    const mode = body.mode || "test";
-    const testEmail = body.testEmail;
+    const mode =
+      body.mode || "test";
+
+    const testEmail =
+      body.testEmail
+        ?.trim()
+        .toLowerCase();
 
     const supabase =
       createAdminClient();
@@ -342,12 +356,25 @@ export async function POST(request) {
         email_verified,
         qr_token
       `)
-      .eq("status", "confirmed")
-      .eq("email_verified", true)
-      .not("qr_token", "is", null)
-      .order("created_at", {
-        ascending: true,
-      });
+      .eq(
+        "status",
+        "confirmed",
+      )
+      .eq(
+        "email_verified",
+        true,
+      )
+      .not(
+        "qr_token",
+        "is",
+        null,
+      )
+      .order(
+        "created_at",
+        {
+          ascending: true,
+        },
+      );
 
     if (error) {
       console.error(
@@ -381,12 +408,12 @@ export async function POST(request) {
     /*
       TEST MODE
 
-      Sends one attendee's existing ticket
-      to the email address supplied in
-      testEmail.
+      Finds the verified registration
+      matching testEmail.
 
-      This lets us inspect the email before
-      sending anything to all attendees.
+      This prevents us from accidentally
+      using another attendee's name or
+      QR ticket during testing.
     */
     if (mode === "test") {
       if (!testEmail) {
@@ -402,14 +429,36 @@ export async function POST(request) {
       }
 
       const registration =
-        registrations[0];
+        registrations.find(
+          (item) =>
+            item.email
+              ?.trim()
+              .toLowerCase() ===
+            testEmail,
+        );
+
+      if (!registration) {
+        return NextResponse.json(
+          {
+            error:
+              "No verified registration was found for this test email.",
+          },
+          {
+            status: 404,
+          },
+        );
+      }
 
       await sendTicketEmail({
-        email: testEmail,
+        email:
+          registration.email,
+
         fullName:
           registration.full_name,
+
         registrationCode:
           registration.registration_code,
+
         qrToken:
           registration.qr_token,
       });
@@ -418,7 +467,10 @@ export async function POST(request) {
         success: true,
         mode: "test",
         sent: 1,
-        sentTo: testEmail,
+        sentTo:
+          registration.email,
+        registrationCode:
+          registration.registration_code,
         message:
           "Test ticket email sent successfully.",
       });
@@ -427,13 +479,14 @@ export async function POST(request) {
     /*
       ALL MODE
 
-      Sends each already-verified attendee
-      their EXISTING QR ticket.
+      Sends every already-verified
+      attendee their EXISTING ticket.
 
-      It does not change:
-      - qr_token
+      It does NOT change:
       - registration
-      - verification status
+      - qr_token
+      - email_verified
+      - registration_code
       - capacity
     */
     if (mode === "all") {
@@ -447,10 +500,13 @@ export async function POST(request) {
           await sendTicketEmail({
             email:
               registration.email,
+
             fullName:
               registration.full_name,
+
             registrationCode:
               registration.registration_code,
+
             qrToken:
               registration.qr_token,
           });
@@ -469,15 +525,16 @@ export async function POST(request) {
           results.push({
             email:
               registration.email,
+
             success: false,
+
             error:
               emailError.message,
           });
         }
 
         /*
-          Small delay so we do not fire all
-          emails simultaneously.
+          Small delay between sends.
         */
         await wait(600);
       }
@@ -489,16 +546,21 @@ export async function POST(request) {
         ).length;
 
       const failed =
-        results.length - successful;
+        results.length -
+        successful;
 
       return NextResponse.json({
         success:
           failed === 0,
+
         total:
           results.length,
+
         sent:
           successful,
+
         failed,
+
         results,
       });
     }
