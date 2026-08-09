@@ -1,78 +1,289 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 
 export default function AdminDashboard({
   initialRegistrations,
   adminName,
   adminEmail,
 }) {
-  const [registrations, setRegistrations] = useState(initialRegistrations);
-  const [query, setQuery] = useState("");
-  const [updatingId, setUpdatingId] = useState("");
-  const [scannerActive, setScannerActive] = useState(false);
-  const [scanMessage, setScanMessage] = useState("");
-  const [scanType, setScanType] = useState("");
+  const [registrations, setRegistrations] =
+    useState(initialRegistrations);
 
-  const scannerRef = useRef(null);
-  const processingRef = useRef(false);
+  const [query, setQuery] =
+    useState("");
+
+  const [updatingId, setUpdatingId] =
+    useState("");
+
+  const [scannerActive, setScannerActive] =
+    useState(false);
+
+  const [scanMessage, setScanMessage] =
+    useState("");
+
+  const [scanType, setScanType] =
+    useState("");
+
+  const scannerRef =
+    useRef(null);
+
+  const processingRef =
+    useRef(false);
+
+  const audioContextRef =
+    useRef(null);
 
   const filtered = useMemo(() => {
-    const term = query.trim().toLowerCase();
+    const term =
+      query.trim().toLowerCase();
 
-    if (!term) return registrations;
+    if (!term) {
+      return registrations;
+    }
 
-    return registrations.filter((item) =>
-      [
-        item.full_name,
-        item.email,
-        item.phone,
-        item.registration_code,
-      ]
-        .join(" ")
-        .toLowerCase()
-        .includes(term),
+    return registrations.filter(
+      (item) =>
+        [
+          item.full_name,
+          item.email,
+          item.phone,
+          item.registration_code,
+        ]
+          .join(" ")
+          .toLowerCase()
+          .includes(term),
     );
   }, [registrations, query]);
 
-  const activeRegistrations = registrations.filter(
-    (item) => item.status === "confirmed",
-  );
+  const activeRegistrations =
+    registrations.filter(
+      (item) =>
+        item.status === "confirmed",
+    );
 
-  const reservedPlaces = activeRegistrations.reduce(
-    (sum, item) => sum + Number(item.ticket_quantity),
-    0,
-  );
+  const reservedPlaces =
+    activeRegistrations.reduce(
+      (sum, item) =>
+        sum +
+        Number(item.ticket_quantity),
+      0,
+    );
 
-  const checkedInPlaces = activeRegistrations
-    .filter((item) => item.checked_in)
-    .reduce((sum, item) => sum + Number(item.ticket_quantity), 0);
+  const checkedInPlaces =
+    activeRegistrations
+      .filter(
+        (item) => item.checked_in,
+      )
+      .reduce(
+        (sum, item) =>
+          sum +
+          Number(
+            item.ticket_quantity,
+          ),
+        0,
+      );
 
-  async function updateCheckIn(registration, checkedIn) {
-    setUpdatingId(registration.id);
+  function getAudioContext() {
+    if (
+      typeof window ===
+      "undefined"
+    ) {
+      return null;
+    }
 
+    const AudioContextClass =
+      window.AudioContext ||
+      window.webkitAudioContext;
+
+    if (!AudioContextClass) {
+      return null;
+    }
+
+    if (
+      !audioContextRef.current
+    ) {
+      audioContextRef.current =
+        new AudioContextClass();
+    }
+
+    return audioContextRef.current;
+  }
+
+  async function ensureAudioReady() {
     try {
-      const response = await fetch("/api/admin/check-in", {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          registrationId: registration.id,
-          checkedIn,
-        }),
-      });
+      const audioContext =
+        getAudioContext();
 
-      const result = await response.json();
-
-      if (!response.ok) {
-        throw new Error(result.error || "Check-in could not be updated.");
+      if (!audioContext) {
+        return;
       }
 
-      setRegistrations((current) =>
-        current.map((item) =>
-          item.id === registration.id
-            ? { ...item, checked_in: result.checkedIn }
-            : item,
-        ),
+      if (
+        audioContext.state ===
+        "suspended"
+      ) {
+        await audioContext.resume();
+      }
+    } catch (error) {
+      console.error(
+        "Could not initialise scanner audio:",
+        error,
+      );
+    }
+  }
+
+  function playTone({
+    frequency,
+    duration,
+    volume = 0.12,
+    delay = 0,
+  }) {
+    try {
+      const audioContext =
+        getAudioContext();
+
+      if (!audioContext) {
+        return;
+      }
+
+      const startTime =
+        audioContext.currentTime +
+        delay;
+
+      const oscillator =
+        audioContext.createOscillator();
+
+      const gainNode =
+        audioContext.createGain();
+
+      oscillator.type = "sine";
+
+      oscillator.frequency.setValueAtTime(
+        frequency,
+        startTime,
+      );
+
+      gainNode.gain.setValueAtTime(
+        0.0001,
+        startTime,
+      );
+
+      gainNode.gain.exponentialRampToValueAtTime(
+        volume,
+        startTime + 0.01,
+      );
+
+      gainNode.gain.exponentialRampToValueAtTime(
+        0.0001,
+        startTime + duration,
+      );
+
+      oscillator.connect(
+        gainNode,
+      );
+
+      gainNode.connect(
+        audioContext.destination,
+      );
+
+      oscillator.start(
+        startTime,
+      );
+
+      oscillator.stop(
+        startTime +
+          duration +
+          0.03,
+      );
+    } catch (error) {
+      console.error(
+        "Scanner sound error:",
+        error,
+      );
+    }
+  }
+
+  function playSuccessSound() {
+    playTone({
+      frequency: 950,
+      duration: 0.16,
+      volume: 0.14,
+    });
+  }
+
+  function playErrorSound() {
+    playTone({
+      frequency: 330,
+      duration: 0.17,
+      volume: 0.13,
+    });
+
+    playTone({
+      frequency: 220,
+      duration: 0.22,
+      volume: 0.13,
+      delay: 0.2,
+    });
+  }
+
+  async function updateCheckIn(
+    registration,
+    checkedIn,
+  ) {
+    setUpdatingId(
+      registration.id,
+    );
+
+    try {
+      const response =
+        await fetch(
+          "/api/admin/check-in",
+          {
+            method: "PATCH",
+
+            headers: {
+              "Content-Type":
+                "application/json",
+            },
+
+            body: JSON.stringify({
+              registrationId:
+                registration.id,
+
+              checkedIn,
+            }),
+          },
+        );
+
+      const result =
+        await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          result.error ||
+            "Check-in could not be updated.",
+        );
+      }
+
+      setRegistrations(
+        (current) =>
+          current.map(
+            (item) =>
+              item.id ===
+              registration.id
+                ? {
+                    ...item,
+                    checked_in:
+                      result.checkedIn,
+                  }
+                : item,
+          ),
       );
 
       return result.checkedIn;
@@ -81,9 +292,14 @@ export default function AdminDashboard({
     }
   }
 
-  async function toggleCheckIn(registration) {
+  async function toggleCheckIn(
+    registration,
+  ) {
     try {
-      await updateCheckIn(registration, !registration.checked_in);
+      await updateCheckIn(
+        registration,
+        !registration.checked_in,
+      );
     } catch (error) {
       window.alert(
         error instanceof Error
@@ -93,87 +309,153 @@ export default function AdminDashboard({
     }
   }
 
-  function extractQrToken(decodedText) {
+  function extractQrToken(
+    decodedText,
+  ) {
     try {
-      const url = new URL(decodedText);
-      const parts = url.pathname.split("/").filter(Boolean);
+      const url =
+        new URL(decodedText);
 
-      if (parts[0] === "ticket" && parts[1]) {
+      const parts =
+        url.pathname
+          .split("/")
+          .filter(Boolean);
+
+      if (
+        parts[0] === "ticket" &&
+        parts[1]
+      ) {
         return parts[1];
       }
     } catch {
-      const parts = decodedText.split("/").filter(Boolean);
+      const parts =
+        decodedText
+          .split("/")
+          .filter(Boolean);
+
       return parts.at(-1) || "";
     }
 
     return "";
   }
 
-  async function handleSuccessfulScan(decodedText) {
-    if (processingRef.current) return;
+  function showScanError(
+    message,
+  ) {
+    setScanType("error");
+    setScanMessage(message);
+    playErrorSound();
+  }
+
+  function showScanWarning(
+    message,
+  ) {
+    setScanType("warning");
+    setScanMessage(message);
+    playErrorSound();
+  }
+
+  function showScanSuccess(
+    message,
+  ) {
+    setScanType("success");
+    setScanMessage(message);
+    playSuccessSound();
+  }
+
+  async function handleSuccessfulScan(
+    decodedText,
+  ) {
+    if (
+      processingRef.current
+    ) {
+      return;
+    }
 
     processingRef.current = true;
 
     try {
-      const qrToken = extractQrToken(decodedText);
+      const qrToken =
+        extractQrToken(
+          decodedText,
+        );
 
       if (!qrToken) {
-        setScanType("error");
-        setScanMessage("Invalid QR ticket.");
+        showScanError(
+          "Invalid QR ticket.",
+        );
+
         return;
       }
 
-      const registration = registrations.find(
-        (item) => item.qr_token === qrToken,
-      );
+      const registration =
+        registrations.find(
+          (item) =>
+            item.qr_token ===
+            qrToken,
+        );
 
       if (!registration) {
-        setScanType("error");
-        setScanMessage("Ticket not found in the registration database.");
+        showScanError(
+          "Ticket not found in the registration database.",
+        );
+
         return;
       }
 
-      if (!registration.email_verified) {
-        setScanType("error");
-        setScanMessage(
+      if (
+        !registration.email_verified
+      ) {
+        showScanError(
           `${registration.full_name}'s email has not been verified.`,
         );
+
         return;
       }
 
-      if (registration.status !== "confirmed") {
-        setScanType("error");
-        setScanMessage(
+      if (
+        registration.status !==
+        "confirmed"
+      ) {
+        showScanError(
           `${registration.full_name}'s registration is not confirmed.`,
         );
+
         return;
       }
 
-      if (registration.checked_in) {
-        setScanType("warning");
-        setScanMessage(
+      if (
+        registration.checked_in
+      ) {
+        showScanWarning(
           `${registration.full_name} has already been checked in.`,
         );
+
         return;
       }
 
-      await updateCheckIn(registration, true);
+      await updateCheckIn(
+        registration,
+        true,
+      );
 
-      setScanType("success");
-      setScanMessage(
+      showScanSuccess(
         `${registration.full_name} checked in successfully. Code: ${registration.registration_code}`,
       );
     } catch (error) {
-      setScanType("error");
-      setScanMessage(
+      showScanError(
         error instanceof Error
           ? error.message
           : "The QR ticket could not be processed.",
       );
     } finally {
-      window.setTimeout(() => {
-        processingRef.current = false;
-      }, 1800);
+      window.setTimeout(
+        () => {
+          processingRef.current =
+            false;
+        },
+        1800,
+      );
     }
   }
 
@@ -182,16 +464,34 @@ export default function AdminDashboard({
     setScanType("");
 
     try {
-      const { Html5Qrcode } = await import("html5-qrcode");
+      await ensureAudioReady();
 
-      const scanner = new Html5Qrcode("admin-qr-reader");
-      scannerRef.current = scanner;
+      const {
+        Html5Qrcode,
+      } = await import(
+        "html5-qrcode"
+      );
+
+      const scanner =
+        new Html5Qrcode(
+          "admin-qr-reader",
+        );
+
+      scannerRef.current =
+        scanner;
 
       await scanner.start(
-        { facingMode: "environment" },
+        {
+          facingMode:
+            "environment",
+        },
         {
           fps: 10,
-          qrbox: { width: 250, height: 250 },
+
+          qrbox: {
+            width: 250,
+            height: 250,
+          },
         },
         handleSuccessfulScan,
         () => {},
@@ -199,36 +499,62 @@ export default function AdminDashboard({
 
       setScannerActive(true);
     } catch (error) {
-      scannerRef.current = null;
+      scannerRef.current =
+        null;
+
       setScannerActive(false);
-      setScanType("error");
-      setScanMessage(
+
+      showScanError(
         "Camera could not start. Allow camera permission and try again.",
       );
 
-      console.error("QR scanner error:", error);
+      console.error(
+        "QR scanner error:",
+        error,
+      );
     }
   }
 
   async function stopScanner() {
     try {
-      if (scannerRef.current?.isScanning) {
+      if (
+        scannerRef.current
+          ?.isScanning
+      ) {
         await scannerRef.current.stop();
       }
 
       scannerRef.current?.clear();
     } catch (error) {
-      console.error("Could not stop QR scanner:", error);
+      console.error(
+        "Could not stop QR scanner:",
+        error,
+      );
     } finally {
-      scannerRef.current = null;
+      scannerRef.current =
+        null;
+
       setScannerActive(false);
     }
   }
 
   useEffect(() => {
     return () => {
-      if (scannerRef.current?.isScanning) {
-        scannerRef.current.stop().catch(() => {});
+      if (
+        scannerRef.current
+          ?.isScanning
+      ) {
+        scannerRef.current
+          .stop()
+          .catch(() => {});
+      }
+
+      if (
+        audioContextRef.current
+      ) {
+        audioContextRef.current
+          .close()
+          .catch(() => {});
       }
     };
   }, []);
@@ -246,59 +572,154 @@ export default function AdminDashboard({
       "Created At",
     ];
 
-    const rows = registrations.map((item) => [
-      item.registration_code,
-      item.full_name,
-      item.email,
-      item.phone,
-      item.ticket_quantity,
-      item.status,
-      item.email_verified ? "Yes" : "No",
-      item.checked_in ? "Yes" : "No",
-      item.created_at,
-    ]);
+    const rows =
+      registrations.map(
+        (item) => [
+          item.registration_code,
+          item.full_name,
+          item.email,
+          item.phone,
+          item.ticket_quantity,
+          item.status,
+          item.email_verified
+            ? "Yes"
+            : "No",
+          item.checked_in
+            ? "Yes"
+            : "No",
+          item.created_at,
+        ],
+      );
 
-    const csv = [headers, ...rows]
+    const csv = [
+      headers,
+      ...rows,
+    ]
       .map((row) =>
         row
-          .map((value) => `"${String(value ?? "").replaceAll('"', '""')}"`)
+          .map(
+            (value) =>
+              `"${String(
+                value ?? "",
+              ).replaceAll(
+                '"',
+                '""',
+              )}"`,
+          )
           .join(","),
       )
       .join("\n");
 
-    const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
+    const blob =
+      new Blob(
+        [csv],
+        {
+          type:
+            "text/csv;charset=utf-8",
+        },
+      );
+
+    const url =
+      URL.createObjectURL(blob);
+
+    const link =
+      document.createElement("a");
 
     link.href = url;
-    link.download = "sat-chit-ananda-registrations.csv";
+
+    link.download =
+      "sat-chit-ananda-registrations.csv";
+
     link.click();
 
     URL.revokeObjectURL(url);
   }
 
+  const scannerMessageStyle = {
+    maxWidth: "620px",
+    margin: "20px auto 0",
+    padding: "18px",
+    borderRadius: "12px",
+    textAlign: "center",
+    fontWeight: "800",
+    fontSize: "16px",
+    lineHeight: 1.5,
+
+    background:
+      scanType === "success"
+        ? "#071d10"
+        : scanType === "warning"
+          ? "#241b00"
+          : "#220909",
+
+    color:
+      scanType === "success"
+        ? "#7dff9f"
+        : scanType === "warning"
+          ? "#ffd86b"
+          : "#ff8b8b",
+
+    border:
+      scanType === "success"
+        ? "1px solid #2ecc71"
+        : scanType === "warning"
+          ? "1px solid #d9a928"
+          : "1px solid #e55353",
+
+    boxShadow:
+      scanType === "success"
+        ? "0 0 0 1px rgba(46,204,113,0.08), 0 10px 30px rgba(0,0,0,0.35)"
+        : scanType === "warning"
+          ? "0 0 0 1px rgba(217,169,40,0.08), 0 10px 30px rgba(0,0,0,0.35)"
+          : "0 0 0 1px rgba(229,83,83,0.08), 0 10px 30px rgba(0,0,0,0.35)",
+  };
+
   return (
     <main className="adminShell">
       <header className="adminHeader">
         <div>
-          <p className="sectionEyebrow gold">Organiser portal</p>
-          <h1>Registration dashboard</h1>
+          <p className="sectionEyebrow gold">
+            Organiser portal
+          </p>
+
+          <h1>
+            Registration dashboard
+          </h1>
+
           <p>
-            Signed in as <strong>{adminName}</strong> ({adminEmail})
+            Signed in as{" "}
+            <strong>
+              {adminName}
+            </strong>{" "}
+            ({adminEmail})
           </p>
         </div>
 
         <div className="adminActions">
-          <a href="/" className="adminActionLink">
+          <a
+            href="/"
+            className="adminActionLink"
+          >
             View public website
           </a>
 
-          <button onClick={exportCsv} disabled={!registrations.length}>
+          <button
+            onClick={exportCsv}
+            disabled={
+              !registrations.length
+            }
+          >
             Export CSV
           </button>
 
-          <form action="/auth/signout" method="post">
-            <button className="dangerButton" type="submit">
+          <form
+            action="/auth/signout"
+            method="post"
+          >
+            <button
+              className="dangerButton"
+              type="submit"
+            >
               Sign out
             </button>
           </form>
@@ -307,77 +728,194 @@ export default function AdminDashboard({
 
       <section className="statGrid">
         <article>
-          <small>Registrations</small>
-          <strong>{activeRegistrations.length}</strong>
+          <small>
+            Registrations
+          </small>
+
+          <strong>
+            {
+              activeRegistrations.length
+            }
+          </strong>
         </article>
 
         <article>
-          <small>Reserved places</small>
-          <strong>{reservedPlaces}</strong>
+          <small>
+            Reserved places
+          </small>
+
+          <strong>
+            {reservedPlaces}
+          </strong>
         </article>
 
         <article>
-          <small>Remaining capacity</small>
-          <strong>{Math.max(350 - reservedPlaces, 0)}</strong>
+          <small>
+            Remaining capacity
+          </small>
+
+          <strong>
+            {Math.max(
+              350 -
+                reservedPlaces,
+              0,
+            )}
+          </strong>
         </article>
 
         <article>
-          <small>Checked in</small>
-          <strong>{checkedInPlaces}</strong>
+          <small>
+            Checked in
+          </small>
+
+          <strong>
+            {checkedInPlaces}
+          </strong>
         </article>
       </section>
 
       <section
         className="adminTableCard"
-        style={{ marginBottom: "24px", padding: "24px" }}
+        style={{
+          marginBottom: "24px",
+          padding: "24px",
+          background:
+            "#050505",
+          border:
+            "1px solid #242424",
+          boxShadow:
+            "0 18px 50px rgba(0,0,0,0.35)",
+        }}
       >
         <div className="tableToolbar">
           <div>
-            <h2>QR ticket scanner</h2>
-            <p>Scan an attendee’s confirmed ticket to check them in.</p>
+            <h2
+              style={{
+                color: "#ffffff",
+                marginBottom: "6px",
+              }}
+            >
+              QR ticket scanner
+            </h2>
+
+            <p
+              style={{
+                color: "#c8c8c8",
+              }}
+            >
+              Scan an attendee’s
+              confirmed ticket to
+              check them in.
+            </p>
           </div>
 
           <button
             type="button"
-            onClick={scannerActive ? stopScanner : startScanner}
+            onClick={
+              scannerActive
+                ? stopScanner
+                : startScanner
+            }
+            style={{
+              background:
+                scannerActive
+                  ? "#2a2a2a"
+                  : "#ffffff",
+
+              color:
+                scannerActive
+                  ? "#ffffff"
+                  : "#050505",
+
+              border:
+                "1px solid #5a5a5a",
+
+              fontWeight: "800",
+            }}
           >
-            {scannerActive ? "Stop scanner" : "Start scanner"}
+            {scannerActive
+              ? "Stop scanner"
+              : "Start scanner"}
           </button>
         </div>
 
         <div
-          id="admin-qr-reader"
           style={{
-            maxWidth: "480px",
-            margin: scannerActive ? "24px auto 0" : "0 auto",
-            overflow: "hidden",
-            borderRadius: "14px",
+            maxWidth: "520px",
+            margin:
+              scannerActive
+                ? "24px auto 0"
+                : "18px auto 0",
+            padding:
+              scannerActive
+                ? "10px"
+                : "0",
+            borderRadius:
+              "18px",
+            background:
+              "#000000",
+            border:
+              scannerActive
+                ? "2px solid #333333"
+                : "1px solid #1f1f1f",
+            overflow:
+              "hidden",
           }}
-        />
+        >
+          <div
+            id="admin-qr-reader"
+            style={{
+              width: "100%",
+              minHeight:
+                scannerActive
+                  ? "320px"
+                  : "0",
+              overflow:
+                "hidden",
+              borderRadius:
+                "14px",
+              background:
+                "#000000",
+              color:
+                "#ffffff",
+            }}
+          />
+        </div>
+
+        {!scannerActive &&
+        !scanMessage ? (
+          <p
+            style={{
+              textAlign:
+                "center",
+              margin:
+                "18px 0 0",
+              color:
+                "#9a9a9a",
+              fontSize:
+                "14px",
+            }}
+          >
+            Press Start scanner
+            and allow camera
+            access.
+          </p>
+        ) : null}
 
         {scanMessage ? (
           <div
-            style={{
-              maxWidth: "620px",
-              margin: "20px auto 0",
-              padding: "16px",
-              borderRadius: "10px",
-              textAlign: "center",
-              fontWeight: "700",
-              background:
-                scanType === "success"
-                  ? "#e7f7ed"
-                  : scanType === "warning"
-                    ? "#fff4d6"
-                    : "#fde8e8",
-              color:
-                scanType === "success"
-                  ? "#176b37"
-                  : scanType === "warning"
-                    ? "#805b00"
-                    : "#9b1c1c",
-            }}
+            style={
+              scannerMessageStyle
+            }
           >
+            {scanType ===
+            "success"
+              ? "✓ "
+              : scanType ===
+                  "warning"
+                ? "⚠ "
+                : "✕ "}
+
             {scanMessage}
           </div>
         ) : null}
@@ -386,15 +924,28 @@ export default function AdminDashboard({
       <section className="adminTableCard">
         <div className="tableToolbar">
           <div>
-            <h2>Attendee list</h2>
+            <h2>
+              Attendee list
+            </h2>
+
             <p>
-              {filtered.length} record{filtered.length === 1 ? "" : "s"} shown
+              {filtered.length}{" "}
+              record
+              {filtered.length ===
+              1
+                ? ""
+                : "s"}{" "}
+              shown
             </p>
           </div>
 
           <input
             value={query}
-            onChange={(event) => setQuery(event.target.value)}
+            onChange={(event) =>
+              setQuery(
+                event.target.value,
+              )
+            }
             placeholder="Search name, email, phone or code"
           />
         </div>
@@ -404,77 +955,145 @@ export default function AdminDashboard({
             <table>
               <thead>
                 <tr>
-                  <th>Guest</th>
-                  <th>Contact</th>
-                  <th>Code</th>
-                  <th>Places</th>
-                  <th>Status</th>
+                  <th>
+                    Guest
+                  </th>
+
+                  <th>
+                    Contact
+                  </th>
+
+                  <th>
+                    Code
+                  </th>
+
+                  <th>
+                    Places
+                  </th>
+
+                  <th>
+                    Status
+                  </th>
+
                   <th />
                 </tr>
               </thead>
 
               <tbody>
-                {filtered.map((item) => (
-                  <tr key={item.id}>
-                    <td>
-                      <strong>{item.full_name}</strong>
-                      <small>
-                        {new Date(item.created_at).toLocaleString("en-AU")}
-                      </small>
-                    </td>
+                {filtered.map(
+                  (item) => (
+                    <tr
+                      key={
+                        item.id
+                      }
+                    >
+                      <td>
+                        <strong>
+                          {
+                            item.full_name
+                          }
+                        </strong>
 
-                    <td>
-                      <span>{item.email}</span>
-                      <small>{item.phone}</small>
-                    </td>
+                        <small>
+                          {new Date(
+                            item.created_at,
+                          ).toLocaleString(
+                            "en-AU",
+                          )}
+                        </small>
+                      </td>
 
-                    <td>
-                      <code>{item.registration_code}</code>
-                    </td>
+                      <td>
+                        <span>
+                          {
+                            item.email
+                          }
+                        </span>
 
-                    <td>{item.ticket_quantity}</td>
+                        <small>
+                          {
+                            item.phone
+                          }
+                        </small>
+                      </td>
 
-                    <td>
-                      <span
-                        className={
-                          item.checked_in
-                            ? "statusChecked"
-                            : "statusPending"
+                      <td>
+                        <code>
+                          {
+                            item.registration_code
+                          }
+                        </code>
+                      </td>
+
+                      <td>
+                        {
+                          item.ticket_quantity
                         }
-                      >
-                        {item.checked_in ? "Checked in" : "Registered"}
-                      </span>
+                      </td>
 
-                      <small>
-                        {item.email_verified
-                          ? "Email verified"
-                          : "Email unverified"}
-                      </small>
-                    </td>
+                      <td>
+                        <span
+                          className={
+                            item.checked_in
+                              ? "statusChecked"
+                              : "statusPending"
+                          }
+                        >
+                          {item.checked_in
+                            ? "Checked in"
+                            : "Registered"}
+                        </span>
 
-                    <td>
-                      <button
-                        className="tableButton"
-                        disabled={updatingId === item.id}
-                        onClick={() => toggleCheckIn(item)}
-                      >
-                        {updatingId === item.id
-                          ? "Saving..."
-                          : item.checked_in
-                            ? "Undo"
-                            : "Check in"}
-                      </button>
-                    </td>
-                  </tr>
-                ))}
+                        <small>
+                          {item.email_verified
+                            ? "Email verified"
+                            : "Email unverified"}
+                        </small>
+                      </td>
+
+                      <td>
+                        <button
+                          className="tableButton"
+                          disabled={
+                            updatingId ===
+                            item.id
+                          }
+                          onClick={() =>
+                            toggleCheckIn(
+                              item,
+                            )
+                          }
+                        >
+                          {updatingId ===
+                          item.id
+                            ? "Saving..."
+                            : item.checked_in
+                              ? "Undo"
+                              : "Check in"}
+                        </button>
+                      </td>
+                    </tr>
+                  ),
+                )}
               </tbody>
             </table>
           </div>
         ) : (
           <div className="emptyState">
-            <div>ॐ</div>
-            <h3>No matching registrations</h3>
-            <p>New public registrations will appear here.</p>
+            <div>
+              ॐ
+            </div>
+
+            <h3>
+              No matching
+              registrations
+            </h3>
+
+            <p>
+              New public
+              registrations will
+              appear here.
+            </p>
           </div>
         )}
       </section>
