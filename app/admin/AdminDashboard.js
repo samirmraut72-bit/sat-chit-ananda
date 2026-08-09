@@ -30,6 +30,9 @@ export default function AdminDashboard({
   const [scanType, setScanType] =
     useState("");
 
+  const [scanPopupOpen, setScanPopupOpen] =
+    useState(false);
+
   const scannerRef =
     useRef(null);
 
@@ -37,6 +40,9 @@ export default function AdminDashboard({
     useRef(false);
 
   const audioContextRef =
+    useRef(null);
+
+  const popupTimerRef =
     useRef(null);
 
   const filtered = useMemo(() => {
@@ -115,7 +121,7 @@ export default function AdminDashboard({
     return audioContextRef.current;
   }
 
-  async function ensureAudioReady() {
+  async function unlockAudio() {
     try {
       const audioContext =
         getAudioContext();
@@ -130,9 +136,39 @@ export default function AdminDashboard({
       ) {
         await audioContext.resume();
       }
+
+      const oscillator =
+        audioContext.createOscillator();
+
+      const gainNode =
+        audioContext.createGain();
+
+      oscillator.frequency.value =
+        440;
+
+      oscillator.type =
+        "sine";
+
+      gainNode.gain.value =
+        0.0001;
+
+      oscillator.connect(
+        gainNode,
+      );
+
+      gainNode.connect(
+        audioContext.destination,
+      );
+
+      oscillator.start();
+
+      oscillator.stop(
+        audioContext.currentTime +
+          0.05,
+      );
     } catch (error) {
       console.error(
-        "Could not initialise scanner audio:",
+        "Could not unlock scanner audio:",
         error,
       );
     }
@@ -141,8 +177,9 @@ export default function AdminDashboard({
   function playTone({
     frequency,
     duration,
-    volume = 0.12,
+    volume = 0.35,
     delay = 0,
+    type = "sine",
   }) {
     try {
       const audioContext =
@@ -150,6 +187,15 @@ export default function AdminDashboard({
 
       if (!audioContext) {
         return;
+      }
+
+      if (
+        audioContext.state ===
+        "suspended"
+      ) {
+        audioContext
+          .resume()
+          .catch(() => {});
       }
 
       const startTime =
@@ -162,7 +208,8 @@ export default function AdminDashboard({
       const gainNode =
         audioContext.createGain();
 
-      oscillator.type = "sine";
+      oscillator.type =
+        type;
 
       oscillator.frequency.setValueAtTime(
         frequency,
@@ -170,17 +217,17 @@ export default function AdminDashboard({
       );
 
       gainNode.gain.setValueAtTime(
-        0.0001,
+        0.001,
         startTime,
       );
 
-      gainNode.gain.exponentialRampToValueAtTime(
+      gainNode.gain.linearRampToValueAtTime(
         volume,
-        startTime + 0.01,
+        startTime + 0.015,
       );
 
-      gainNode.gain.exponentialRampToValueAtTime(
-        0.0001,
+      gainNode.gain.linearRampToValueAtTime(
+        0.001,
         startTime + duration,
       );
 
@@ -211,25 +258,106 @@ export default function AdminDashboard({
 
   function playSuccessSound() {
     playTone({
-      frequency: 950,
-      duration: 0.16,
-      volume: 0.14,
+      frequency: 1250,
+      duration: 0.22,
+      volume: 0.4,
+      type: "square",
     });
+
+    if (
+      typeof navigator !==
+        "undefined" &&
+      navigator.vibrate
+    ) {
+      navigator.vibrate(120);
+    }
   }
 
   function playErrorSound() {
     playTone({
-      frequency: 330,
-      duration: 0.17,
-      volume: 0.13,
+      frequency: 300,
+      duration: 0.2,
+      volume: 0.4,
+      type: "square",
     });
 
     playTone({
-      frequency: 220,
-      duration: 0.22,
-      volume: 0.13,
-      delay: 0.2,
+      frequency: 190,
+      duration: 0.28,
+      volume: 0.4,
+      delay: 0.23,
+      type: "square",
     });
+
+    if (
+      typeof navigator !==
+        "undefined" &&
+      navigator.vibrate
+    ) {
+      navigator.vibrate([
+        120,
+        80,
+        180,
+      ]);
+    }
+  }
+
+  function openScanPopup(
+    type,
+    message,
+  ) {
+    setScanType(type);
+    setScanMessage(message);
+    setScanPopupOpen(true);
+
+    if (
+      popupTimerRef.current
+    ) {
+      window.clearTimeout(
+        popupTimerRef.current,
+      );
+    }
+
+    popupTimerRef.current =
+      window.setTimeout(
+        () => {
+          setScanPopupOpen(false);
+        },
+        2200,
+      );
+  }
+
+  function showScanError(
+    message,
+  ) {
+    openScanPopup(
+      "error",
+      message,
+    );
+
+    playErrorSound();
+  }
+
+  function showScanWarning(
+    message,
+  ) {
+    openScanPopup(
+      "warning",
+      message,
+    );
+
+    playErrorSound();
+  }
+
+  function showScanSuccess(
+    message,
+  ) {
+    openScanPopup(
+      "success",
+      message,
+    );
+
+    playSuccessSound();
   }
 
   async function updateCheckIn(
@@ -339,30 +467,6 @@ export default function AdminDashboard({
     return "";
   }
 
-  function showScanError(
-    message,
-  ) {
-    setScanType("error");
-    setScanMessage(message);
-    playErrorSound();
-  }
-
-  function showScanWarning(
-    message,
-  ) {
-    setScanType("warning");
-    setScanMessage(message);
-    playErrorSound();
-  }
-
-  function showScanSuccess(
-    message,
-  ) {
-    setScanType("success");
-    setScanMessage(message);
-    playSuccessSound();
-  }
-
   async function handleSuccessfulScan(
     decodedText,
   ) {
@@ -462,10 +566,11 @@ export default function AdminDashboard({
   async function startScanner() {
     setScanMessage("");
     setScanType("");
+    setScanPopupOpen(false);
+
+    await unlockAudio();
 
     try {
-      await ensureAudioReady();
-
       const {
         Html5Qrcode,
       } = await import(
@@ -556,6 +661,14 @@ export default function AdminDashboard({
           .close()
           .catch(() => {});
       }
+
+      if (
+        popupTimerRef.current
+      ) {
+        window.clearTimeout(
+          popupTimerRef.current,
+        );
+      }
     };
   }, []);
 
@@ -635,44 +748,39 @@ export default function AdminDashboard({
     URL.revokeObjectURL(url);
   }
 
-  const scannerMessageStyle = {
-    maxWidth: "620px",
-    margin: "20px auto 0",
-    padding: "18px",
-    borderRadius: "12px",
-    textAlign: "center",
-    fontWeight: "800",
-    fontSize: "16px",
-    lineHeight: 1.5,
+  const popupIsSuccess =
+    scanType === "success";
 
-    background:
-      scanType === "success"
-        ? "#071d10"
-        : scanType === "warning"
-          ? "#241b00"
-          : "#220909",
+  const popupIsWarning =
+    scanType === "warning";
 
-    color:
-      scanType === "success"
-        ? "#7dff9f"
-        : scanType === "warning"
-          ? "#ffd86b"
-          : "#ff8b8b",
+  const popupAccent =
+    popupIsSuccess
+      ? "#34e875"
+      : popupIsWarning
+        ? "#f5c542"
+        : "#ff5757";
 
-    border:
-      scanType === "success"
-        ? "1px solid #2ecc71"
-        : scanType === "warning"
-          ? "1px solid #d9a928"
-          : "1px solid #e55353",
+  const popupBackground =
+    popupIsSuccess
+      ? "#06140b"
+      : popupIsWarning
+        ? "#171300"
+        : "#180606";
 
-    boxShadow:
-      scanType === "success"
-        ? "0 0 0 1px rgba(46,204,113,0.08), 0 10px 30px rgba(0,0,0,0.35)"
-        : scanType === "warning"
-          ? "0 0 0 1px rgba(217,169,40,0.08), 0 10px 30px rgba(0,0,0,0.35)"
-          : "0 0 0 1px rgba(229,83,83,0.08), 0 10px 30px rgba(0,0,0,0.35)",
-  };
+  const popupTitle =
+    popupIsSuccess
+      ? "CHECK-IN SUCCESSFUL"
+      : popupIsWarning
+        ? "ALREADY CHECKED IN"
+        : "CHECK-IN FAILED";
+
+  const popupSymbol =
+    popupIsSuccess
+      ? "✓"
+      : popupIsWarning
+        ? "!"
+        : "✕";
 
   return (
     <main className="adminShell">
@@ -830,7 +938,8 @@ export default function AdminDashboard({
               border:
                 "1px solid #5a5a5a",
 
-              fontWeight: "800",
+              fontWeight:
+                "800",
             }}
           >
             {scannerActive
@@ -842,22 +951,28 @@ export default function AdminDashboard({
         <div
           style={{
             maxWidth: "520px",
+
             margin:
               scannerActive
                 ? "24px auto 0"
                 : "18px auto 0",
+
             padding:
               scannerActive
                 ? "10px"
                 : "0",
+
             borderRadius:
               "18px",
+
             background:
               "#000000",
+
             border:
               scannerActive
                 ? "2px solid #333333"
                 : "1px solid #1f1f1f",
+
             overflow:
               "hidden",
           }}
@@ -866,32 +981,39 @@ export default function AdminDashboard({
             id="admin-qr-reader"
             style={{
               width: "100%",
+
               minHeight:
                 scannerActive
                   ? "320px"
                   : "0",
+
               overflow:
                 "hidden",
+
               borderRadius:
                 "14px",
+
               background:
                 "#000000",
+
               color:
                 "#ffffff",
             }}
           />
         </div>
 
-        {!scannerActive &&
-        !scanMessage ? (
+        {!scannerActive ? (
           <p
             style={{
               textAlign:
                 "center",
+
               margin:
                 "18px 0 0",
+
               color:
                 "#9a9a9a",
+
               fontSize:
                 "14px",
             }}
@@ -900,25 +1022,30 @@ export default function AdminDashboard({
             and allow camera
             access.
           </p>
-        ) : null}
+        ) : (
+          <p
+            style={{
+              textAlign:
+                "center",
 
-        {scanMessage ? (
-          <div
-            style={
-              scannerMessageStyle
-            }
+              margin:
+                "18px 0 0",
+
+              color:
+                "#b8b8b8",
+
+              fontSize:
+                "14px",
+
+              fontWeight:
+                "700",
+            }}
           >
-            {scanType ===
-            "success"
-              ? "✓ "
-              : scanType ===
-                  "warning"
-                ? "⚠ "
-                : "✕ "}
-
-            {scanMessage}
-          </div>
-        ) : null}
+            Scanner active —
+            point the camera at
+            the attendee QR code.
+          </p>
+        )}
       </section>
 
       <section className="adminTableCard">
@@ -1097,6 +1224,159 @@ export default function AdminDashboard({
           </div>
         )}
       </section>
+
+      {scanPopupOpen ? (
+        <div
+          style={{
+            position: "fixed",
+            inset: 0,
+            zIndex: 99999,
+
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+
+            padding: "24px",
+
+            background:
+              "rgba(0,0,0,0.78)",
+
+            backdropFilter:
+              "blur(6px)",
+          }}
+        >
+          <div
+            style={{
+              width:
+                "min(92vw, 520px)",
+
+              background:
+                popupBackground,
+
+              border:
+                `3px solid ${popupAccent}`,
+
+              borderRadius:
+                "24px",
+
+              padding:
+                "36px 26px",
+
+              textAlign:
+                "center",
+
+              boxShadow:
+                `0 0 0 1px ${popupAccent}30, 0 25px 80px rgba(0,0,0,0.65)`,
+
+              color:
+                "#ffffff",
+            }}
+          >
+            <div
+              style={{
+                width:
+                  "88px",
+
+                height:
+                  "88px",
+
+                margin:
+                  "0 auto 22px",
+
+                borderRadius:
+                  "50%",
+
+                border:
+                  `4px solid ${popupAccent}`,
+
+                color:
+                  popupAccent,
+
+                display:
+                  "flex",
+
+                alignItems:
+                  "center",
+
+                justifyContent:
+                  "center",
+
+                fontSize:
+                  "52px",
+
+                fontWeight:
+                  "900",
+
+                lineHeight:
+                  1,
+              }}
+            >
+              {popupSymbol}
+            </div>
+
+            <h2
+              style={{
+                margin:
+                  "0 0 16px",
+
+                color:
+                  popupAccent,
+
+                fontSize:
+                  "clamp(26px, 7vw, 38px)",
+
+                fontWeight:
+                  "900",
+
+                letterSpacing:
+                  "0.04em",
+              }}
+            >
+              {popupTitle}
+            </h2>
+
+            <p
+              style={{
+                margin:
+                  "0 auto",
+
+                maxWidth:
+                  "430px",
+
+                color:
+                  "#ffffff",
+
+                fontSize:
+                  "clamp(17px, 4.5vw, 22px)",
+
+                fontWeight:
+                  "700",
+
+                lineHeight:
+                  1.5,
+              }}
+            >
+              {scanMessage}
+            </p>
+
+            <p
+              style={{
+                margin:
+                  "22px 0 0",
+
+                color:
+                  "#bdbdbd",
+
+                fontSize:
+                  "13px",
+              }}
+            >
+              Scanner will be ready
+              for the next attendee.
+            </p>
+          </div>
+        </div>
+      ) : null}
     </main>
   );
 }
