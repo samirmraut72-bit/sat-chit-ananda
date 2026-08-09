@@ -39,7 +39,10 @@ export default function AdminDashboard({
   const processingRef =
     useRef(false);
 
-  const audioContextRef =
+  const successAudioRef =
+    useRef(null);
+
+  const errorAudioRef =
     useRef(null);
 
   const popupTimerRef =
@@ -95,174 +98,123 @@ export default function AdminDashboard({
         0,
       );
 
-  function getAudioContext() {
+  function prepareSounds() {
     if (
       typeof window ===
       "undefined"
     ) {
-      return null;
-    }
-
-    const AudioContextClass =
-      window.AudioContext ||
-      window.webkitAudioContext;
-
-    if (!AudioContextClass) {
-      return null;
+      return;
     }
 
     if (
-      !audioContextRef.current
+      !successAudioRef.current
     ) {
-      audioContextRef.current =
-        new AudioContextClass();
+      const sound =
+        new Audio(
+          "/sounds/success.wav",
+        );
+
+      sound.preload =
+        "auto";
+
+      sound.volume =
+        1;
+
+      successAudioRef.current =
+        sound;
     }
 
-    return audioContextRef.current;
+    if (
+      !errorAudioRef.current
+    ) {
+      const sound =
+        new Audio(
+          "/sounds/error.wav",
+        );
+
+      sound.preload =
+        "auto";
+
+      sound.volume =
+        1;
+
+      errorAudioRef.current =
+        sound;
+    }
   }
 
-  async function unlockAudio() {
-    try {
-      const audioContext =
-        getAudioContext();
+  async function unlockSounds() {
+    prepareSounds();
 
-      if (!audioContext) {
+    const sounds = [
+      successAudioRef.current,
+      errorAudioRef.current,
+    ];
+
+    for (
+      const sound of sounds
+    ) {
+      if (!sound) {
+        continue;
+      }
+
+      try {
+        sound.muted =
+          true;
+
+        sound.currentTime =
+          0;
+
+        await sound.play();
+
+        sound.pause();
+
+        sound.currentTime =
+          0;
+
+        sound.muted =
+          false;
+      } catch (error) {
+        sound.muted =
+          false;
+
+        console.log(
+          "Safari audio unlock:",
+          error,
+        );
+      }
+    }
+  }
+
+  async function playSuccessSound() {
+    try {
+      prepareSounds();
+
+      const sound =
+        successAudioRef.current;
+
+      if (!sound) {
         return;
       }
 
-      if (
-        audioContext.state ===
-        "suspended"
-      ) {
-        await audioContext.resume();
-      }
+      sound.pause();
 
-      const oscillator =
-        audioContext.createOscillator();
+      sound.currentTime =
+        0;
 
-      const gainNode =
-        audioContext.createGain();
+      sound.muted =
+        false;
 
-      oscillator.frequency.value =
-        440;
+      sound.volume =
+        1;
 
-      oscillator.type =
-        "sine";
-
-      gainNode.gain.value =
-        0.0001;
-
-      oscillator.connect(
-        gainNode,
-      );
-
-      gainNode.connect(
-        audioContext.destination,
-      );
-
-      oscillator.start();
-
-      oscillator.stop(
-        audioContext.currentTime +
-          0.05,
-      );
+      await sound.play();
     } catch (error) {
       console.error(
-        "Could not unlock scanner audio:",
+        "Success sound error:",
         error,
       );
     }
-  }
-
-  function playTone({
-    frequency,
-    duration,
-    volume = 0.35,
-    delay = 0,
-    type = "sine",
-  }) {
-    try {
-      const audioContext =
-        getAudioContext();
-
-      if (!audioContext) {
-        return;
-      }
-
-      if (
-        audioContext.state ===
-        "suspended"
-      ) {
-        audioContext
-          .resume()
-          .catch(() => {});
-      }
-
-      const startTime =
-        audioContext.currentTime +
-        delay;
-
-      const oscillator =
-        audioContext.createOscillator();
-
-      const gainNode =
-        audioContext.createGain();
-
-      oscillator.type =
-        type;
-
-      oscillator.frequency.setValueAtTime(
-        frequency,
-        startTime,
-      );
-
-      gainNode.gain.setValueAtTime(
-        0.001,
-        startTime,
-      );
-
-      gainNode.gain.linearRampToValueAtTime(
-        volume,
-        startTime + 0.015,
-      );
-
-      gainNode.gain.linearRampToValueAtTime(
-        0.001,
-        startTime + duration,
-      );
-
-      oscillator.connect(
-        gainNode,
-      );
-
-      gainNode.connect(
-        audioContext.destination,
-      );
-
-      oscillator.start(
-        startTime,
-      );
-
-      oscillator.stop(
-        startTime +
-          duration +
-          0.03,
-      );
-    } catch (error) {
-      console.error(
-        "Scanner sound error:",
-        error,
-      );
-    }
-  }
-
-  function playSuccessSound() {
-    playTone({
-      frequency: 1250,
-      duration: 0.22,
-      volume: 0.4,
-      type: "square",
-    });
 
     if (
       typeof navigator !==
@@ -273,21 +225,35 @@ export default function AdminDashboard({
     }
   }
 
-  function playErrorSound() {
-    playTone({
-      frequency: 300,
-      duration: 0.2,
-      volume: 0.4,
-      type: "square",
-    });
+  async function playErrorSound() {
+    try {
+      prepareSounds();
 
-    playTone({
-      frequency: 190,
-      duration: 0.28,
-      volume: 0.4,
-      delay: 0.23,
-      type: "square",
-    });
+      const sound =
+        errorAudioRef.current;
+
+      if (!sound) {
+        return;
+      }
+
+      sound.pause();
+
+      sound.currentTime =
+        0;
+
+      sound.muted =
+        false;
+
+      sound.volume =
+        1;
+
+      await sound.play();
+    } catch (error) {
+      console.error(
+        "Error sound error:",
+        error,
+      );
+    }
 
     if (
       typeof navigator !==
@@ -307,8 +273,14 @@ export default function AdminDashboard({
     message,
   ) {
     setScanType(type);
-    setScanMessage(message);
-    setScanPopupOpen(true);
+
+    setScanMessage(
+      message,
+    );
+
+    setScanPopupOpen(
+      true,
+    );
 
     if (
       popupTimerRef.current
@@ -321,7 +293,9 @@ export default function AdminDashboard({
     popupTimerRef.current =
       window.setTimeout(
         () => {
-          setScanPopupOpen(false);
+          setScanPopupOpen(
+            false,
+          );
         },
         2200,
       );
@@ -335,7 +309,7 @@ export default function AdminDashboard({
       message,
     );
 
-    playErrorSound();
+    void playErrorSound();
   }
 
   function showScanWarning(
@@ -346,7 +320,7 @@ export default function AdminDashboard({
       message,
     );
 
-    playErrorSound();
+    void playErrorSound();
   }
 
   function showScanSuccess(
@@ -357,7 +331,7 @@ export default function AdminDashboard({
       message,
     );
 
-    playSuccessSound();
+    void playSuccessSound();
   }
 
   async function updateCheckIn(
@@ -380,12 +354,13 @@ export default function AdminDashboard({
                 "application/json",
             },
 
-            body: JSON.stringify({
-              registrationId:
-                registration.id,
+            body:
+              JSON.stringify({
+                registrationId:
+                  registration.id,
 
-              checkedIn,
-            }),
+                checkedIn,
+              }),
           },
         );
 
@@ -407,6 +382,7 @@ export default function AdminDashboard({
               registration.id
                 ? {
                     ...item,
+
                     checked_in:
                       result.checkedIn,
                   }
@@ -450,7 +426,8 @@ export default function AdminDashboard({
           .filter(Boolean);
 
       if (
-        parts[0] === "ticket" &&
+        parts[0] ===
+          "ticket" &&
         parts[1]
       ) {
         return parts[1];
@@ -461,7 +438,10 @@ export default function AdminDashboard({
           .split("/")
           .filter(Boolean);
 
-      return parts.at(-1) || "";
+      return (
+        parts.at(-1) ||
+        ""
+      );
     }
 
     return "";
@@ -476,7 +456,8 @@ export default function AdminDashboard({
       return;
     }
 
-    processingRef.current = true;
+    processingRef.current =
+      true;
 
     try {
       const qrToken =
@@ -499,7 +480,9 @@ export default function AdminDashboard({
             qrToken,
         );
 
-      if (!registration) {
+      if (
+        !registration
+      ) {
         showScanError(
           "Ticket not found in the registration database.",
         );
@@ -565,10 +548,19 @@ export default function AdminDashboard({
 
   async function startScanner() {
     setScanMessage("");
-    setScanType("");
-    setScanPopupOpen(false);
 
-    await unlockAudio();
+    setScanType("");
+
+    setScanPopupOpen(
+      false,
+    );
+
+    /*
+      Important for Safari:
+      sound files are unlocked
+      from the direct button tap.
+    */
+    await unlockSounds();
 
     try {
       const {
@@ -590,6 +582,7 @@ export default function AdminDashboard({
           facingMode:
             "environment",
         },
+
         {
           fps: 10,
 
@@ -598,16 +591,22 @@ export default function AdminDashboard({
             height: 250,
           },
         },
+
         handleSuccessfulScan,
+
         () => {},
       );
 
-      setScannerActive(true);
+      setScannerActive(
+        true,
+      );
     } catch (error) {
       scannerRef.current =
         null;
 
-      setScannerActive(false);
+      setScannerActive(
+        false,
+      );
 
       showScanError(
         "Camera could not start. Allow camera permission and try again.",
@@ -639,11 +638,15 @@ export default function AdminDashboard({
       scannerRef.current =
         null;
 
-      setScannerActive(false);
+      setScannerActive(
+        false,
+      );
     }
   }
 
   useEffect(() => {
+    prepareSounds();
+
     return () => {
       if (
         scannerRef.current
@@ -651,15 +654,27 @@ export default function AdminDashboard({
       ) {
         scannerRef.current
           .stop()
-          .catch(() => {});
+          .catch(
+            () => {},
+          );
       }
 
       if (
-        audioContextRef.current
+        successAudioRef.current
       ) {
-        audioContextRef.current
-          .close()
-          .catch(() => {});
+        successAudioRef.current.pause();
+
+        successAudioRef.current =
+          null;
+      }
+
+      if (
+        errorAudioRef.current
+      ) {
+        errorAudioRef.current.pause();
+
+        errorAudioRef.current =
+          null;
       }
 
       if (
@@ -694,12 +709,15 @@ export default function AdminDashboard({
           item.phone,
           item.ticket_quantity,
           item.status,
+
           item.email_verified
             ? "Yes"
             : "No",
+
           item.checked_in
             ? "Yes"
             : "No",
+
           item.created_at,
         ],
       );
@@ -733,26 +751,35 @@ export default function AdminDashboard({
       );
 
     const url =
-      URL.createObjectURL(blob);
+      URL.createObjectURL(
+        blob,
+      );
 
     const link =
-      document.createElement("a");
+      document.createElement(
+        "a",
+      );
 
-    link.href = url;
+    link.href =
+      url;
 
     link.download =
       "sat-chit-ananda-registrations.csv";
 
     link.click();
 
-    URL.revokeObjectURL(url);
+    URL.revokeObjectURL(
+      url,
+    );
   }
 
   const popupIsSuccess =
-    scanType === "success";
+    scanType ===
+    "success";
 
   const popupIsWarning =
-    scanType === "warning";
+    scanType ===
+    "warning";
 
   const popupAccent =
     popupIsSuccess
@@ -812,7 +839,9 @@ export default function AdminDashboard({
           </a>
 
           <button
-            onClick={exportCsv}
+            onClick={
+              exportCsv
+            }
             disabled={
               !registrations.length
             }
@@ -877,7 +906,9 @@ export default function AdminDashboard({
           </small>
 
           <strong>
-            {checkedInPlaces}
+            {
+              checkedInPlaces
+            }
           </strong>
         </article>
       </section>
@@ -885,12 +916,18 @@ export default function AdminDashboard({
       <section
         className="adminTableCard"
         style={{
-          marginBottom: "24px",
-          padding: "24px",
+          marginBottom:
+            "24px",
+
+          padding:
+            "24px",
+
           background:
             "#050505",
+
           border:
             "1px solid #242424",
+
           boxShadow:
             "0 18px 50px rgba(0,0,0,0.35)",
         }}
@@ -899,8 +936,11 @@ export default function AdminDashboard({
           <div>
             <h2
               style={{
-                color: "#ffffff",
-                marginBottom: "6px",
+                color:
+                  "#ffffff",
+
+                marginBottom:
+                  "6px",
               }}
             >
               QR ticket scanner
@@ -908,7 +948,8 @@ export default function AdminDashboard({
 
             <p
               style={{
-                color: "#c8c8c8",
+                color:
+                  "#c8c8c8",
               }}
             >
               Scan an attendee’s
@@ -950,7 +991,8 @@ export default function AdminDashboard({
 
         <div
           style={{
-            maxWidth: "520px",
+            maxWidth:
+              "520px",
 
             margin:
               scannerActive
@@ -980,7 +1022,8 @@ export default function AdminDashboard({
           <div
             id="admin-qr-reader"
             style={{
-              width: "100%",
+              width:
+                "100%",
 
               minHeight:
                 scannerActive
@@ -1067,8 +1110,12 @@ export default function AdminDashboard({
           </div>
 
           <input
-            value={query}
-            onChange={(event) =>
+            value={
+              query
+            }
+            onChange={(
+              event,
+            ) =>
               setQuery(
                 event.target.value,
               )
@@ -1228,15 +1275,26 @@ export default function AdminDashboard({
       {scanPopupOpen ? (
         <div
           style={{
-            position: "fixed",
-            inset: 0,
-            zIndex: 99999,
+            position:
+              "fixed",
 
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
+            inset:
+              0,
 
-            padding: "24px",
+            zIndex:
+              99999,
+
+            display:
+              "flex",
+
+            alignItems:
+              "center",
+
+            justifyContent:
+              "center",
+
+            padding:
+              "24px",
 
             background:
               "rgba(0,0,0,0.78)",
@@ -1311,7 +1369,9 @@ export default function AdminDashboard({
                   1,
               }}
             >
-              {popupSymbol}
+              {
+                popupSymbol
+              }
             </div>
 
             <h2
@@ -1332,7 +1392,9 @@ export default function AdminDashboard({
                   "0.04em",
               }}
             >
-              {popupTitle}
+              {
+                popupTitle
+              }
             </h2>
 
             <p
@@ -1356,7 +1418,9 @@ export default function AdminDashboard({
                   1.5,
               }}
             >
-              {scanMessage}
+              {
+                scanMessage
+              }
             </p>
 
             <p
@@ -1371,8 +1435,9 @@ export default function AdminDashboard({
                   "13px",
               }}
             >
-              Scanner will be ready
-              for the next attendee.
+              Scanner will be
+              ready for the next
+              attendee.
             </p>
           </div>
         </div>
