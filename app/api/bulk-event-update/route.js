@@ -19,9 +19,6 @@ const INSTAGRAM_ICON =
 const TIKTOK_ICON =
   "https://satchitananda.com.au/social/tiktok.png";
 
-/*
-  FINAL EMAIL TEMPLATE
-*/
 function emailHtml() {
   return `
     <div
@@ -115,8 +112,6 @@ function emailHtml() {
           and shared experience.
         </p>
 
-        <!-- EVENT DETAILS -->
-
         <div
           style="
             margin:26px 0;
@@ -125,7 +120,6 @@ function emailHtml() {
             border-radius:12px;
           "
         >
-
           <h2
             style="
               margin:0 0 16px;
@@ -136,64 +130,31 @@ function emailHtml() {
             Event Details
           </h2>
 
-          <p
-            style="
-              margin:8px 0;
-              font-size:15px;
-              line-height:1.5;
-            "
-          >
+          <p style="margin:8px 0;font-size:15px;line-height:1.5;">
             <strong>Date:</strong>
             Friday, 14 August 2026
           </p>
 
-          <p
-            style="
-              margin:8px 0;
-              font-size:15px;
-              line-height:1.5;
-            "
-          >
+          <p style="margin:8px 0;font-size:15px;line-height:1.5;">
             <strong>Venue:</strong>
             The Granville Centre
           </p>
 
-          <p
-            style="
-              margin:8px 0;
-              font-size:15px;
-              line-height:1.5;
-            "
-          >
+          <p style="margin:8px 0;font-size:15px;line-height:1.5;">
             <strong>Doors Open:</strong>
             6:00 PM
           </p>
 
-          <p
-            style="
-              margin:8px 0;
-              font-size:15px;
-              line-height:1.5;
-            "
-          >
+          <p style="margin:8px 0;font-size:15px;line-height:1.5;">
             <strong>Program Starts:</strong>
             Sharp at 6:45 PM
           </p>
 
-          <p
-            style="
-              margin:8px 0;
-              font-size:15px;
-              line-height:1.5;
-            "
-          >
+          <p style="margin:8px 0;font-size:15px;line-height:1.5;">
             <strong>Doors Close:</strong>
             7:00 PM
           </p>
-
         </div>
-
-        <!-- IMPORTANT INFORMATION -->
 
         <div
           style="
@@ -239,8 +200,6 @@ function emailHtml() {
           </strong>
         </p>
 
-        <!-- FOOTWEAR NOTICE -->
-
         <div
           style="
             margin:20px 0 26px;
@@ -249,7 +208,6 @@ function emailHtml() {
             border-radius:10px;
           "
         >
-
           <p
             style="
               margin:0;
@@ -257,7 +215,6 @@ function emailHtml() {
               line-height:1.75;
             "
           >
-
             <span
               style="
                 font-size:24px;
@@ -269,10 +226,7 @@ function emailHtml() {
               👞
             </span>
 
-            As the program will include the chanting
-            of religious and spiritual chants, we
-            respectfully request all attendees to
-
+            We respectfully request all attendees to
             <strong>
               remove their footwear before entering
               the designated program and seating area.
@@ -280,15 +234,9 @@ function emailHtml() {
 
             A dedicated space will be available for
             footwear. We sincerely appreciate your
-            understanding, respect, and cooperation
-            in helping us maintain the spiritual
-            atmosphere of the gathering.
-
+            understanding and cooperation.
           </p>
-
         </div>
-
-        <!-- SOCIAL MEDIA -->
 
         <p
           style="
@@ -310,9 +258,6 @@ function emailHtml() {
             text-align:center;
           "
         >
-
-          <!-- INSTAGRAM -->
-
           <a
             href="${INSTAGRAM_URL}"
             target="_blank"
@@ -339,8 +284,6 @@ function emailHtml() {
             />
           </a>
 
-          <!-- TIKTOK -->
-
           <a
             href="${TIKTOK_URL}"
             target="_blank"
@@ -366,10 +309,7 @@ function emailHtml() {
               "
             />
           </a>
-
         </div>
-
-        <!-- CLOSING -->
 
         <p
           style="
@@ -403,13 +343,10 @@ function emailHtml() {
           "
         >
           With warmth and gratitude,<br />
-
           <strong>
             Project Beyond Team
           </strong>
-
           <br />
-
           <em>
             In collaboration with NRNA NSW
           </em>
@@ -420,13 +357,7 @@ function emailHtml() {
   `;
 }
 
-/*
-  SPLIT EMAILS INTO GROUPS OF 100
-*/
-function splitIntoChunks(
-  array,
-  size
-) {
+function splitIntoChunks(array, size) {
   const chunks = [];
 
   for (
@@ -445,9 +376,6 @@ function splitIntoChunks(
   return chunks;
 }
 
-/*
-  SEND ONE RESEND BATCH
-*/
 async function sendBatch(
   emails,
   idempotencyKey
@@ -504,16 +432,8 @@ async function sendBatch(
   return result;
 }
 
-/*
-  API ENDPOINT
-*/
 export async function POST(request) {
   try {
-
-    /*
-      SECURITY
-    */
-
     const expectedSecret =
       process.env.BULK_EMAIL_SECRET;
 
@@ -528,18 +448,13 @@ export async function POST(request) {
     ) {
       return NextResponse.json(
         {
-          error:
-            "Unauthorized.",
+          error: "Unauthorized.",
         },
         {
           status: 401,
         }
       );
     }
-
-    /*
-      REQUEST BODY
-    */
 
     const body =
       await request.json();
@@ -554,10 +469,6 @@ export async function POST(request) {
         .trim()
         .toLowerCase();
 
-    /*
-      LOAD ALL CONFIRMED GUESTS
-    */
-
     const supabase =
       createAdminClient();
 
@@ -566,9 +477,7 @@ export async function POST(request) {
       error,
     } =
       await supabase
-        .from(
-          "registrations"
-        )
+        .from("registrations")
         .select(`
           id,
           full_name,
@@ -603,14 +512,7 @@ export async function POST(request) {
       );
     }
 
-    /*
-      =========================
-      TEST MODE
-      =========================
-    */
-
     if (mode === "test") {
-
       if (!testEmail) {
         return NextResponse.json(
           {
@@ -662,15 +564,6 @@ export async function POST(request) {
         },
       ];
 
-      /*
-        NEW TEST KEY EVERY TIME.
-
-        This means you can repeatedly
-        send sample emails while editing
-        the template without receiving
-        Resend's 409 idempotency error.
-      */
-
       const testKey =
         `sat-chit-ananda-final-test-${Date.now()}`;
 
@@ -693,12 +586,6 @@ export async function POST(request) {
       });
     }
 
-    /*
-      =========================
-      BULK MODE VALIDATION
-      =========================
-    */
-
     if (mode !== "all") {
       return NextResponse.json(
         {
@@ -711,10 +598,6 @@ export async function POST(request) {
       );
     }
 
-    /*
-      ONLY REGISTRATIONS WITH EMAIL
-    */
-
     const validRegistrations =
       registrations.filter(
         (registration) =>
@@ -723,10 +606,6 @@ export async function POST(request) {
               ?.trim()
           )
       );
-
-    /*
-      CREATE EMAIL PAYLOADS
-    */
 
     const emailPayloads =
       validRegistrations.map(
@@ -747,11 +626,6 @@ export async function POST(request) {
         })
       );
 
-    /*
-      RESEND:
-      MAX 100 EMAILS PER BATCH
-    */
-
     const batches =
       splitIntoChunks(
         emailPayloads,
@@ -760,29 +634,13 @@ export async function POST(request) {
 
     const results = [];
 
-    /*
-      SEND BULK EMAIL
-    */
-
     for (
       let index = 0;
       index < batches.length;
       index++
     ) {
-
-      /*
-        FIXED FINAL BULK KEYS.
-
-        Important:
-        If the API request is accidentally
-        repeated with the exact same email
-        batch, Resend can recognise the
-        idempotency key instead of blindly
-        sending another duplicate batch.
-      */
-
       const bulkKey =
-        `sat-chit-ananda-final-information-20260812-batch-${index + 1}`;
+        `sat-chit-ananda-final-information-20260812-v2-batch-${index + 1}`;
 
       await sendBatch(
         batches[index],
@@ -801,10 +659,6 @@ export async function POST(request) {
           true,
       });
     }
-
-    /*
-      FINAL SUMMARY
-    */
 
     return NextResponse.json({
       success:
@@ -827,7 +681,6 @@ export async function POST(request) {
     });
 
   } catch (error) {
-
     console.error(
       "Bulk event update failed:",
       error
