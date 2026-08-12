@@ -404,12 +404,6 @@ async function processRegistration(
 
 export async function POST(request) {
   try {
-    /*
-      Protect this route with a secret stored
-      in Vercel Environment Variables.
-
-      Do not put the secret directly in code.
-    */
     const expectedSecret =
       process.env.BULK_EMAIL_SECRET;
 
@@ -417,6 +411,41 @@ export async function POST(request) {
       request.headers.get(
         "x-bulk-email-secret",
       );
+
+    /*
+      SAFE DIAGNOSTIC:
+      This does NOT print either secret.
+      It only reports whether each value exists
+      and how many characters it contains.
+    */
+    console.log(
+      "Bulk secret diagnostic:",
+      {
+        expectedLoaded:
+          Boolean(expectedSecret),
+
+        expectedLength:
+          expectedSecret
+            ? expectedSecret.length
+            : 0,
+
+        suppliedLoaded:
+          Boolean(suppliedSecret),
+
+        suppliedLength:
+          suppliedSecret
+            ? suppliedSecret.length
+            : 0,
+
+        lengthsMatch:
+          Boolean(
+            expectedSecret &&
+            suppliedSecret &&
+            expectedSecret.length ===
+              suppliedSecret.length
+          ),
+      }
+    );
 
     if (
       !expectedSecret ||
@@ -617,10 +646,6 @@ export async function POST(request) {
         summary.failed +=
           1;
 
-        /*
-          Don't return attendee email addresses
-          in the API result.
-        */
         summary.failures.push({
           registrationCode:
             registration.registration_code,
@@ -632,10 +657,6 @@ export async function POST(request) {
         });
       }
 
-      /*
-        Small delay so we don't hammer
-        the email provider.
-      */
       await wait(600);
     }
 
