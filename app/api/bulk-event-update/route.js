@@ -19,6 +19,9 @@ const INSTAGRAM_ICON =
 const TIKTOK_ICON =
   "https://satchitananda.com.au/social/tiktok.png";
 
+/*
+  FINAL EMAIL TEMPLATE
+*/
 function emailHtml() {
   return `
     <div
@@ -102,7 +105,7 @@ function emailHtml() {
 
         <p
           style="
-            margin:0 0 22px;
+            margin:0 0 24px;
             font-size:16px;
             line-height:1.7;
           "
@@ -111,6 +114,8 @@ function emailHtml() {
           evening of music, stillness, connection,
           and shared experience.
         </p>
+
+        <!-- EVENT DETAILS -->
 
         <div
           style="
@@ -131,36 +136,90 @@ function emailHtml() {
             Event Details
           </h2>
 
-          <p style="margin:8px 0;font-size:15px;line-height:1.5;">
+          <p
+            style="
+              margin:8px 0;
+              font-size:15px;
+              line-height:1.5;
+            "
+          >
             <strong>Date:</strong>
             Friday, 14 August 2026
           </p>
 
-          <p style="margin:8px 0;font-size:15px;line-height:1.5;">
+          <p
+            style="
+              margin:8px 0;
+              font-size:15px;
+              line-height:1.5;
+            "
+          >
             <strong>Venue:</strong>
             The Granville Centre
           </p>
 
-          <p style="margin:8px 0;font-size:15px;line-height:1.5;">
+          <p
+            style="
+              margin:8px 0;
+              font-size:15px;
+              line-height:1.5;
+            "
+          >
             <strong>Doors Open:</strong>
             6:00 PM
           </p>
 
-          <p style="margin:8px 0;font-size:15px;line-height:1.5;">
+          <p
+            style="
+              margin:8px 0;
+              font-size:15px;
+              line-height:1.5;
+            "
+          >
             <strong>Program Starts:</strong>
             Sharp at 6:45 PM
           </p>
 
-          <p style="margin:8px 0;font-size:15px;line-height:1.5;">
+          <p
+            style="
+              margin:8px 0;
+              font-size:15px;
+              line-height:1.5;
+            "
+          >
             <strong>Doors Close:</strong>
             7:00 PM
           </p>
 
         </div>
 
+        <!-- IMPORTANT INFORMATION -->
+
+        <div
+          style="
+            margin:28px 0 18px;
+            padding:15px 18px;
+            background:#fff5f5;
+            border-left:5px solid #d32f2f;
+            border-radius:8px;
+          "
+        >
+          <p
+            style="
+              margin:0;
+              color:#b71c1c;
+              font-size:18px;
+              font-weight:700;
+              line-height:1.4;
+            "
+          >
+            ❗ Important Information
+          </p>
+        </div>
+
         <p
           style="
-            margin:0 0 18px;
+            margin:0 0 20px;
             font-size:15px;
             line-height:1.7;
           "
@@ -169,23 +228,67 @@ function emailHtml() {
           flow of the evening, we kindly request
           everyone to
           <strong>
-            arrive early and be seated before 6:45 PM.
+            arrive early and be seated before
+            6:45 PM.
           </strong>
-        </p>
 
-        <p
-          style="
-            margin:0 0 22px;
-            font-size:15px;
-            line-height:1.7;
-          "
-        >
           Please note that
           <strong>
             entry will not be available after the
             doors close at 7:00 PM.
           </strong>
         </p>
+
+        <!-- FOOTWEAR NOTICE -->
+
+        <div
+          style="
+            margin:20px 0 26px;
+            padding:18px;
+            background:#faf7f3;
+            border-radius:10px;
+          "
+        >
+
+          <p
+            style="
+              margin:0;
+              font-size:15px;
+              line-height:1.75;
+            "
+          >
+
+            <span
+              style="
+                font-size:24px;
+                line-height:1;
+                vertical-align:middle;
+                margin-right:5px;
+              "
+            >
+              👞
+            </span>
+
+            As the program will include the chanting
+            of religious and spiritual chants, we
+            respectfully request all attendees to
+
+            <strong>
+              remove their footwear before entering
+              the designated program and seating area.
+            </strong>
+
+            A dedicated space will be available for
+            footwear. We sincerely appreciate your
+            understanding, respect, and cooperation
+            in helping us maintain the spiritual
+            atmosphere of the gathering.
+
+          </p>
+
+        </div>
+
+        <!-- SOCIAL MEDIA -->
 
         <p
           style="
@@ -197,22 +300,25 @@ function emailHtml() {
           For important updates, event moments,
           and information about our future
           gatherings, please stay connected with
-          <strong>Project Beyond</strong>.
+          <strong>Project Beyond</strong> on
+          Instagram and TikTok.
         </p>
 
         <div
           style="
-            margin:18px 0 28px;
+            margin:20px 0 30px;
             text-align:center;
           "
         >
+
+          <!-- INSTAGRAM -->
 
           <a
             href="${INSTAGRAM_URL}"
             target="_blank"
             style="
               display:inline-block;
-              margin:0 10px;
+              margin:0 12px;
               text-decoration:none;
               vertical-align:middle;
             "
@@ -233,12 +339,14 @@ function emailHtml() {
             />
           </a>
 
+          <!-- TIKTOK -->
+
           <a
             href="${TIKTOK_URL}"
             target="_blank"
             style="
               display:inline-block;
-              margin:0 10px;
+              margin:0 12px;
               text-decoration:none;
               vertical-align:middle;
             "
@@ -260,6 +368,8 @@ function emailHtml() {
           </a>
 
         </div>
+
+        <!-- CLOSING -->
 
         <p
           style="
@@ -293,8 +403,16 @@ function emailHtml() {
           "
         >
           With warmth and gratitude,<br />
-          <strong>Project Beyond Team</strong><br />
-          <em>In collaboration with NRNA NSW</em>
+
+          <strong>
+            Project Beyond Team
+          </strong>
+
+          <br />
+
+          <em>
+            In collaboration with NRNA NSW
+          </em>
         </p>
 
       </div>
@@ -302,7 +420,13 @@ function emailHtml() {
   `;
 }
 
-function splitIntoChunks(array, size) {
+/*
+  SPLIT EMAILS INTO GROUPS OF 100
+*/
+function splitIntoChunks(
+  array,
+  size
+) {
   const chunks = [];
 
   for (
@@ -321,6 +445,9 @@ function splitIntoChunks(array, size) {
   return chunks;
 }
 
+/*
+  SEND ONE RESEND BATCH
+*/
 async function sendBatch(
   emails,
   idempotencyKey
@@ -377,8 +504,16 @@ async function sendBatch(
   return result;
 }
 
+/*
+  API ENDPOINT
+*/
 export async function POST(request) {
   try {
+
+    /*
+      SECURITY
+    */
+
     const expectedSecret =
       process.env.BULK_EMAIL_SECRET;
 
@@ -393,13 +528,18 @@ export async function POST(request) {
     ) {
       return NextResponse.json(
         {
-          error: "Unauthorized.",
+          error:
+            "Unauthorized.",
         },
         {
           status: 401,
         }
       );
     }
+
+    /*
+      REQUEST BODY
+    */
 
     const body =
       await request.json();
@@ -414,6 +554,10 @@ export async function POST(request) {
         .trim()
         .toLowerCase();
 
+    /*
+      LOAD ALL CONFIRMED GUESTS
+    */
+
     const supabase =
       createAdminClient();
 
@@ -422,7 +566,9 @@ export async function POST(request) {
       error,
     } =
       await supabase
-        .from("registrations")
+        .from(
+          "registrations"
+        )
         .select(`
           id,
           full_name,
@@ -458,9 +604,13 @@ export async function POST(request) {
     }
 
     /*
+      =========================
       TEST MODE
+      =========================
     */
+
     if (mode === "test") {
+
       if (!testEmail) {
         return NextResponse.json(
           {
@@ -494,13 +644,14 @@ export async function POST(request) {
         );
       }
 
-      const payload = [
+      const testPayload = [
         {
           from:
             FROM_EMAIL,
 
           to: [
-            registration.email,
+            registration.email
+              .trim()
           ],
 
           subject:
@@ -512,29 +663,42 @@ export async function POST(request) {
       ];
 
       /*
-        TEST MODE gets a fresh key
-        every time so Resend allows
-        another test with changed HTML.
+        NEW TEST KEY EVERY TIME.
+
+        This means you can repeatedly
+        send sample emails while editing
+        the template without receiving
+        Resend's 409 idempotency error.
       */
+
       const testKey =
-        `sat-chit-ananda-event-test-${Date.now()}`;
+        `sat-chit-ananda-final-test-${Date.now()}`;
 
       await sendBatch(
-        payload,
+        testPayload,
         testKey
       );
 
       return NextResponse.json({
         success: true,
-        mode: "test",
+
+        mode:
+          "test",
+
         email:
           registration.email,
+
+        message:
+          "Test email sent successfully.",
       });
     }
 
     /*
-      BULK MODE
+      =========================
+      BULK MODE VALIDATION
+      =========================
     */
+
     if (mode !== "all") {
       return NextResponse.json(
         {
@@ -547,6 +711,10 @@ export async function POST(request) {
       );
     }
 
+    /*
+      ONLY REGISTRATIONS WITH EMAIL
+    */
+
     const validRegistrations =
       registrations.filter(
         (registration) =>
@@ -556,6 +724,10 @@ export async function POST(request) {
           )
       );
 
+    /*
+      CREATE EMAIL PAYLOADS
+    */
+
     const emailPayloads =
       validRegistrations.map(
         (registration) => ({
@@ -564,7 +736,7 @@ export async function POST(request) {
 
           to: [
             registration.email
-              .trim(),
+              .trim()
           ],
 
           subject:
@@ -575,6 +747,11 @@ export async function POST(request) {
         })
       );
 
+    /*
+      RESEND:
+      MAX 100 EMAILS PER BATCH
+    */
+
     const batches =
       splitIntoChunks(
         emailPayloads,
@@ -583,18 +760,29 @@ export async function POST(request) {
 
     const results = [];
 
+    /*
+      SEND BULK EMAIL
+    */
+
     for (
       let index = 0;
       index < batches.length;
       index++
     ) {
+
       /*
-        BULK keys stay fixed.
-        This helps protect against
-        accidental duplicate bulk sends.
+        FIXED FINAL BULK KEYS.
+
+        Important:
+        If the API request is accidentally
+        repeated with the exact same email
+        batch, Resend can recognise the
+        idempotency key instead of blindly
+        sending another duplicate batch.
       */
+
       const bulkKey =
-        `sat-chit-ananda-final-event-update-20260812-batch-${index + 1}`;
+        `sat-chit-ananda-final-information-20260812-batch-${index + 1}`;
 
       await sendBatch(
         batches[index],
@@ -609,14 +797,21 @@ export async function POST(request) {
           batches[index]
             .length,
 
-        success: true,
+        success:
+          true,
       });
     }
 
-    return NextResponse.json({
-      success: true,
+    /*
+      FINAL SUMMARY
+    */
 
-      mode: "all",
+    return NextResponse.json({
+      success:
+        true,
+
+      mode:
+        "all",
 
       totalConfirmed:
         registrations.length,
@@ -630,7 +825,9 @@ export async function POST(request) {
       batches:
         results,
     });
+
   } catch (error) {
+
     console.error(
       "Bulk event update failed:",
       error
