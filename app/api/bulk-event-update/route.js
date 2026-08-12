@@ -199,21 +199,21 @@ function emailHtml() {
           style="
             margin:28px 0 18px;
             padding:15px 18px;
-            background:#fff5f5;
-            border-left:5px solid #d32f2f;
+            background:#f3faf5;
+            border-left:5px solid #5f8f6f;
             border-radius:8px;
           "
         >
           <p
             style="
               margin:0;
-              color:#b71c1c;
+              color:#3f6f4f;
               font-size:18px;
               font-weight:700;
               line-height:1.4;
             "
           >
-            ❗ Important Information
+            🌿 Important Information
           </p>
         </div>
 
