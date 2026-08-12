@@ -13,162 +13,292 @@ const INSTAGRAM_URL =
 const TIKTOK_URL =
   "https://www.tiktok.com/@project_beyond_1";
 
-function emailHtml(name) {
-  return `
-    <div style="
-      margin:0;
-      padding:32px 16px;
-      background:#f5efe8;
-      font-family:Arial,sans-serif;
-      color:#29231f;
-    ">
-      <div style="
-        max-width:620px;
-        margin:0 auto;
-        background:#ffffff;
-        border-radius:18px;
-        padding:34px;
-      ">
+const INSTAGRAM_ICON =
+  "https://satchitananda.com.au/social/instagram.png";
 
-        <p style="
-          margin:0 0 8px;
-          color:#7a3f2b;
-          font-size:13px;
-          font-weight:700;
-          letter-spacing:1px;
-        ">
+const TIKTOK_ICON =
+  "https://satchitananda.com.au/social/tiktok.png";
+
+function emailHtml() {
+  return `
+    <div
+      style="
+        margin:0;
+        padding:30px 14px;
+        background:#f5efe8;
+        font-family:Arial,Helvetica,sans-serif;
+        color:#29231f;
+      "
+    >
+      <div
+        style="
+          max-width:620px;
+          margin:0 auto;
+          background:#ffffff;
+          border-radius:18px;
+          padding:34px 28px;
+        "
+      >
+
+        <p
+          style="
+            margin:0 0 8px;
+            color:#7a3f2b;
+            font-size:13px;
+            font-weight:700;
+            letter-spacing:1.2px;
+          "
+        >
           SAT-CHIT-ĀNANDA
         </p>
 
-        <h1 style="
-          margin:0 0 20px;
-          font-size:29px;
-        ">
+        <h1
+          style="
+            margin:0 0 22px;
+            font-size:29px;
+            line-height:1.25;
+            color:#29231f;
+          "
+        >
           Important Event Information
         </h1>
 
-        <p>
-          Dear ${name || "Sat-Chit-Ānanda Family"},
+        <p
+          style="
+            margin:0 0 18px;
+            font-size:16px;
+            line-height:1.7;
+          "
+        >
+          Dear Sat-Chit-Ānanda Family,
         </p>
 
-        <p style="line-height:1.7;">
+        <p
+          style="
+            margin:0 0 18px;
+            font-size:16px;
+            line-height:1.7;
+          "
+        >
           Thank you for registering and for choosing
-          to be part of <strong>Sat-Chit-Ānanda</strong>.
+          to be part of
+          <strong>Sat-Chit-Ānanda</strong>.
         </p>
 
-        <p style="line-height:1.7;">
+        <p
+          style="
+            margin:0 0 18px;
+            font-size:16px;
+            line-height:1.7;
+          "
+        >
           We are truly grateful for the wonderful
           response from our community. With all
           available places now reserved,
-          <strong>registration is officially closed.</strong>
+          <strong>
+            registration is officially closed.
+          </strong>
         </p>
 
-        <p style="line-height:1.7;">
+        <p
+          style="
+            margin:0 0 22px;
+            font-size:16px;
+            line-height:1.7;
+          "
+        >
           We look forward to coming together for an
           evening of music, stillness, connection,
           and shared experience.
         </p>
 
-        <div style="
-          margin:26px 0;
-          padding:20px;
-          background:#faf7f3;
-          border-radius:12px;
-        ">
+        <div
+          style="
+            margin:26px 0;
+            padding:20px;
+            background:#faf7f3;
+            border-radius:12px;
+          "
+        >
 
-          <h2 style="
-            margin:0 0 16px;
-            font-size:20px;
-          ">
+          <h2
+            style="
+              margin:0 0 16px;
+              font-size:20px;
+              color:#29231f;
+            "
+          >
             Event Details
           </h2>
 
-          <p>
+          <p
+            style="
+              margin:8px 0;
+              font-size:15px;
+              line-height:1.5;
+            "
+          >
             <strong>Date:</strong>
             Friday, 14 August 2026
           </p>
 
-          <p>
+          <p
+            style="
+              margin:8px 0;
+              font-size:15px;
+              line-height:1.5;
+            "
+          >
             <strong>Venue:</strong>
             The Granville Centre
           </p>
 
-          <p>
+          <p
+            style="
+              margin:8px 0;
+              font-size:15px;
+              line-height:1.5;
+            "
+          >
             <strong>Doors Open:</strong>
             6:00 PM
           </p>
 
-          <p>
+          <p
+            style="
+              margin:8px 0;
+              font-size:15px;
+              line-height:1.5;
+            "
+          >
             <strong>Program Starts:</strong>
             Sharp at 6:45 PM
           </p>
 
-          <p>
+          <p
+            style="
+              margin:8px 0;
+              font-size:15px;
+              line-height:1.5;
+            "
+          >
             <strong>Doors Close:</strong>
             7:00 PM
           </p>
+
         </div>
 
-        <p style="line-height:1.7;">
+        <p
+          style="
+            margin:0 0 18px;
+            font-size:15px;
+            line-height:1.7;
+          "
+        >
           To help us begin on time and maintain the
           flow of the evening, we kindly request
-          everyone to <strong>arrive early and be
-          seated before 6:45 PM.</strong>
+          everyone to
+          <strong>
+            arrive early and be seated before
+            6:45 PM.
+          </strong>
         </p>
 
-        <p style="line-height:1.7;">
+        <p
+          style="
+            margin:0 0 22px;
+            font-size:15px;
+            line-height:1.7;
+          "
+        >
           Please note that
-          <strong>entry will not be available after
-          the doors close at 7:00 PM.</strong>
+          <strong>
+            entry will not be available after the
+            doors close at 7:00 PM.
+          </strong>
         </p>
 
-        <p style="line-height:1.7;">
-          For important updates, event moments, and
-          information about our future gatherings,
-          please stay connected with
+        <p
+          style="
+            margin:0 0 14px;
+            font-size:15px;
+            line-height:1.7;
+          "
+        >
+          For important updates, event moments,
+          and information about our future
+          gatherings, please stay connected with
           <strong>Project Beyond</strong>.
         </p>
 
-        <div style="
-          margin:24px 0;
-          text-align:center;
-        ">
+        <div
+          style="
+            margin:18px 0 28px;
+            text-align:center;
+          "
+        >
 
           <a
             href="${INSTAGRAM_URL}"
+            target="_blank"
             style="
               display:inline-block;
-              margin:6px;
-              padding:13px 20px;
-              background:#7a3f2b;
-              color:#ffffff;
+              margin:0 10px;
               text-decoration:none;
-              border-radius:9px;
-              font-weight:700;
+              vertical-align:middle;
             "
           >
-            Follow on Instagram
+            <img
+              src="${INSTAGRAM_ICON}"
+              alt="Instagram"
+              width="32"
+              height="32"
+              style="
+                width:32px;
+                height:32px;
+                display:block;
+                border:0;
+                outline:none;
+                text-decoration:none;
+              "
+            />
           </a>
 
           <a
             href="${TIKTOK_URL}"
+            target="_blank"
             style="
               display:inline-block;
-              margin:6px;
-              padding:13px 20px;
-              background:#29231f;
-              color:#ffffff;
+              margin:0 10px;
               text-decoration:none;
-              border-radius:9px;
-              font-weight:700;
+              vertical-align:middle;
             "
           >
-            Follow on TikTok
+            <img
+              src="${TIKTOK_ICON}"
+              alt="TikTok"
+              width="32"
+              height="32"
+              style="
+                width:32px;
+                height:32px;
+                display:block;
+                border:0;
+                outline:none;
+                text-decoration:none;
+              "
+            />
           </a>
 
         </div>
 
-        <p style="line-height:1.7;">
+        <p
+          style="
+            margin:0 0 18px;
+            font-size:15px;
+            line-height:1.7;
+          "
+        >
           Thank you once again for your trust,
           support, and presence. Your participation
           is what brings Sat-Chit-Ānanda to life,
@@ -176,16 +306,25 @@ function emailHtml(name) {
           of this growing family.
         </p>
 
-        <p style="line-height:1.7;">
+        <p
+          style="
+            margin:0 0 24px;
+            font-size:15px;
+            line-height:1.7;
+          "
+        >
           We look forward to welcoming you.
         </p>
 
-        <p style="
-          margin-top:28px;
-          line-height:1.7;
-        ">
-          With warmth and gratitude,<br>
-          <strong>Project Beyond Team</strong><br>
+        <p
+          style="
+            margin:0;
+            font-size:15px;
+            line-height:1.7;
+          "
+        >
+          With warmth and gratitude,<br />
+          <strong>Project Beyond Team</strong><br />
           <em>In collaboration with NRNA NSW</em>
         </p>
 
@@ -197,16 +336,26 @@ function emailHtml(name) {
 function splitIntoChunks(array, size) {
   const chunks = [];
 
-  for (let i = 0; i < array.length; i += size) {
+  for (
+    let i = 0;
+    i < array.length;
+    i += size
+  ) {
     chunks.push(
-      array.slice(i, i + size)
+      array.slice(
+        i,
+        i + size
+      )
     );
   }
 
   return chunks;
 }
 
-async function sendBatch(emails, batchNumber) {
+async function sendBatch(
+  emails,
+  batchNumber
+) {
   const apiKey =
     process.env.RESEND_API_KEY;
 
@@ -234,7 +383,9 @@ async function sendBatch(emails, batchNumber) {
         },
 
         body:
-          JSON.stringify(emails),
+          JSON.stringify(
+            emails
+          ),
       }
     );
 
@@ -259,6 +410,10 @@ async function sendBatch(emails, batchNumber) {
 
 export async function POST(request) {
   try {
+    /*
+      SECURITY CHECK
+    */
+
     const expectedSecret =
       process.env.BULK_EMAIL_SECRET;
 
@@ -281,6 +436,10 @@ export async function POST(request) {
       );
     }
 
+    /*
+      READ REQUEST
+    */
+
     const body =
       await request.json();
 
@@ -294,30 +453,37 @@ export async function POST(request) {
         .trim()
         .toLowerCase();
 
+    /*
+      LOAD CONFIRMED REGISTRATIONS
+    */
+
     const supabase =
       createAdminClient();
 
     const {
       data: registrations,
       error,
-    } = await supabase
-      .from("registrations")
-      .select(`
-        id,
-        full_name,
-        email,
-        status
-      `)
-      .eq(
-        "status",
-        "confirmed"
-      )
-      .order(
-        "created_at",
-        {
-          ascending: true,
-        }
-      );
+    } =
+      await supabase
+        .from(
+          "registrations"
+        )
+        .select(`
+          id,
+          full_name,
+          email,
+          status
+        `)
+        .eq(
+          "status",
+          "confirmed"
+        )
+        .order(
+          "created_at",
+          {
+            ascending: true,
+          }
+        );
 
     if (error) {
       console.error(
@@ -339,6 +505,7 @@ export async function POST(request) {
     /*
       TEST MODE
     */
+
     if (mode === "test") {
       if (!testEmail) {
         return NextResponse.json(
@@ -375,19 +542,18 @@ export async function POST(request) {
 
       const payload = [
         {
-          from: FROM_EMAIL,
+          from:
+            FROM_EMAIL,
 
           to: [
-            registration.email
+            registration.email,
           ],
 
           subject:
             "Important Event Information – Sat-Chit-Ānanda",
 
           html:
-            emailHtml(
-              registration.full_name
-            ),
+            emailHtml(),
         },
       ];
 
@@ -405,8 +571,9 @@ export async function POST(request) {
     }
 
     /*
-      BULK SEND
+      BULK MODE VALIDATION
     */
+
     if (mode !== "all") {
       return NextResponse.json(
         {
@@ -419,37 +586,46 @@ export async function POST(request) {
       );
     }
 
+    /*
+      REMOVE EMPTY EMAILS
+    */
+
     const validRegistrations =
       registrations.filter(
         (registration) =>
           Boolean(
             registration.email
+              ?.trim()
           )
       );
+
+    /*
+      BUILD EMAILS
+    */
 
     const emailPayloads =
       validRegistrations.map(
         (registration) => ({
-          from: FROM_EMAIL,
+          from:
+            FROM_EMAIL,
 
           to: [
             registration.email
+              .trim(),
           ],
 
           subject:
             "Important Event Information – Sat-Chit-Ānanda",
 
           html:
-            emailHtml(
-              registration.full_name
-            ),
+            emailHtml(),
         })
       );
 
     /*
-      Resend allows maximum
-      100 emails per batch.
+      MAXIMUM 100 PER RESEND BATCH
     */
+
     const batches =
       splitIntoChunks(
         emailPayloads,
@@ -458,27 +634,35 @@ export async function POST(request) {
 
     const results = [];
 
+    /*
+      SEND EACH BATCH
+    */
+
     for (
       let index = 0;
       index < batches.length;
       index++
     ) {
-      const result =
-        await sendBatch(
-          batches[index],
-          index + 1
-        );
+      await sendBatch(
+        batches[index],
+        index + 1
+      );
 
       results.push({
         batch:
           index + 1,
 
         count:
-          batches[index].length,
+          batches[index]
+            .length,
 
         success: true,
       });
     }
+
+    /*
+      SUCCESS RESPONSE
+    */
 
     return NextResponse.json({
       success: true,
