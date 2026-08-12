@@ -386,7 +386,6 @@ export default function HomePage() {
 
                   {soldOut && (
                     <p className="finalRegistrationNotice">
-                      Final Registration Opening Soon
                     </p>
                   )}
                 </>

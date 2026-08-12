@@ -162,7 +162,7 @@ export default function RegisterPage() {
 
     if (soldOut) {
       setError(
-        "Registration is currently full. Final registration will be opening soon.",
+        "Registration is currently full.",
       );
 
       return;
