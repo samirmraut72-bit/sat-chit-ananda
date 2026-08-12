@@ -131,57 +131,27 @@ function emailHtml() {
             Event Details
           </h2>
 
-          <p
-            style="
-              margin:8px 0;
-              font-size:15px;
-              line-height:1.5;
-            "
-          >
+          <p style="margin:8px 0;font-size:15px;line-height:1.5;">
             <strong>Date:</strong>
             Friday, 14 August 2026
           </p>
 
-          <p
-            style="
-              margin:8px 0;
-              font-size:15px;
-              line-height:1.5;
-            "
-          >
+          <p style="margin:8px 0;font-size:15px;line-height:1.5;">
             <strong>Venue:</strong>
             The Granville Centre
           </p>
 
-          <p
-            style="
-              margin:8px 0;
-              font-size:15px;
-              line-height:1.5;
-            "
-          >
+          <p style="margin:8px 0;font-size:15px;line-height:1.5;">
             <strong>Doors Open:</strong>
             6:00 PM
           </p>
 
-          <p
-            style="
-              margin:8px 0;
-              font-size:15px;
-              line-height:1.5;
-            "
-          >
+          <p style="margin:8px 0;font-size:15px;line-height:1.5;">
             <strong>Program Starts:</strong>
             Sharp at 6:45 PM
           </p>
 
-          <p
-            style="
-              margin:8px 0;
-              font-size:15px;
-              line-height:1.5;
-            "
-          >
+          <p style="margin:8px 0;font-size:15px;line-height:1.5;">
             <strong>Doors Close:</strong>
             7:00 PM
           </p>
@@ -199,8 +169,7 @@ function emailHtml() {
           flow of the evening, we kindly request
           everyone to
           <strong>
-            arrive early and be seated before
-            6:45 PM.
+            arrive early and be seated before 6:45 PM.
           </strong>
         </p>
 
@@ -354,7 +323,7 @@ function splitIntoChunks(array, size) {
 
 async function sendBatch(
   emails,
-  batchNumber
+  idempotencyKey
 ) {
   const apiKey =
     process.env.RESEND_API_KEY;
@@ -379,7 +348,7 @@ async function sendBatch(
             "application/json",
 
           "Idempotency-Key":
-            `sat-chit-ananda-event-update-${batchNumber}-20260812`,
+            idempotencyKey,
         },
 
         body:
@@ -410,10 +379,6 @@ async function sendBatch(
 
 export async function POST(request) {
   try {
-    /*
-      SECURITY CHECK
-    */
-
     const expectedSecret =
       process.env.BULK_EMAIL_SECRET;
 
@@ -436,10 +401,6 @@ export async function POST(request) {
       );
     }
 
-    /*
-      READ REQUEST
-    */
-
     const body =
       await request.json();
 
@@ -453,10 +414,6 @@ export async function POST(request) {
         .trim()
         .toLowerCase();
 
-    /*
-      LOAD CONFIRMED REGISTRATIONS
-    */
-
     const supabase =
       createAdminClient();
 
@@ -465,9 +422,7 @@ export async function POST(request) {
       error,
     } =
       await supabase
-        .from(
-          "registrations"
-        )
+        .from("registrations")
         .select(`
           id,
           full_name,
@@ -505,7 +460,6 @@ export async function POST(request) {
     /*
       TEST MODE
     */
-
     if (mode === "test") {
       if (!testEmail) {
         return NextResponse.json(
@@ -557,9 +511,17 @@ export async function POST(request) {
         },
       ];
 
+      /*
+        TEST MODE gets a fresh key
+        every time so Resend allows
+        another test with changed HTML.
+      */
+      const testKey =
+        `sat-chit-ananda-event-test-${Date.now()}`;
+
       await sendBatch(
         payload,
-        "test"
+        testKey
       );
 
       return NextResponse.json({
@@ -571,9 +533,8 @@ export async function POST(request) {
     }
 
     /*
-      BULK MODE VALIDATION
+      BULK MODE
     */
-
     if (mode !== "all") {
       return NextResponse.json(
         {
@@ -586,10 +547,6 @@ export async function POST(request) {
       );
     }
 
-    /*
-      REMOVE EMPTY EMAILS
-    */
-
     const validRegistrations =
       registrations.filter(
         (registration) =>
@@ -598,10 +555,6 @@ export async function POST(request) {
               ?.trim()
           )
       );
-
-    /*
-      BUILD EMAILS
-    */
 
     const emailPayloads =
       validRegistrations.map(
@@ -622,10 +575,6 @@ export async function POST(request) {
         })
       );
 
-    /*
-      MAXIMUM 100 PER RESEND BATCH
-    */
-
     const batches =
       splitIntoChunks(
         emailPayloads,
@@ -634,18 +583,22 @@ export async function POST(request) {
 
     const results = [];
 
-    /*
-      SEND EACH BATCH
-    */
-
     for (
       let index = 0;
       index < batches.length;
       index++
     ) {
+      /*
+        BULK keys stay fixed.
+        This helps protect against
+        accidental duplicate bulk sends.
+      */
+      const bulkKey =
+        `sat-chit-ananda-final-event-update-20260812-batch-${index + 1}`;
+
       await sendBatch(
         batches[index],
-        index + 1
+        bulkKey
       );
 
       results.push({
@@ -659,10 +612,6 @@ export async function POST(request) {
         success: true,
       });
     }
-
-    /*
-      SUCCESS RESPONSE
-    */
 
     return NextResponse.json({
       success: true,
