@@ -3,10 +3,20 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
+import {
+  formatAustralianMobile,
+  getEmailSuggestion,
+  normalizeAustralianMobile,
+  normalizeEmail,
+  validateContactDetails,
+} from "@/lib/validation/contact";
+
 const initialForm = {
   fullName: "",
   email: "",
+  confirmEmail: "",
   phone: "",
+  confirmPhone: "",
   ticketQuantity: "1",
   consent: false,
   website: "",
@@ -75,11 +85,13 @@ function RegistrationTeamFooter() {
 export default function RegisterPage() {
   const [form, setForm] = useState(initialForm);
   const [error, setError] = useState("");
+  const [fieldErrors, setFieldErrors] = useState({});
   const [registration, setRegistration] = useState(null);
   const [submitting, setSubmitting] = useState(false);
 
   const [availability, setAvailability] = useState(null);
-  const [availabilityError, setAvailabilityError] = useState("");
+  const [availabilityError, setAvailabilityError] =
+    useState("");
 
   useEffect(() => {
     let active = true;
@@ -139,18 +151,60 @@ export default function RegisterPage() {
     availability?.registrationOpen === false ||
     availability?.available === 0;
 
+  const emailSuggestion =
+    getEmailSuggestion(form.email);
+
+  const emailsMatch =
+    form.email &&
+    form.confirmEmail &&
+    normalizeEmail(form.email) ===
+      normalizeEmail(form.confirmEmail);
+
+  const phonesMatch =
+    form.phone &&
+    form.confirmPhone &&
+    normalizeAustralianMobile(form.phone) ===
+      normalizeAustralianMobile(form.confirmPhone);
+
   function updateField(event) {
-    const { name, value, type, checked } = event.target;
+    const {
+      name,
+      value,
+      type,
+      checked,
+    } = event.target;
+
+    setError("");
+
+    setFieldErrors((current) => ({
+      ...current,
+      [name]: "",
+    }));
 
     setForm((current) => ({
       ...current,
-      [name]: type === "checkbox" ? checked : value,
+      [name]:
+        type === "checkbox"
+          ? checked
+          : value,
+    }));
+  }
+
+  function handlePhoneBlur(fieldName) {
+    setForm((current) => ({
+      ...current,
+      [fieldName]:
+        formatAustralianMobile(
+          current[fieldName],
+        ),
     }));
   }
 
   async function handleSubmit(event) {
     event.preventDefault();
+
     setError("");
+    setFieldErrors({});
 
     if (soldOut) {
       setError(
@@ -160,21 +214,86 @@ export default function RegisterPage() {
       return;
     }
 
+    if (!form.fullName.trim()) {
+      setFieldErrors({
+        fullName:
+          "Please enter your full name.",
+      });
+
+      return;
+    }
+
+    if (form.fullName.trim().length < 2) {
+      setFieldErrors({
+        fullName:
+          "Please enter your full name.",
+      });
+
+      return;
+    }
+
+    const contactValidation =
+      validateContactDetails({
+        email: form.email,
+        confirmEmail: form.confirmEmail,
+        phone: form.phone,
+        confirmPhone: form.confirmPhone,
+      });
+
+    if (!contactValidation.valid) {
+      setFieldErrors({
+        [contactValidation.field]:
+          contactValidation.error,
+      });
+
+      return;
+    }
+
+    if (!form.consent) {
+      setFieldErrors({
+        consent:
+          "Please confirm that you agree to receive registration and important event updates.",
+      });
+
+      return;
+    }
+
     setSubmitting(true);
 
     try {
-      const response = await fetch("/api/register", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          ...form,
-          ticketQuantity: "1",
-        }),
-      });
+      const response = await fetch(
+        "/api/register",
+        {
+          method: "POST",
 
-      const result = await response.json();
+          headers: {
+            "Content-Type":
+              "application/json",
+          },
+
+          body: JSON.stringify({
+            fullName:
+              form.fullName.trim(),
+
+            email:
+              contactValidation.email,
+
+            phone:
+              contactValidation.phone,
+
+            ticketQuantity: "1",
+
+            consent:
+              form.consent,
+
+            website:
+              form.website,
+          }),
+        },
+      );
+
+      const result =
+        await response.json();
 
       if (!response.ok) {
         throw new Error(
@@ -187,15 +306,21 @@ export default function RegisterPage() {
         const latestAvailability =
           await getAvailability();
 
-        setAvailability(latestAvailability);
-      } catch (availabilityRefreshError) {
+        setAvailability(
+          latestAvailability,
+        );
+      } catch (
+        availabilityRefreshError
+      ) {
         console.error(
           "Availability refresh error:",
           availabilityRefreshError,
         );
       }
 
-      setRegistration(result.registration);
+      setRegistration(
+        result.registration,
+      );
 
       window.scrollTo({
         top: 0,
@@ -225,13 +350,14 @@ export default function RegisterPage() {
           </p>
 
           <h1>
-            Thank you, {registration.fullName}
+            Thank you,{" "}
+            {registration.fullName}
           </h1>
 
           <p className="confirmationLead">
-            Your place at Sat-Chit-{"\u0100"}nanda has
-            been reserved. Please check your email and
-            verify your address to receive your QR ticket.
+            Your place at
+            Sat-Chit-{"\u0100"}nanda
+            has been reserved.
           </p>
 
           <div className="ticket">
@@ -305,16 +431,17 @@ export default function RegisterPage() {
           </div>
 
           <p className="smallPrint">
-            Please check your inbox and verify your email
-            address. Your QR ticket will be sent after
-            verification.
+            Please keep your confirmation
+            details safe.
           </p>
 
           <div className="confirmationActions">
             <button
               className="primaryButton buttonReset"
               type="button"
-              onClick={() => window.print()}
+              onClick={() =>
+                window.print()
+              }
             >
               Print Confirmation
             </button>
@@ -352,7 +479,8 @@ export default function RegisterPage() {
             />
 
             <p>
-              NRNA in collaboration with Project Beyond
+              NRNA in collaboration with
+              Project Beyond
             </p>
           </div>
 
@@ -361,13 +489,15 @@ export default function RegisterPage() {
           </p>
 
           <h1>
-            {soldOut ? "Event Closed" : "Reserve a Spot"}
+            {soldOut
+              ? "Event Closed"
+              : "Reserve a Spot"}
           </h1>
 
           <p>
             {soldOut
               ? "Thank you for sharing this gathering with us. Stay connected with Project Beyond for what comes next."
-              : "Each attendee must complete their own individual registration. One registration reserves one place only."}
+              : "Please enter your contact details carefully. We use your email and mobile number for your registration and important event information."}
           </p>
 
           <div
@@ -390,28 +520,37 @@ export default function RegisterPage() {
                 soldOut ? (
                   <>
                     <strong>
-                      Thank you for being part of this beautiful gathering.
+                      Thank you for being
+                      part of this beautiful
+                      gathering.
                     </strong>
 
                     <p
                       style={{
-                        margin: "8px 0 0",
+                        margin:
+                          "8px 0 0",
                         fontSize: "14px",
                         lineHeight: "1.5",
                         opacity: 0.85,
                       }}
                     >
-                      Stay connected with us for the next journey. ✨
+                      Stay connected with
+                      us for the next
+                      journey. ✨
                     </p>
                   </>
                 ) : (
                   <strong>
-                    Available spots: {availability.available}
+                    Available spots:{" "}
+                    {
+                      availability.available
+                    }
                   </strong>
                 )
               ) : (
                 <strong>
-                  Checking available spots...
+                  Checking available
+                  spots...
                 </strong>
               )}
 
@@ -450,7 +589,8 @@ export default function RegisterPage() {
               </small>
 
               <strong>
-                Free individual registration
+                Free individual
+                registration
               </strong>
             </div>
           </div>
@@ -487,6 +627,20 @@ export default function RegisterPage() {
                 maxLength={100}
                 disabled={soldOut}
               />
+
+              {fieldErrors.fullName && (
+                <small
+                  style={{
+                    display: "block",
+                    marginTop: "7px",
+                    color: "#ff9d9d",
+                  }}
+                >
+                  {
+                    fieldErrors.fullName
+                  }
+                </small>
+              )}
             </label>
 
             <label>
@@ -504,6 +658,103 @@ export default function RegisterPage() {
                 maxLength={150}
                 disabled={soldOut}
               />
+
+              {emailSuggestion && (
+                <small
+                  style={{
+                    display: "block",
+                    marginTop: "7px",
+                    color: "#f1b24a",
+                  }}
+                >
+                  Did you mean{" "}
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setForm(
+                        (current) => ({
+                          ...current,
+                          email:
+                            emailSuggestion,
+                        }),
+                      )
+                    }
+                    style={{
+                      padding: 0,
+                      border: 0,
+                      background:
+                        "transparent",
+                      color: "inherit",
+                      font: "inherit",
+                      textDecoration:
+                        "underline",
+                      cursor: "pointer",
+                    }}
+                  >
+                    {emailSuggestion}
+                  </button>
+                  ?
+                </small>
+              )}
+
+              {fieldErrors.email && (
+                <small
+                  style={{
+                    display: "block",
+                    marginTop: "7px",
+                    color: "#ff9d9d",
+                  }}
+                >
+                  {fieldErrors.email}
+                </small>
+              )}
+            </label>
+
+            <label>
+              <span>
+                Confirm email address
+              </span>
+
+              <input
+                name="confirmEmail"
+                type="email"
+                value={
+                  form.confirmEmail
+                }
+                onChange={updateField}
+                placeholder="Enter your email again"
+                autoComplete="off"
+                maxLength={150}
+                disabled={soldOut}
+              />
+
+              {form.confirmEmail &&
+                emailsMatch && (
+                  <small
+                    style={{
+                      display: "block",
+                      marginTop: "7px",
+                      color: "#8fd694",
+                    }}
+                  >
+                    ✓ Email addresses
+                    match
+                  </small>
+                )}
+
+              {fieldErrors.confirmEmail && (
+                <small
+                  style={{
+                    display: "block",
+                    marginTop: "7px",
+                    color: "#ff9d9d",
+                  }}
+                >
+                  {
+                    fieldErrors.confirmEmail
+                  }
+                </small>
+              )}
             </label>
 
             <label>
@@ -516,11 +767,80 @@ export default function RegisterPage() {
                 type="tel"
                 value={form.phone}
                 onChange={updateField}
-                placeholder="04XX XXX XXX"
+                onBlur={() =>
+                  handlePhoneBlur(
+                    "phone",
+                  )
+                }
+                placeholder="0412 345 678"
                 autoComplete="tel"
                 maxLength={20}
                 disabled={soldOut}
               />
+
+              {fieldErrors.phone && (
+                <small
+                  style={{
+                    display: "block",
+                    marginTop: "7px",
+                    color: "#ff9d9d",
+                  }}
+                >
+                  {fieldErrors.phone}
+                </small>
+              )}
+            </label>
+
+            <label>
+              <span>
+                Confirm mobile number
+              </span>
+
+              <input
+                name="confirmPhone"
+                type="tel"
+                value={
+                  form.confirmPhone
+                }
+                onChange={updateField}
+                onBlur={() =>
+                  handlePhoneBlur(
+                    "confirmPhone",
+                  )
+                }
+                placeholder="Enter your mobile again"
+                autoComplete="off"
+                maxLength={20}
+                disabled={soldOut}
+              />
+
+              {form.confirmPhone &&
+                phonesMatch && (
+                  <small
+                    style={{
+                      display: "block",
+                      marginTop: "7px",
+                      color: "#8fd694",
+                    }}
+                  >
+                    ✓ Mobile numbers
+                    match
+                  </small>
+                )}
+
+              {fieldErrors.confirmPhone && (
+                <small
+                  style={{
+                    display: "block",
+                    marginTop: "7px",
+                    color: "#ff9d9d",
+                  }}
+                >
+                  {
+                    fieldErrors.confirmPhone
+                  }
+                </small>
+              )}
             </label>
 
             <div className="singleReservationNotice">
@@ -533,8 +853,8 @@ export default function RegisterPage() {
               </strong>
 
               <p>
-                Every attendee must complete their own
-                registration.
+                Every attendee must complete
+                their own registration.
               </p>
             </div>
 
@@ -569,11 +889,25 @@ export default function RegisterPage() {
               />
 
               <span>
-                I agree that the organiser may use these
-                details for registration confirmation and
-                important event updates.
+                I agree that the organiser
+                may use these details for
+                registration confirmation
+                and important event updates.
               </span>
             </label>
+
+            {fieldErrors.consent && (
+              <small
+                style={{
+                  display: "block",
+                  marginTop: "-10px",
+                  marginBottom: "16px",
+                  color: "#ff9d9d",
+                }}
+              >
+                {fieldErrors.consent}
+              </small>
+            )}
 
             {error && (
               <div
@@ -589,8 +923,10 @@ export default function RegisterPage() {
                 className="errorMessage"
                 role="status"
               >
-                Thank you for being part of this beautiful gathering.
-                Stay connected with us for the next journey. ✨
+                Thank you for being part of
+                this beautiful gathering.
+                Stay connected with us for
+                the next journey. ✨
               </div>
             )}
 
@@ -629,7 +965,9 @@ export default function RegisterPage() {
             <button
               className="submitButton"
               type="submit"
-              disabled={submitting || soldOut}
+              disabled={
+                submitting || soldOut
+              }
             >
               {soldOut
                 ? "Event Closed"

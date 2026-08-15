@@ -4,9 +4,25 @@ import { z } from "zod";
 
 import { createAdminClient } from "@/lib/supabase/admin";
 
+import {
+  getEmailSuggestion,
+  isValidAustralianMobile,
+  isValidEmailFormat,
+  normalizeAustralianMobile,
+  normalizeEmail,
+} from "@/lib/validation/contact";
+
 const registrationSchema = z.object({
-  fullName: z.string().trim().min(2).max(100),
-  email: z.string().trim().email().max(150),
+  fullName: z
+    .string()
+    .trim()
+    .min(2)
+    .max(100),
+
+  email: z
+    .string()
+    .trim()
+    .max(150),
 
   phone: z
     .string()
@@ -42,7 +58,7 @@ function makeVerificationToken() {
 }
 
 function escapeHtml(value) {
-  return value
+  return String(value)
     .replaceAll("&", "&amp;")
     .replaceAll("<", "&lt;")
     .replaceAll(">", "&gt;")
@@ -75,6 +91,7 @@ async function sendVerificationEmail({
       headers: {
         Authorization:
           `Bearer ${resendApiKey}`,
+
         "Content-Type":
           "application/json",
       },
@@ -149,10 +166,10 @@ async function sendVerificationEmail({
                   margin:0 0 18px;
                 "
               >
-                We are delighted to warmly
-                welcome you to Sat-Chit-Ānanda,
-                an intimate evening of kirtan,
-                music, devotion and community.
+                We are delighted to warmly welcome
+                you to Sat-Chit-Ānanda, an intimate
+                evening of kirtan, music, devotion
+                and community.
               </p>
 
               <p
@@ -163,10 +180,10 @@ async function sendVerificationEmail({
                 "
               >
                 Your registration has been
-                received. Please verify your
-                email address using the button
-                below to confirm your place and
-                receive your personal QR ticket.
+                received. Please verify your email
+                address using the button below to
+                confirm your place and receive your
+                personal QR ticket.
               </p>
 
               <div
@@ -251,6 +268,7 @@ async function sendVerificationEmail({
                 "
               >
                 With warmth,<br />
+
                 <strong>
                   The Sat-Chit-Ānanda Team
                 </strong>
@@ -326,6 +344,11 @@ export async function POST(request) {
     const body =
       await request.json();
 
+    /*
+      First layer of server validation.
+      This protects the API even if someone
+      bypasses the browser registration form.
+    */
     const parsed =
       registrationSchema.safeParse({
         ...body,
@@ -344,7 +367,7 @@ export async function POST(request) {
           "Please enter a valid email address.",
 
         phone:
-          "Please enter a valid mobile number.",
+          "Please enter a valid Australian mobile number.",
 
         ticketQuantity:
           "Only one place can be reserved per registration.",
@@ -368,11 +391,107 @@ export async function POST(request) {
       );
     }
 
+    /*
+      Honeypot protection.
+
+      Real users never fill this field.
+      Basic bots often do.
+    */
     if (parsed.data.website) {
       return NextResponse.json({
         success: true,
         verificationPending: true,
       });
+    }
+
+    /*
+      Normalize the values BEFORE storing them.
+
+      Email:
+      Sameer@GMAIL.COM
+      becomes
+      sameer@gmail.com
+
+      Phone:
+      +61 412 345 678
+      becomes
+      0412345678
+    */
+    const email =
+      normalizeEmail(
+        parsed.data.email,
+      );
+
+    const phone =
+      normalizeAustralianMobile(
+        parsed.data.phone,
+      );
+
+    /*
+      Strict server-side email validation.
+    */
+    if (!isValidEmailFormat(email)) {
+      return NextResponse.json(
+        {
+          error:
+            "Please enter a valid email address.",
+        },
+        {
+          status: 400,
+        },
+      );
+    }
+
+    /*
+      Catch common email-domain typing mistakes.
+
+      Examples:
+      gmail.con
+      gmqil.com
+      yahoo.con
+    */
+    const emailSuggestion =
+      getEmailSuggestion(email);
+
+    if (emailSuggestion) {
+      return NextResponse.json(
+        {
+          error:
+            `Please check your email address. Did you mean ${emailSuggestion}?`,
+        },
+        {
+          status: 400,
+        },
+      );
+    }
+
+    /*
+      Australian mobile validation.
+
+      Valid examples:
+
+      0412 345 678
+      0412345678
+      +61 412 345 678
+
+      Stored format:
+
+      0412345678
+    */
+    if (
+      !isValidAustralianMobile(
+        phone,
+      )
+    ) {
+      return NextResponse.json(
+        {
+          error:
+            "Please enter a valid Australian mobile number, for example 0412 345 678.",
+        },
+        {
+          status: 400,
+        },
+      );
     }
 
     const supabase =
@@ -385,19 +504,24 @@ export async function POST(request) {
       makeVerificationToken();
 
     /*
-      All verification links expire exactly
-      when 14 August ends in Sydney.
+      CURRENT EVENT LOGIC
 
-      Sydney is UTC+10 in August.
+      We are keeping your existing verification
+      behaviour for now.
+
+      In the next QR upgrade we will remove this
+      hard-coded event expiry and move QR validity
+      into proper event settings.
     */
     const verificationExpiresAt =
       new Date(
         "2026-08-15T00:00:00+10:00",
       ).toISOString();
 
-    const email =
-      parsed.data.email.toLowerCase();
-
+    /*
+      Create the registration through your
+      existing database function.
+    */
     const { data, error } =
       await supabase.rpc(
         "register_for_event",
@@ -415,7 +539,7 @@ export async function POST(request) {
             email,
 
           p_phone:
-            parsed.data.phone,
+            phone,
 
           p_ticket_quantity:
             1,
@@ -428,6 +552,9 @@ export async function POST(request) {
         error,
       );
 
+      /*
+        Duplicate email or phone.
+      */
       if (error.code === "23505") {
         return NextResponse.json(
           {
@@ -440,6 +567,10 @@ export async function POST(request) {
         );
       }
 
+      /*
+        Database only allows one attendee
+        per registration.
+      */
       if (
         error.message.includes(
           "ONE_RESERVATION_ONLY",
@@ -456,6 +587,9 @@ export async function POST(request) {
         );
       }
 
+      /*
+        Event capacity protection.
+      */
       if (
         error.message.includes(
           "CAPACITY_EXCEEDED",
@@ -472,6 +606,9 @@ export async function POST(request) {
         );
       }
 
+      /*
+        Registration-open protection.
+      */
       if (
         error.message.includes(
           "REGISTRATION_CLOSED",
@@ -504,6 +641,19 @@ export async function POST(request) {
         ? data[0]
         : data;
 
+    /*
+      CURRENT QR / EMAIL VERIFICATION SYSTEM
+
+      At the moment QR is still NULL until
+      email verification.
+
+      We are deliberately leaving this untouched
+      in this step.
+
+      In our QR upgrade we will change this so
+      a QR token is created immediately when
+      registration succeeds.
+    */
     const { error: tokenError } =
       await supabase
         .from("registrations")
@@ -529,6 +679,10 @@ export async function POST(request) {
         tokenError,
       );
 
+      /*
+        Roll back registration if preparation
+        failed.
+      */
       await supabase
         .from("registrations")
         .delete()
@@ -569,6 +723,14 @@ export async function POST(request) {
         emailError,
       );
 
+      /*
+        Your current system deletes the
+        registration when the verification
+        email cannot be sent.
+
+        We will reconsider this when we build
+        the new QR/email delivery architecture.
+      */
       await supabase
         .from("registrations")
         .delete()
@@ -580,7 +742,7 @@ export async function POST(request) {
       return NextResponse.json(
         {
           error:
-            "We could not send the verification email. Please try again.",
+            "We could not send the verification email. Please check your email address and try again.",
         },
         {
           status: 500,
@@ -600,7 +762,8 @@ export async function POST(request) {
         fullName:
           result.full_name,
 
-        ticketQuantity: 1,
+        ticketQuantity:
+          1,
       },
 
       message:
