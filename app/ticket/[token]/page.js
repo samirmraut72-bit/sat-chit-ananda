@@ -5,22 +5,12 @@ import { createAdminClient } from "@/lib/supabase/admin";
 
 export const dynamic = "force-dynamic";
 
-const EVENT_EXPIRY =
-  new Date(
-    "2026-08-15T00:00:00+10:00",
-  ).getTime();
-
 export default async function TicketPage({
   params,
 }) {
   const { token } = await params;
 
-  /*
-    After 12:00 AM on 15 August 2026
-    Sydney time, the QR ticket page is no
-    longer accessible.
-  */
-  if (Date.now() >= EVENT_EXPIRY) {
+  if (!token) {
     notFound();
   }
 
@@ -37,9 +27,10 @@ export default async function TicketPage({
       full_name,
       email,
       phone,
+      status,
+      checked_in,
       email_verified,
-      qr_token,
-      verification_expires_at
+      qr_token
     `)
     .eq(
       "qr_token",
@@ -47,33 +38,41 @@ export default async function TicketPage({
     )
     .maybeSingle();
 
+  /*
+    A ticket is valid when:
+    - the QR token exists
+    - the registration exists
+    - the registration is confirmed
+
+    Email verification is NOT required.
+  */
   if (
     error ||
     !registration ||
-    !registration.email_verified ||
-    !registration.qr_token
+    !registration.qr_token ||
+    registration.status !== "confirmed"
   ) {
     notFound();
   }
 
   /*
-    Extra database-level expiry check.
+    Use the current website origin.
 
-    This keeps the behaviour consistent
-    with the verification link expiry.
+    Local:
+    http://localhost:3000
+
+    Production:
+    https://satchitananda.com.au
   */
-  if (
-    registration.verification_expires_at &&
-    new Date(
-      registration.verification_expires_at,
-    ).getTime() <= Date.now()
-  ) {
-    notFound();
-  }
+  const baseUrl =
+    process.env.NEXT_PUBLIC_SITE_URL ||
+    "http://localhost:3000";
 
   const ticketUrl =
-    `https://satchitananda.com.au/ticket/` +
-    registration.qr_token;
+    `${baseUrl}/ticket/` +
+    encodeURIComponent(
+      registration.qr_token,
+    );
 
   const qrCode =
     await QRCode.toDataURL(
@@ -114,7 +113,7 @@ export default async function TicketPage({
             letterSpacing: "1px",
           }}
         >
-          EMAIL VERIFIED
+          REGISTRATION CONFIRMED
         </p>
 
         <h1
@@ -134,7 +133,7 @@ export default async function TicketPage({
             marginBottom: "28px",
           }}
         >
-          Your place is confirmed.
+          Your QR ticket is ready.
         </p>
 
         <img
@@ -170,6 +169,24 @@ export default async function TicketPage({
             {
               registration.registration_code
             }
+          </p>
+
+          <p>
+            <strong>
+              Email status:
+            </strong>{" "}
+            {registration.email_verified
+              ? "Verified"
+              : "Not yet verified"}
+          </p>
+
+          <p>
+            <strong>
+              Check-in status:
+            </strong>{" "}
+            {registration.checked_in
+              ? "Checked in"
+              : "Not checked in"}
           </p>
 
           <p>
@@ -212,13 +229,12 @@ export default async function TicketPage({
             color: "#8a817b",
           }}
         >
-          This ticket remains accessible
-          until 12:00 AM on
-          15 August 2026.
+          Email verification does not affect
+          access to this QR ticket.
         </p>
 
         <a
-          href="https://satchitananda.com.au"
+          href={baseUrl}
           style={{
             display: "inline-block",
             marginTop: "18px",

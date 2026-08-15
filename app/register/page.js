@@ -22,12 +22,16 @@ const initialForm = {
 };
 
 async function getAvailability() {
-  const response = await fetch("/api/availability", {
-    method: "GET",
-    cache: "no-store",
-  });
+  const response = await fetch(
+    "/api/availability",
+    {
+      method: "GET",
+      cache: "no-store",
+    },
+  );
 
-  const result = await response.json();
+  const result =
+    await response.json();
 
   if (!response.ok) {
     throw new Error(
@@ -100,17 +104,25 @@ export default function RegisterPage() {
   const [error, setError] =
     useState("");
 
-  const [fieldErrors, setFieldErrors] =
-    useState({});
+  const [
+    fieldErrors,
+    setFieldErrors,
+  ] = useState({});
 
-  const [registration, setRegistration] =
-    useState(null);
+  const [
+    registration,
+    setRegistration,
+  ] = useState(null);
 
-  const [submitting, setSubmitting] =
-    useState(false);
+  const [
+    submitting,
+    setSubmitting,
+  ] = useState(false);
 
-  const [availability, setAvailability] =
-    useState(null);
+  const [
+    availability,
+    setAvailability,
+  ] = useState(null);
 
   const [
     availabilityError,
@@ -126,8 +138,13 @@ export default function RegisterPage() {
           await getAvailability();
 
         if (active) {
-          setAvailability(result);
-          setAvailabilityError("");
+          setAvailability(
+            result,
+          );
+
+          setAvailabilityError(
+            "",
+          );
         }
       } catch (loadError) {
         console.error(
@@ -163,7 +180,9 @@ export default function RegisterPage() {
     return () => {
       active = false;
 
-      window.clearInterval(interval);
+      window.clearInterval(
+        interval,
+      );
 
       window.removeEventListener(
         "focus",
@@ -173,13 +192,18 @@ export default function RegisterPage() {
   }, []);
 
   const soldOut =
-    availability?.soldOut === true ||
-    availability?.registrationOpen ===
+    availability?.soldOut ===
+      true ||
+    availability
+      ?.registrationOpen ===
       false ||
-    availability?.available === 0;
+    availability?.available ===
+      0;
 
   const emailSuggestion =
-    getEmailSuggestion(form.email);
+    getEmailSuggestion(
+      form.email,
+    );
 
   function updateField(event) {
     const {
@@ -191,30 +215,36 @@ export default function RegisterPage() {
 
     setError("");
 
-    setFieldErrors((current) => ({
-      ...current,
-      [name]: "",
-    }));
+    setFieldErrors(
+      (current) => ({
+        ...current,
+        [name]: "",
+      }),
+    );
 
-    setForm((current) => ({
-      ...current,
+    setForm(
+      (current) => ({
+        ...current,
 
-      [name]:
-        type === "checkbox"
-          ? checked
-          : value,
-    }));
+        [name]:
+          type === "checkbox"
+            ? checked
+            : value,
+      }),
+    );
   }
 
   function handlePhoneBlur() {
-    setForm((current) => ({
-      ...current,
+    setForm(
+      (current) => ({
+        ...current,
 
-      phone:
-        formatAustralianMobile(
-          current.phone,
-        ),
-    }));
+        phone:
+          formatAustralianMobile(
+            current.phone,
+          ),
+      }),
+    );
   }
 
   function useSuggestedEmail() {
@@ -222,18 +252,25 @@ export default function RegisterPage() {
       return;
     }
 
-    setForm((current) => ({
-      ...current,
-      email: emailSuggestion,
-    }));
+    setForm(
+      (current) => ({
+        ...current,
+        email:
+          emailSuggestion,
+      }),
+    );
 
-    setFieldErrors((current) => ({
-      ...current,
-      email: "",
-    }));
+    setFieldErrors(
+      (current) => ({
+        ...current,
+        email: "",
+      }),
+    );
   }
 
-  async function handleSubmit(event) {
+  async function handleSubmit(
+    event,
+  ) {
     event.preventDefault();
 
     setError("");
@@ -263,16 +300,14 @@ export default function RegisterPage() {
     }
 
     const email =
-      normalizeEmail(form.email);
+      normalizeEmail(
+        form.email,
+      );
 
     const phone =
       normalizeAustralianMobile(
         form.phone,
       );
-
-    /*
-      EMAIL VALIDATION
-    */
 
     if (!email) {
       setFieldErrors({
@@ -283,7 +318,11 @@ export default function RegisterPage() {
       return;
     }
 
-    if (!isValidEmailFormat(email)) {
+    if (
+      !isValidEmailFormat(
+        email,
+      )
+    ) {
       setFieldErrors({
         email:
           "Please enter a valid email address.",
@@ -293,7 +332,9 @@ export default function RegisterPage() {
     }
 
     const suggestedEmail =
-      getEmailSuggestion(email);
+      getEmailSuggestion(
+        email,
+      );
 
     if (suggestedEmail) {
       setFieldErrors({
@@ -303,10 +344,6 @@ export default function RegisterPage() {
 
       return;
     }
-
-    /*
-      MOBILE VALIDATION
-    */
 
     if (!phone) {
       setFieldErrors({
@@ -318,7 +355,9 @@ export default function RegisterPage() {
     }
 
     if (
-      !isValidAustralianMobile(phone)
+      !isValidAustralianMobile(
+        phone,
+      )
     ) {
       setFieldErrors({
         phone:
@@ -327,10 +366,6 @@ export default function RegisterPage() {
 
       return;
     }
-
-    /*
-      CONSENT
-    */
 
     if (!form.consent) {
       setFieldErrors({
@@ -344,31 +379,35 @@ export default function RegisterPage() {
     setSubmitting(true);
 
     try {
-      const response = await fetch(
-        "/api/register",
-        {
-          method: "POST",
+      const response =
+        await fetch(
+          "/api/register",
+          {
+            method:
+              "POST",
 
-          headers: {
-            "Content-Type":
-              "application/json",
+            headers: {
+              "Content-Type":
+                "application/json",
+            },
+
+            body:
+              JSON.stringify({
+                fullName,
+                email,
+                phone,
+
+                ticketQuantity:
+                  "1",
+
+                consent:
+                  form.consent,
+
+                website:
+                  form.website,
+              }),
           },
-
-          body: JSON.stringify({
-            fullName,
-            email,
-            phone,
-
-            ticketQuantity: "1",
-
-            consent:
-              form.consent,
-
-            website:
-              form.website,
-          }),
-        },
-      );
+        );
 
       const result =
         await response.json();
@@ -396,17 +435,27 @@ export default function RegisterPage() {
         );
       }
 
-      setRegistration(
-        result.registration,
-      );
+      setRegistration({
+        ...result.registration,
+
+        emailSent:
+          result.emailSent ===
+          true,
+
+        message:
+          result.message ||
+          "",
+      });
 
       window.scrollTo({
         top: 0,
-        behavior: "smooth",
+        behavior:
+          "smooth",
       });
     } catch (submitError) {
       setError(
-        submitError instanceof Error
+        submitError instanceof
+          Error
           ? submitError.message
           : "Registration could not be completed.",
       );
@@ -416,7 +465,7 @@ export default function RegisterPage() {
   }
 
   /*
-    REGISTRATION SUCCESS SCREEN
+    SUCCESS PAGE
   */
 
   if (registration) {
@@ -428,18 +477,20 @@ export default function RegisterPage() {
           </div>
 
           <p className="sectionEyebrow">
-            Registration received
+            Registration confirmed
           </p>
 
           <h1>
             Thank you,{" "}
-            {registration.fullName}
+            {
+              registration.fullName
+            }
           </h1>
 
           <p className="confirmationLead">
             Your place at
             Sat-Chit-{"\u0100"}nanda
-            has been reserved.
+            is confirmed.
           </p>
 
           <div className="ticket">
@@ -450,7 +501,8 @@ export default function RegisterPage() {
                 </small>
 
                 <strong>
-                  Sat-Chit-{"\u0100"}nanda
+                  Sat-Chit-
+                  {"\u0100"}nanda
                 </strong>
               </div>
 
@@ -507,14 +559,285 @@ export default function RegisterPage() {
               </small>
 
               <strong>
-                {registration.code}
+                {
+                  registration.code
+                }
               </strong>
             </div>
           </div>
 
-          <p className="smallPrint">
-            Please keep your
-            registration details safe.
+          {/* QR TICKET */}
+
+          <div
+            style={{
+              marginTop:
+                "26px",
+
+              padding:
+                "26px",
+
+              borderRadius:
+                "16px",
+
+              background:
+                "#faf7f3",
+
+              textAlign:
+                "center",
+            }}
+          >
+            <div
+              style={{
+                fontSize:
+                  "36px",
+
+                marginBottom:
+                  "8px",
+              }}
+            >
+              🎟️
+            </div>
+
+            <h2
+              style={{
+                margin:
+                  "0 0 10px",
+
+                fontSize:
+                  "22px",
+              }}
+            >
+              Your QR Ticket
+            </h2>
+
+            <p
+              style={{
+                margin:
+                  "0 auto 20px",
+
+                maxWidth:
+                  "520px",
+
+                lineHeight:
+                  "1.6",
+
+                color:
+                  "#625851",
+              }}
+            >
+              Your QR ticket is
+              active immediately.
+              Present the QR code
+              from your confirmation
+              email or open your
+              ticket below.
+            </p>
+
+            {registration.ticketUrl ? (
+              <a
+                href={
+                  registration.ticketUrl
+                }
+                target="_blank"
+                rel="noopener noreferrer"
+                className="primaryButton"
+                style={{
+                  display:
+                    "inline-block",
+
+                  textDecoration:
+                    "none",
+                }}
+              >
+                Open My QR Ticket
+              </a>
+            ) : (
+              <p
+                style={{
+                  color:
+                    "#9b1c1c",
+
+                  fontWeight:
+                    "700",
+                }}
+              >
+                Ticket link is
+                temporarily
+                unavailable.
+              </p>
+            )}
+          </div>
+
+          {/* EMAIL DELIVERY */}
+
+          <div
+            style={{
+              marginTop:
+                "26px",
+
+              padding:
+                "24px",
+
+              border:
+                registration.emailSent
+                  ? "1px solid #b7d7bf"
+                  : "1px solid #e3c68a",
+
+              borderRadius:
+                "16px",
+
+              background:
+                registration.emailSent
+                  ? "#f4f8f4"
+                  : "#fff9ed",
+
+              textAlign:
+                "left",
+            }}
+          >
+            <p
+              className="sectionEyebrow"
+              style={{
+                margin:
+                  "0 0 8px",
+              }}
+            >
+              Confirmation email
+            </p>
+
+            <h2
+              style={{
+                margin:
+                  "0 0 10px",
+
+                fontSize:
+                  "22px",
+              }}
+            >
+              {registration.emailSent
+                ? "Your ticket has been emailed"
+                : "Your QR ticket is still valid"}
+            </h2>
+
+            {registration.emailSent ? (
+              <>
+                <p
+                  style={{
+                    margin:
+                      "0",
+
+                    color:
+                      "#46604b",
+
+                    lineHeight:
+                      "1.6",
+                  }}
+                >
+                  We sent one
+                  confirmation email
+                  containing your QR
+                  ticket and event
+                  details.
+                </p>
+
+                <p
+                  style={{
+                    margin:
+                      "12px 0 0",
+
+                    color:
+                      "#625851",
+
+                    lineHeight:
+                      "1.6",
+                  }}
+                >
+                  At the entrance,
+                  simply show the QR
+                  code from your email
+                  to event staff.
+                </p>
+              </>
+            ) : (
+              <>
+                <p
+                  style={{
+                    margin:
+                      "0 0 10px",
+
+                    color:
+                      "#8a5b00",
+
+                    fontWeight:
+                      "700",
+
+                    lineHeight:
+                      "1.6",
+                  }}
+                >
+                  Your registration
+                  succeeded, but the
+                  confirmation email
+                  could not be sent.
+                </p>
+
+                <p
+                  style={{
+                    margin:
+                      "0",
+
+                    color:
+                      "#625851",
+
+                    lineHeight:
+                      "1.6",
+                  }}
+                >
+                  Your QR ticket is
+                  still valid. Open it
+                  using the button
+                  above and keep your
+                  registration code
+                  safe.
+                </p>
+              </>
+            )}
+
+            {registration.message ? (
+              <p
+                style={{
+                  margin:
+                    "14px 0 0",
+
+                  fontSize:
+                    "13px",
+
+                  color:
+                    "#746a63",
+
+                  lineHeight:
+                    "1.6",
+                }}
+              >
+                {
+                  registration.message
+                }
+              </p>
+            ) : null}
+          </div>
+
+          <p
+            className="smallPrint"
+            style={{
+              marginTop:
+                "24px",
+            }}
+          >
+            Please keep your QR
+            ticket and registration
+            details safe. Event staff
+            will scan the QR code when
+            you arrive.
           </p>
 
           <div className="confirmationActions">
@@ -543,7 +866,7 @@ export default function RegisterPage() {
   }
 
   /*
-    REGISTRATION PAGE
+    REGISTRATION FORM
   */
 
   return (
@@ -565,8 +888,8 @@ export default function RegisterPage() {
             />
 
             <p>
-              NRNA in collaboration with
-              Project Beyond
+              NRNA in collaboration
+              with Project Beyond
             </p>
           </div>
 
@@ -583,7 +906,7 @@ export default function RegisterPage() {
           <p>
             {soldOut
               ? "Thank you for sharing this gathering with us. Stay connected with Project Beyond for what comes next."
-              : "Please enter your contact details carefully. We use your email and mobile number for your registration and important event information."}
+              : "Please enter your contact details carefully. Your confirmation email will contain your QR ticket for event entry."}
           </p>
 
           <div
@@ -606,8 +929,9 @@ export default function RegisterPage() {
                 soldOut ? (
                   <>
                     <strong>
-                      Thank you for being
-                      part of this beautiful
+                      Thank you for
+                      being part of
+                      this beautiful
                       gathering.
                     </strong>
 
@@ -615,16 +939,20 @@ export default function RegisterPage() {
                       style={{
                         margin:
                           "8px 0 0",
+
                         fontSize:
                           "14px",
+
                         lineHeight:
                           "1.5",
-                        opacity: 0.85,
+
+                        opacity:
+                          0.85,
                       }}
                     >
-                      Stay connected with
-                      us for the next
-                      journey. ✨
+                      Stay connected
+                      with us for the
+                      next journey. ✨
                     </p>
                   </>
                 ) : (
@@ -644,7 +972,9 @@ export default function RegisterPage() {
 
               {availabilityError && (
                 <p>
-                  {availabilityError}
+                  {
+                    availabilityError
+                  }
                 </p>
               )}
             </div>
@@ -699,7 +1029,9 @@ export default function RegisterPage() {
           </div>
 
           <form
-            onSubmit={handleSubmit}
+            onSubmit={
+              handleSubmit
+            }
             noValidate
           >
             {/* FULL NAME */}
@@ -711,12 +1043,18 @@ export default function RegisterPage() {
 
               <input
                 name="fullName"
-                value={form.fullName}
-                onChange={updateField}
+                value={
+                  form.fullName
+                }
+                onChange={
+                  updateField
+                }
                 placeholder="Enter your full name"
                 autoComplete="name"
                 maxLength={100}
-                disabled={soldOut}
+                disabled={
+                  soldOut
+                }
               />
 
               {fieldErrors.fullName && (
@@ -724,8 +1062,10 @@ export default function RegisterPage() {
                   style={{
                     display:
                       "block",
+
                     marginTop:
                       "7px",
+
                     color:
                       "#ff9d9d",
                   }}
@@ -747,12 +1087,18 @@ export default function RegisterPage() {
               <input
                 name="email"
                 type="email"
-                value={form.email}
-                onChange={updateField}
+                value={
+                  form.email
+                }
+                onChange={
+                  updateField
+                }
                 placeholder="you@example.com"
                 autoComplete="email"
                 maxLength={150}
-                disabled={soldOut}
+                disabled={
+                  soldOut
+                }
               />
 
               {emailSuggestion && (
@@ -760,8 +1106,10 @@ export default function RegisterPage() {
                   style={{
                     display:
                       "block",
+
                     marginTop:
                       "7px",
+
                     color:
                       "#f1b24a",
                   }}
@@ -774,25 +1122,35 @@ export default function RegisterPage() {
                       useSuggestedEmail
                     }
                     style={{
-                      padding: 0,
-                      border: 0,
+                      padding:
+                        0,
+
+                      border:
+                        0,
+
                       background:
                         "transparent",
+
                       color:
                         "inherit",
+
                       font:
                         "inherit",
+
                       fontWeight:
                         "700",
+
                       textDecoration:
                         "underline",
+
                       cursor:
                         "pointer",
                     }}
                   >
-                    {emailSuggestion}
+                    {
+                      emailSuggestion
+                    }
                   </button>
-
                   ?
                 </small>
               )}
@@ -802,8 +1160,10 @@ export default function RegisterPage() {
                   style={{
                     display:
                       "block",
+
                     marginTop:
                       "7px",
+
                     color:
                       "#ff9d9d",
                   }}
@@ -825,15 +1185,21 @@ export default function RegisterPage() {
               <input
                 name="phone"
                 type="tel"
-                value={form.phone}
-                onChange={updateField}
+                value={
+                  form.phone
+                }
+                onChange={
+                  updateField
+                }
                 onBlur={
                   handlePhoneBlur
                 }
                 placeholder="0412 345 678"
                 autoComplete="tel"
                 maxLength={20}
-                disabled={soldOut}
+                disabled={
+                  soldOut
+                }
               />
 
               {fieldErrors.phone && (
@@ -841,8 +1207,10 @@ export default function RegisterPage() {
                   style={{
                     display:
                       "block",
+
                     marginTop:
                       "7px",
+
                     color:
                       "#ff9d9d",
                   }}
@@ -854,7 +1222,7 @@ export default function RegisterPage() {
               )}
             </label>
 
-            {/* RESERVATION */}
+            {/* ONE ATTENDEE */}
 
             <div className="singleReservationNotice">
               <span>
@@ -911,15 +1279,21 @@ export default function RegisterPage() {
                 onChange={
                   updateField
                 }
-                disabled={soldOut}
+                disabled={
+                  soldOut
+                }
               />
 
               <span>
                 I agree that the
-                organiser may use these
-                details for registration
-                confirmation and
-                important event updates.
+                organiser may use my
+                name, email and mobile
+                number to manage my
+                registration, event
+                entry, safety
+                communications and
+                necessary event
+                administration.
               </span>
             </label>
 
@@ -928,10 +1302,13 @@ export default function RegisterPage() {
                 style={{
                   display:
                     "block",
+
                   marginTop:
                     "-10px",
+
                   marginBottom:
                     "16px",
+
                   color:
                     "#ff9d9d",
                 }}
@@ -953,7 +1330,7 @@ export default function RegisterPage() {
               </div>
             )}
 
-            {/* CLOSED EVENT */}
+            {/* CLOSED */}
 
             {soldOut && (
               <div
@@ -961,14 +1338,15 @@ export default function RegisterPage() {
                 role="status"
               >
                 Thank you for being
-                part of this beautiful
-                gathering. Stay
-                connected with us for
-                the next journey. ✨
+                part of this
+                beautiful gathering.
+                Stay connected with
+                us for the next
+                journey. ✨
               </div>
             )}
 
-            {/* ORDER SUMMARY */}
+            {/* SUMMARY */}
 
             <div className="orderSummary">
               <div>
@@ -1001,8 +1379,6 @@ export default function RegisterPage() {
                 </strong>
               </div>
             </div>
-
-            {/* SUBMIT */}
 
             <button
               className="submitButton"

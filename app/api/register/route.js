@@ -1,4 +1,8 @@
-import { randomUUID } from "crypto";
+import {
+  randomUUID,
+} from "crypto";
+
+import QRCode from "qrcode";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 
@@ -11,6 +15,9 @@ import {
   normalizeAustralianMobile,
   normalizeEmail,
 } from "@/lib/validation/contact";
+
+const EVENT_SLUG =
+  "sat-chit-ananda-2026";
 
 const registrationSchema = z.object({
   fullName: z
@@ -28,8 +35,7 @@ const registrationSchema = z.object({
     .string()
     .trim()
     .min(8)
-    .max(20)
-    .regex(/^[+()\-\s0-9]+$/),
+    .max(30),
 
   ticketQuantity: z.coerce
     .number()
@@ -53,11 +59,14 @@ function makeRegistrationCode() {
     .toUpperCase()}`;
 }
 
-function makeVerificationToken() {
-  return randomUUID().replaceAll("-", "");
+function makeQrToken() {
+  return randomUUID().replaceAll(
+    "-",
+    "",
+  );
 }
 
-function escapeHtml(value) {
+function escapeHtml(value = "") {
   return String(value)
     .replaceAll("&", "&amp;")
     .replaceAll("<", "&lt;")
@@ -66,10 +75,32 @@ function escapeHtml(value) {
     .replaceAll("'", "&#039;");
 }
 
-async function sendVerificationEmail({
+async function makeQrPngBase64(
+  ticketUrl,
+) {
+  const qrBuffer =
+    await QRCode.toBuffer(
+      ticketUrl,
+      {
+        type: "png",
+        width: 420,
+        margin: 2,
+        errorCorrectionLevel:
+          "M",
+      },
+    );
+
+  return qrBuffer.toString(
+    "base64",
+  );
+}
+
+async function sendRegistrationEmail({
   email,
   fullName,
-  verificationUrl,
+  registrationCode,
+  ticketUrl,
+  qrBase64,
 }) {
   const resendApiKey =
     process.env.RESEND_API_KEY;
@@ -82,6 +113,14 @@ async function sendVerificationEmail({
 
   const safeName =
     escapeHtml(fullName);
+
+  const safeRegistrationCode =
+    escapeHtml(
+      registrationCode,
+    );
+
+  const safeTicketUrl =
+    escapeHtml(ticketUrl);
 
   const response = await fetch(
     "https://api.resend.com/emails",
@@ -103,35 +142,57 @@ async function sendVerificationEmail({
         to: [email],
 
         subject:
-          "A warm welcome to Sat-Chit-Ānanda",
+          "Your Sat-Chit-Ānanda QR Ticket",
+
+        text: `
+Namaste ${fullName},
+
+Your registration for Sat-Chit-Ānanda is confirmed.
+
+Registration code:
+${registrationCode}
+
+Please present your QR ticket at the entrance.
+
+You can also open your ticket here:
+${ticketUrl}
+
+Friday, 14 August 2026
+6:45 PM–9:00 PM
+The Granville Centre
+1 Memorial Drive, Granville NSW 2142
+
+Sat-Chit-Ānanda
+Project Beyond
+        `.trim(),
 
         html: `
           <div
             style="
+              margin:0;
+              padding:32px 16px;
+              background:#f5efe8;
               font-family:Arial,sans-serif;
-              max-width:620px;
-              margin:0 auto;
-              padding:36px 24px;
-              color:#2f2925;
-              background:#fffaf5;
+              color:#29231f;
             "
           >
             <div
               style="
+                max-width:620px;
+                margin:0 auto;
                 background:#ffffff;
                 border-radius:18px;
                 padding:36px;
                 box-shadow:0 10px 30px rgba(0,0,0,0.08);
               "
             >
-
               <p
                 style="
                   margin:0 0 10px;
-                  color:#a06b3d;
+                  color:#7a3f2b;
                   font-size:13px;
                   font-weight:700;
-                  letter-spacing:1.5px;
+                  letter-spacing:1.4px;
                   text-transform:uppercase;
                 "
               >
@@ -140,20 +201,19 @@ async function sendVerificationEmail({
 
               <h1
                 style="
+                  margin:0 0 18px;
                   font-size:30px;
                   line-height:1.2;
-                  margin:0 0 18px;
-                  color:#2f2925;
                 "
               >
-                Thank you for registering
+                Your QR ticket is ready
               </h1>
 
               <p
                 style="
+                  margin:0 0 18px;
                   font-size:17px;
                   line-height:1.7;
-                  margin:0 0 18px;
                 "
               >
                 Namaste ${safeName},
@@ -161,168 +221,172 @@ async function sendVerificationEmail({
 
               <p
                 style="
+                  margin:0 0 20px;
                   font-size:16px;
                   line-height:1.7;
-                  margin:0 0 18px;
                 "
               >
-                We are delighted to warmly welcome
-                you to Sat-Chit-Ānanda, an intimate
-                evening of kirtan, music, devotion
-                and community.
-              </p>
-
-              <p
-                style="
-                  font-size:16px;
-                  line-height:1.7;
-                  margin:0 0 24px;
-                "
-              >
-                Your registration has been
-                received. Please verify your email
-                address using the button below to
-                confirm your place and receive your
-                personal QR ticket.
+                Your registration is confirmed.
+                Please present the QR code below
+                when you arrive at the venue.
               </p>
 
               <div
                 style="
-                  margin:30px 0;
+                  margin:28px 0;
+                  padding:24px;
+                  background:#faf7f3;
+                  border-radius:16px;
                   text-align:center;
                 "
               >
-                <a
-                  href="${verificationUrl}"
+                <img
+                  src="cid:sat-chit-ananda-ticket-qr"
+                  alt="Sat-Chit-Ananda QR ticket"
+                  width="320"
+                  height="320"
                   style="
-                    display:inline-block;
-                    background:#7a3f2b;
-                    color:#ffffff;
-                    text-decoration:none;
-                    padding:15px 28px;
-                    border-radius:10px;
-                    font-size:16px;
-                    font-weight:700;
+                    display:block;
+                    width:100%;
+                    max-width:320px;
+                    height:auto;
+                    margin:0 auto;
+                    background:#ffffff;
+                    border-radius:12px;
+                  "
+                />
+
+                <p
+                  style="
+                    margin:18px 0 0;
+                    font-size:14px;
+                    color:#625851;
+                    line-height:1.6;
                   "
                 >
-                  Verify email and receive QR ticket
-                </a>
+                  Show this QR code to event staff
+                  at the entrance.
+                </p>
               </div>
 
               <div
                 style="
-                  background:#faf4ee;
-                  border-radius:12px;
-                  padding:20px;
                   margin:26px 0;
+                  padding:20px;
+                  background:#faf7f3;
+                  border-radius:12px;
                 "
               >
                 <p
                   style="
-                    margin:0 0 10px;
-                    font-weight:700;
-                    color:#3b332d;
+                    margin:0 0 8px;
                   "
                 >
-                  Event details
+                  <strong>
+                    Registration code:
+                  </strong>
+                  ${safeRegistrationCode}
                 </p>
 
-                <p style="margin:6px 0;font-size:15px;">
+                <p
+                  style="
+                    margin:8px 0;
+                  "
+                >
                   <strong>Date:</strong>
                   Friday, 14 August 2026
                 </p>
 
-                <p style="margin:6px 0;font-size:15px;">
+                <p
+                  style="
+                    margin:8px 0;
+                  "
+                >
                   <strong>Time:</strong>
                   6:45 PM–9:00 PM
                 </p>
 
-                <p style="margin:6px 0;font-size:15px;">
+                <p
+                  style="
+                    margin:8px 0;
+                  "
+                >
                   <strong>Venue:</strong>
                   The Granville Centre
                 </p>
 
-                <p style="margin:6px 0;font-size:15px;">
+                <p
+                  style="
+                    margin:8px 0 0;
+                  "
+                >
                   <strong>Address:</strong>
                   1 Memorial Drive,
                   Granville NSW 2142
                 </p>
               </div>
 
-              <p
+              <div
                 style="
-                  font-size:15px;
-                  line-height:1.7;
-                  margin:0 0 18px;
+                  margin:28px 0;
+                  text-align:center;
                 "
               >
-                We look forward to sharing this
-                beautiful gathering with you.
-              </p>
+                <a
+                  href="${safeTicketUrl}"
+                  style="
+                    display:inline-block;
+                    padding:15px 28px;
+                    background:#7a3f2b;
+                    color:#ffffff;
+                    text-decoration:none;
+                    border-radius:10px;
+                    font-size:16px;
+                    font-weight:700;
+                  "
+                >
+                  Open My Ticket
+                </a>
+              </div>
 
               <p
                 style="
-                  font-size:15px;
-                  line-height:1.7;
                   margin:0;
-                "
-              >
-                With warmth,<br />
-
-                <strong>
-                  The Sat-Chit-Ānanda Team
-                </strong>
-              </p>
-
-              <hr
-                style="
-                  margin:32px 0;
-                  border:none;
-                  border-top:1px solid #e6ddd5;
-                "
-              />
-
-              <p
-                style="
-                  font-size:13px;
+                  font-size:14px;
+                  color:#625851;
                   line-height:1.6;
-                  color:#766c65;
-                  margin:0 0 8px;
                 "
               >
-                This ticket link can be used
-                multiple times and will expire
-                at 12:00 AM on 15 August 2026.
+                You may show the QR directly from
+                this email, save a screenshot, or
+                use the Open My Ticket button.
               </p>
 
               <p
                 style="
+                  margin:22px 0 0;
                   font-size:13px;
+                  color:#8a817b;
                   line-height:1.6;
-                  color:#766c65;
-                  margin:0 0 8px;
                 "
               >
-                If the button does not work,
-                copy and paste this link into
-                your browser:
+                Sat-Chit-Ānanda · Project Beyond
               </p>
-
-              <p
-                style="
-                  font-size:13px;
-                  line-height:1.6;
-                  word-break:break-all;
-                  color:#7a3f2b;
-                  margin:0;
-                "
-              >
-                ${verificationUrl}
-              </p>
-
             </div>
           </div>
         `,
+
+        attachments: [
+          {
+            content: qrBase64,
+
+            filename:
+              "sat-chit-ananda-ticket.png",
+
+            content_id:
+              "sat-chit-ananda-ticket-qr",
+          },
+        ],
       }),
     },
   );
@@ -339,16 +403,13 @@ async function sendVerificationEmail({
   return response.json();
 }
 
-export async function POST(request) {
+export async function POST(
+  request,
+) {
   try {
     const body =
       await request.json();
 
-    /*
-      First layer of server validation.
-      This protects the API even if someone
-      bypasses the browser registration form.
-    */
     const parsed =
       registrationSchema.safeParse({
         ...body,
@@ -382,7 +443,9 @@ export async function POST(request) {
       return NextResponse.json(
         {
           error:
-            friendlyMessages[field] ||
+            friendlyMessages[
+              field
+            ] ||
             "Please check the information and try again.",
         },
         {
@@ -392,31 +455,16 @@ export async function POST(request) {
     }
 
     /*
-      Honeypot protection.
-
-      Real users never fill this field.
-      Basic bots often do.
+      Honeypot
     */
-    if (parsed.data.website) {
+    if (
+      parsed.data.website
+    ) {
       return NextResponse.json({
         success: true,
-        verificationPending: true,
       });
     }
 
-    /*
-      Normalize the values BEFORE storing them.
-
-      Email:
-      Sameer@GMAIL.COM
-      becomes
-      sameer@gmail.com
-
-      Phone:
-      +61 412 345 678
-      becomes
-      0412345678
-    */
     const email =
       normalizeEmail(
         parsed.data.email,
@@ -427,10 +475,11 @@ export async function POST(request) {
         parsed.data.phone,
       );
 
-    /*
-      Strict server-side email validation.
-    */
-    if (!isValidEmailFormat(email)) {
+    if (
+      !isValidEmailFormat(
+        email,
+      )
+    ) {
       return NextResponse.json(
         {
           error:
@@ -442,16 +491,10 @@ export async function POST(request) {
       );
     }
 
-    /*
-      Catch common email-domain typing mistakes.
-
-      Examples:
-      gmail.con
-      gmqil.com
-      yahoo.con
-    */
     const emailSuggestion =
-      getEmailSuggestion(email);
+      getEmailSuggestion(
+        email,
+      );
 
     if (emailSuggestion) {
       return NextResponse.json(
@@ -465,19 +508,6 @@ export async function POST(request) {
       );
     }
 
-    /*
-      Australian mobile validation.
-
-      Valid examples:
-
-      0412 345 678
-      0412345678
-      +61 412 345 678
-
-      Stored format:
-
-      0412345678
-    */
     if (
       !isValidAustralianMobile(
         phone,
@@ -500,51 +530,34 @@ export async function POST(request) {
     const registrationCode =
       makeRegistrationCode();
 
-    const verificationToken =
-      makeVerificationToken();
+    const qrToken =
+      makeQrToken();
 
-    /*
-      CURRENT EVENT LOGIC
+    const {
+      data,
+      error,
+    } = await supabase.rpc(
+      "register_for_event",
+      {
+        p_event_slug:
+          EVENT_SLUG,
 
-      We are keeping your existing verification
-      behaviour for now.
+        p_registration_code:
+          registrationCode,
 
-      In the next QR upgrade we will remove this
-      hard-coded event expiry and move QR validity
-      into proper event settings.
-    */
-    const verificationExpiresAt =
-      new Date(
-        "2026-08-15T00:00:00+10:00",
-      ).toISOString();
+        p_full_name:
+          parsed.data.fullName,
 
-    /*
-      Create the registration through your
-      existing database function.
-    */
-    const { data, error } =
-      await supabase.rpc(
-        "register_for_event",
-        {
-          p_event_slug:
-            "sat-chit-ananda-2026",
+        p_email:
+          email,
 
-          p_registration_code:
-            registrationCode,
+        p_phone:
+          phone,
 
-          p_full_name:
-            parsed.data.fullName,
-
-          p_email:
-            email,
-
-          p_phone:
-            phone,
-
-          p_ticket_quantity:
-            1,
-        },
-      );
+        p_ticket_quantity:
+          1,
+      },
+    );
 
     if (error) {
       console.error(
@@ -552,10 +565,9 @@ export async function POST(request) {
         error,
       );
 
-      /*
-        Duplicate email or phone.
-      */
-      if (error.code === "23505") {
+      if (
+        error.code === "23505"
+      ) {
         return NextResponse.json(
           {
             error:
@@ -567,31 +579,8 @@ export async function POST(request) {
         );
       }
 
-      /*
-        Database only allows one attendee
-        per registration.
-      */
       if (
-        error.message.includes(
-          "ONE_RESERVATION_ONLY",
-        )
-      ) {
-        return NextResponse.json(
-          {
-            error:
-              "Only one place can be reserved per registration.",
-          },
-          {
-            status: 400,
-          },
-        );
-      }
-
-      /*
-        Event capacity protection.
-      */
-      if (
-        error.message.includes(
+        error.message?.includes(
           "CAPACITY_EXCEEDED",
         )
       ) {
@@ -606,11 +595,8 @@ export async function POST(request) {
         );
       }
 
-      /*
-        Registration-open protection.
-      */
       if (
-        error.message.includes(
+        error.message?.includes(
           "REGISTRATION_CLOSED",
         )
       ) {
@@ -641,60 +627,11 @@ export async function POST(request) {
         ? data[0]
         : data;
 
-    /*
-      CURRENT QR / EMAIL VERIFICATION SYSTEM
-
-      At the moment QR is still NULL until
-      email verification.
-
-      We are deliberately leaving this untouched
-      in this step.
-
-      In our QR upgrade we will change this so
-      a QR token is created immediately when
-      registration succeeds.
-    */
-    const { error: tokenError } =
-      await supabase
-        .from("registrations")
-        .update({
-          email_verified: false,
-
-          verification_token:
-            verificationToken,
-
-          verification_expires_at:
-            verificationExpiresAt,
-
-          qr_token: null,
-        })
-        .eq(
-          "registration_code",
-          registrationCode,
-        );
-
-    if (tokenError) {
-      console.error(
-        "Verification token database error:",
-        tokenError,
-      );
-
-      /*
-        Roll back registration if preparation
-        failed.
-      */
-      await supabase
-        .from("registrations")
-        .delete()
-        .eq(
-          "registration_code",
-          registrationCode,
-        );
-
+    if (!result) {
       return NextResponse.json(
         {
           error:
-            "Registration could not be prepared for verification.",
+            "Registration could not be completed. Please try again.",
         },
         {
           status: 500,
@@ -702,72 +639,160 @@ export async function POST(request) {
       );
     }
 
-    const verificationUrl =
-      `https://satchitananda.com.au/api/verify-email?token=` +
-      encodeURIComponent(
-        verificationToken,
-      );
+    /*
+      QR is created immediately.
 
-    try {
-      await sendVerificationEmail({
+      Email verification is no longer
+      part of ticket validity.
+    */
+    const {
+      data:
+        updatedRegistration,
+      error:
+        updateError,
+    } = await supabase
+      .from("registrations")
+      .update({
+        qr_token:
+          qrToken,
+
+        verification_token:
+          null,
+
+        verification_expires_at:
+          null,
+
+        email_verification_code_hash:
+          null,
+
+        email_verification_code_expires_at:
+          null,
+
+        email_verification_attempts:
+          0,
+      })
+      .eq(
+        "registration_code",
+        registrationCode,
+      )
+      .select(`
+        id,
+        registration_code,
+        full_name,
         email,
+        phone,
+        ticket_quantity,
+        status,
+        checked_in,
+        qr_token,
+        created_at
+      `)
+      .single();
 
-        fullName:
-          parsed.data.fullName,
-
-        verificationUrl,
-      });
-    } catch (emailError) {
+    if (
+      updateError ||
+      !updatedRegistration
+    ) {
       console.error(
-        "Verification email error:",
-        emailError,
+        "QR setup error:",
+        updateError,
       );
-
-      /*
-        Your current system deletes the
-        registration when the verification
-        email cannot be sent.
-
-        We will reconsider this when we build
-        the new QR/email delivery architecture.
-      */
-      await supabase
-        .from("registrations")
-        .delete()
-        .eq(
-          "registration_code",
-          registrationCode,
-        );
 
       return NextResponse.json(
         {
           error:
-            "We could not send the verification email. Please check your email address and try again.",
+            "Your registration was received, but the QR ticket could not be prepared. Please contact the organiser.",
         },
         {
           status: 500,
         },
+      );
+    }
+
+    /*
+      Automatically uses localhost,
+      preview domain, or production domain.
+    */
+    const baseUrl =
+      new URL(
+        request.url,
+      ).origin;
+
+    const ticketUrl =
+      `${baseUrl}/ticket/` +
+      encodeURIComponent(
+        qrToken,
+      );
+
+    /*
+      Generate exactly the same ticket URL
+      into the QR image that the scanner
+      will later read.
+    */
+    const qrBase64 =
+      await makeQrPngBase64(
+        ticketUrl,
+      );
+
+    /*
+      Email failure must not invalidate
+      the registration.
+    */
+    let emailSent =
+      false;
+
+    try {
+      await sendRegistrationEmail({
+        email,
+
+        fullName:
+          updatedRegistration
+            .full_name,
+
+        registrationCode:
+          updatedRegistration
+            .registration_code,
+
+        ticketUrl,
+
+        qrBase64,
+      });
+
+      emailSent = true;
+    } catch (emailError) {
+      console.error(
+        "Registration email error:",
+        emailError,
       );
     }
 
     return NextResponse.json({
       success: true,
 
-      verificationPending: true,
-
       registration: {
         code:
-          result.registration_code,
+          updatedRegistration
+            .registration_code,
 
         fullName:
-          result.full_name,
+          updatedRegistration
+            .full_name,
 
         ticketQuantity:
-          1,
+          updatedRegistration
+            .ticket_quantity,
+
+        qrToken,
+
+        ticketUrl,
       },
 
+      emailSent,
+
       message:
-        "Thank you for registering. Please check your email and verify your address to receive your QR ticket.",
+        emailSent
+          ? "Registration completed successfully. Your QR ticket has also been sent to your email."
+          : "Registration completed successfully. Your QR ticket is ready, but the confirmation email could not be sent.",
     });
   } catch (error) {
     console.error(

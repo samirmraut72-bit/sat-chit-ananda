@@ -48,46 +48,60 @@ export default function AdminDashboard({
   const popupTimerRef =
     useRef(null);
 
-  const filtered = useMemo(() => {
-    const term =
-      query.trim().toLowerCase();
+  /*
+    SEARCH
+  */
 
-    if (!term) {
-      return registrations;
-    }
+  const filtered =
+    useMemo(() => {
+      const term =
+        query
+          .trim()
+          .toLowerCase();
 
-    return registrations.filter(
-      (item) =>
-        [
-          item.full_name,
-          item.email,
-          item.phone,
-          item.registration_code,
-        ]
-          .join(" ")
-          .toLowerCase()
-          .includes(term),
-    );
-  }, [registrations, query]);
+      if (!term) {
+        return registrations;
+      }
+
+      return registrations.filter(
+        (item) =>
+          [
+            item.full_name,
+            item.email,
+            item.phone,
+            item.registration_code,
+          ]
+            .join(" ")
+            .toLowerCase()
+            .includes(term),
+      );
+    }, [
+      registrations,
+      query,
+    ]);
 
   const activeRegistrations =
     registrations.filter(
       (item) =>
-        item.status === "confirmed",
+        item.status ===
+        "confirmed",
     );
 
   const reservedPlaces =
     activeRegistrations.reduce(
       (sum, item) =>
         sum +
-        Number(item.ticket_quantity),
+        Number(
+          item.ticket_quantity,
+        ),
       0,
     );
 
   const checkedInPlaces =
     activeRegistrations
       .filter(
-        (item) => item.checked_in,
+        (item) =>
+          item.checked_in,
       )
       .reduce(
         (sum, item) =>
@@ -97,6 +111,51 @@ export default function AdminDashboard({
           ),
         0,
       );
+
+  /*
+    Insert a new live registration into
+    the dashboard, or update an existing one.
+  */
+  function upsertRegistration(
+    registration,
+  ) {
+    if (!registration?.id) {
+      return;
+    }
+
+    setRegistrations(
+      (current) => {
+        const exists =
+          current.some(
+            (item) =>
+              item.id ===
+              registration.id,
+          );
+
+        if (!exists) {
+          return [
+            registration,
+            ...current,
+          ];
+        }
+
+        return current.map(
+          (item) =>
+            item.id ===
+            registration.id
+              ? {
+                  ...item,
+                  ...registration,
+                }
+              : item,
+        );
+      },
+    );
+  }
+
+  /*
+    SCANNER SOUNDS
+  */
 
   function prepareSounds() {
     if (
@@ -117,8 +176,7 @@ export default function AdminDashboard({
       sound.preload =
         "auto";
 
-      sound.volume =
-        1;
+      sound.volume = 1;
 
       successAudioRef.current =
         sound;
@@ -135,8 +193,7 @@ export default function AdminDashboard({
       sound.preload =
         "auto";
 
-      sound.volume =
-        1;
+      sound.volume = 1;
 
       errorAudioRef.current =
         sound;
@@ -159,24 +216,16 @@ export default function AdminDashboard({
       }
 
       try {
-        sound.muted =
-          true;
-
-        sound.currentTime =
-          0;
+        sound.muted = true;
+        sound.currentTime = 0;
 
         await sound.play();
 
         sound.pause();
-
-        sound.currentTime =
-          0;
-
-        sound.muted =
-          false;
+        sound.currentTime = 0;
+        sound.muted = false;
       } catch (error) {
-        sound.muted =
-          false;
+        sound.muted = false;
 
         console.log(
           "Safari audio unlock:",
@@ -198,15 +247,9 @@ export default function AdminDashboard({
       }
 
       sound.pause();
-
-      sound.currentTime =
-        0;
-
-      sound.muted =
-        false;
-
-      sound.volume =
-        1;
+      sound.currentTime = 0;
+      sound.muted = false;
+      sound.volume = 1;
 
       await sound.play();
     } catch (error) {
@@ -237,15 +280,9 @@ export default function AdminDashboard({
       }
 
       sound.pause();
-
-      sound.currentTime =
-        0;
-
-      sound.muted =
-        false;
-
-      sound.volume =
-        1;
+      sound.currentTime = 0;
+      sound.muted = false;
+      sound.volume = 1;
 
       await sound.play();
     } catch (error) {
@@ -268,19 +305,17 @@ export default function AdminDashboard({
     }
   }
 
+  /*
+    SCANNER POPUP
+  */
+
   function openScanPopup(
     type,
     message,
   ) {
     setScanType(type);
-
-    setScanMessage(
-      message,
-    );
-
-    setScanPopupOpen(
-      true,
-    );
+    setScanMessage(message);
+    setScanPopupOpen(true);
 
     if (
       popupTimerRef.current
@@ -334,6 +369,10 @@ export default function AdminDashboard({
     void playSuccessSound();
   }
 
+  /*
+    MANUAL CHECK-IN / UNDO
+  */
+
   async function updateCheckIn(
     registration,
     checkedIn,
@@ -385,12 +424,18 @@ export default function AdminDashboard({
 
                     checked_in:
                       result.checkedIn,
+
+                    checked_in_at:
+                      result.checkedInAt,
+
+                    checked_in_by:
+                      result.checkedInBy,
                   }
                 : item,
           ),
       );
 
-      return result.checkedIn;
+      return result;
     } finally {
       setUpdatingId("");
     }
@@ -413,12 +458,31 @@ export default function AdminDashboard({
     }
   }
 
+  /*
+    EXTRACT QR TOKEN
+
+    Supports:
+    https://domain/ticket/TOKEN
+
+    and a raw token if one is ever scanned
+    directly.
+  */
+
   function extractQrToken(
     decodedText,
   ) {
+    const value =
+      String(
+        decodedText || "",
+      ).trim();
+
+    if (!value) {
+      return "";
+    }
+
     try {
       const url =
-        new URL(decodedText);
+        new URL(value);
 
       const parts =
         url.pathname
@@ -430,22 +494,50 @@ export default function AdminDashboard({
           "ticket" &&
         parts[1]
       ) {
-        return parts[1];
+        return decodeURIComponent(
+          parts[1],
+        );
       }
+
+      return "";
     } catch {
+      /*
+        If it is not a URL, permit a raw QR
+        token as long as it has a sensible
+        minimum length.
+      */
+      if (
+        value.length >= 10 &&
+        !value.includes("/")
+      ) {
+        return value;
+      }
+
       const parts =
-        decodedText
+        value
           .split("/")
           .filter(Boolean);
 
       return (
-        parts.at(-1) ||
-        ""
+        parts.at(-1) || ""
       );
     }
-
-    return "";
   }
+
+  /*
+    LIVE QR CHECK-IN
+
+    No browser-side registration lookup.
+    No email verification requirement.
+
+    Server:
+      authenticates admin
+      finds ticket live
+      checks status
+      detects duplicate check-in
+      records timestamp
+      records admin
+  */
 
   async function handleSuccessfulScan(
     decodedText,
@@ -473,61 +565,93 @@ export default function AdminDashboard({
         return;
       }
 
-      const registration =
-        registrations.find(
-          (item) =>
-            item.qr_token ===
-            qrToken,
+      const response =
+        await fetch(
+          "/api/admin/scan-check-in",
+          {
+            method: "POST",
+
+            headers: {
+              "Content-Type":
+                "application/json",
+            },
+
+            body:
+              JSON.stringify({
+                qrToken,
+              }),
+          },
         );
 
+      const result =
+        await response.json();
+
+      /*
+        Update the dashboard even when the
+        server tells us the attendee had
+        already checked in.
+      */
       if (
-        !registration
+        result.registration
       ) {
-        showScanError(
-          "Ticket not found in the registration database.",
+        upsertRegistration(
+          result.registration,
         );
-
-        return;
       }
 
       if (
-        !registration.email_verified
+        result.alreadyCheckedIn
       ) {
-        showScanError(
-          `${registration.full_name}'s email has not been verified.`,
-        );
+        let message =
+          result.message ||
+          "This attendee has already been checked in.";
 
-        return;
-      }
+        if (
+          result.registration
+            ?.checked_in_at
+        ) {
+          const time =
+            new Date(
+              result.registration
+                .checked_in_at,
+            ).toLocaleString(
+              "en-AU",
+            );
 
-      if (
-        registration.status !==
-        "confirmed"
-      ) {
-        showScanError(
-          `${registration.full_name}'s registration is not confirmed.`,
-        );
+          message +=
+            ` Check-in time: ${time}.`;
+        }
 
-        return;
-      }
-
-      if (
-        registration.checked_in
-      ) {
         showScanWarning(
-          `${registration.full_name} has already been checked in.`,
+          message,
         );
 
         return;
       }
 
-      await updateCheckIn(
-        registration,
-        true,
-      );
+      if (!response.ok) {
+        showScanError(
+          result.error ||
+            "The QR ticket could not be processed.",
+        );
+
+        return;
+      }
+
+      if (
+        !result.success ||
+        !result.registration
+      ) {
+        showScanError(
+          "The QR ticket could not be processed.",
+        );
+
+        return;
+      }
 
       showScanSuccess(
-        `${registration.full_name} checked in successfully. Code: ${registration.registration_code}`,
+        result.message ||
+          `${result.registration.full_name} checked in successfully.`,
       );
     } catch (error) {
       showScanError(
@@ -546,19 +670,17 @@ export default function AdminDashboard({
     }
   }
 
+  /*
+    START SCANNER
+  */
+
   async function startScanner() {
     setScanMessage("");
-
     setScanType("");
-
-    setScanPopupOpen(
-      false,
-    );
+    setScanPopupOpen(false);
 
     /*
-      Important for Safari:
-      sound files are unlocked
-      from the direct button tap.
+      Needed for Safari/iPhone audio.
     */
     await unlockSounds();
 
@@ -597,16 +719,12 @@ export default function AdminDashboard({
         () => {},
       );
 
-      setScannerActive(
-        true,
-      );
+      setScannerActive(true);
     } catch (error) {
       scannerRef.current =
         null;
 
-      setScannerActive(
-        false,
-      );
+      setScannerActive(false);
 
       showScanError(
         "Camera could not start. Allow camera permission and try again.",
@@ -618,6 +736,10 @@ export default function AdminDashboard({
       );
     }
   }
+
+  /*
+    STOP SCANNER
+  */
 
   async function stopScanner() {
     try {
@@ -638,11 +760,13 @@ export default function AdminDashboard({
       scannerRef.current =
         null;
 
-      setScannerActive(
-        false,
-      );
+      setScannerActive(false);
     }
   }
+
+  /*
+    CLEANUP
+  */
 
   useEffect(() => {
     prepareSounds();
@@ -687,6 +811,16 @@ export default function AdminDashboard({
     };
   }, []);
 
+  /*
+    CSV EXPORT
+
+    Email verification has intentionally
+    been removed.
+
+    We now export the useful attendance
+    audit data instead.
+  */
+
   function exportCsv() {
     const headers = [
       "Registration Code",
@@ -695,9 +829,10 @@ export default function AdminDashboard({
       "Phone",
       "Places",
       "Status",
-      "Email Verified",
       "Checked In",
-      "Created At",
+      "Checked In At",
+      "Checked In By",
+      "Registered At",
     ];
 
     const rows =
@@ -710,13 +845,15 @@ export default function AdminDashboard({
           item.ticket_quantity,
           item.status,
 
-          item.email_verified
-            ? "Yes"
-            : "No",
-
           item.checked_in
             ? "Yes"
             : "No",
+
+          item.checked_in_at ||
+            "",
+
+          item.checked_in_by ||
+            "",
 
           item.created_at,
         ],
@@ -760,8 +897,7 @@ export default function AdminDashboard({
         "a",
       );
 
-    link.href =
-      url;
+    link.href = url;
 
     link.download =
       "sat-chit-ananda-registrations.csv";
@@ -773,13 +909,15 @@ export default function AdminDashboard({
     );
   }
 
+  /*
+    POPUP STYLING
+  */
+
   const popupIsSuccess =
-    scanType ===
-    "success";
+    scanType === "success";
 
   const popupIsWarning =
-    scanType ===
-    "warning";
+    scanType === "warning";
 
   const popupAccent =
     popupIsSuccess
@@ -893,7 +1031,7 @@ export default function AdminDashboard({
 
           <strong>
             {Math.max(
-              350 -
+              270 -
                 reservedPlaces,
               0,
             )}
@@ -906,12 +1044,12 @@ export default function AdminDashboard({
           </small>
 
           <strong>
-            {
-              checkedInPlaces
-            }
+            {checkedInPlaces}
           </strong>
         </article>
       </section>
+
+      {/* QR SCANNER */}
 
       <section
         className="adminTableCard"
@@ -953,7 +1091,7 @@ export default function AdminDashboard({
               }}
             >
               Scan an attendee’s
-              confirmed ticket to
+              confirmed QR ticket to
               check them in.
             </p>
           </div>
@@ -1091,6 +1229,8 @@ export default function AdminDashboard({
         )}
       </section>
 
+      {/* ATTENDEE LIST */}
+
       <section className="adminTableCard">
         <div className="tableToolbar">
           <div>
@@ -1110,9 +1250,7 @@ export default function AdminDashboard({
           </div>
 
           <input
-            value={
-              query
-            }
+            value={query}
             onChange={(
               event,
             ) =>
@@ -1149,6 +1287,10 @@ export default function AdminDashboard({
                     Status
                   </th>
 
+                  <th>
+                    Check-in record
+                  </th>
+
                   <th />
                 </tr>
               </thead>
@@ -1169,6 +1311,7 @@ export default function AdminDashboard({
                         </strong>
 
                         <small>
+                          Registered{" "}
                           {new Date(
                             item.created_at,
                           ).toLocaleString(
@@ -1219,10 +1362,37 @@ export default function AdminDashboard({
                         </span>
 
                         <small>
-                          {item.email_verified
-                            ? "Email verified"
-                            : "Email unverified"}
+                          {item.status ===
+                          "confirmed"
+                            ? "Confirmed registration"
+                            : item.status}
                         </small>
+                      </td>
+
+                      <td>
+                        {item.checked_in ? (
+                          <>
+                            <span>
+                              {item.checked_in_at
+                                ? new Date(
+                                    item.checked_in_at,
+                                  ).toLocaleString(
+                                    "en-AU",
+                                  )
+                                : "Time unavailable"}
+                            </span>
+
+                            <small>
+                              {item.checked_in_by
+                                ? `By ${item.checked_in_by}`
+                                : "Admin not recorded"}
+                            </small>
+                          </>
+                        ) : (
+                          <small>
+                            Not checked in
+                          </small>
+                        )}
                       </td>
 
                       <td>
@@ -1266,11 +1436,15 @@ export default function AdminDashboard({
             <p>
               New public
               registrations will
-              appear here.
+              appear here when
+              scanned or when the
+              dashboard is refreshed.
             </p>
           </div>
         )}
       </section>
+
+      {/* SCANNER RESULT POPUP */}
 
       {scanPopupOpen ? (
         <div
@@ -1278,8 +1452,7 @@ export default function AdminDashboard({
             position:
               "fixed",
 
-            inset:
-              0,
+            inset: 0,
 
             zIndex:
               99999,
