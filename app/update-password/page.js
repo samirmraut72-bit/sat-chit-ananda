@@ -40,6 +40,9 @@ export default function UpdatePasswordPage() {
     try {
       const supabase = createClient();
 
+      /*
+        Change the current user's password.
+      */
       const { error: updateError } =
         await supabase.auth.updateUser({
           password,
@@ -49,12 +52,32 @@ export default function UpdatePasswordPage() {
         throw updateError;
       }
 
-      setMessage(
-        "Password changed successfully. You can now sign in with your new password."
-      );
+      /*
+        Sign out all OTHER sessions for this
+        admin account.
+
+        The current browser remains signed in.
+      */
+      const { error: signOutError } =
+        await supabase.auth.signOut({
+          scope: "others",
+        });
+
+      if (signOutError) {
+        console.error(
+          "Other-session sign out error:",
+          signOutError
+        );
+      }
 
       setPassword("");
       setConfirmPassword("");
+
+      setMessage(
+        signOutError
+          ? "Password changed successfully. Some other sessions may need to expire before they are fully signed out."
+          : "Password changed successfully. Other admin sessions have been signed out."
+      );
     } catch (updateError) {
       console.error(
         "Password update error:",
@@ -152,6 +175,7 @@ export default function UpdatePasswordPage() {
               }
               autoComplete="new-password"
               placeholder="Enter new password"
+              disabled={loading}
               style={{
                 width: "100%",
                 boxSizing: "border-box",
@@ -191,6 +215,7 @@ export default function UpdatePasswordPage() {
               }
               autoComplete="new-password"
               placeholder="Enter password again"
+              disabled={loading}
               style={{
                 width: "100%",
                 boxSizing: "border-box",
@@ -213,6 +238,7 @@ export default function UpdatePasswordPage() {
                 background: "#2b0d0d",
                 border: "1px solid #8c3030",
                 color: "#ffaaaa",
+                lineHeight: "1.5",
               }}
             >
               {error}
@@ -228,6 +254,7 @@ export default function UpdatePasswordPage() {
                 background: "#0d2817",
                 border: "1px solid #286f42",
                 color: "#9effb9",
+                lineHeight: "1.5",
               }}
             >
               {message}
@@ -270,7 +297,7 @@ export default function UpdatePasswordPage() {
               fontWeight: "700",
             }}
           >
-            Go to Admin Login →
+            Go to Admin Dashboard →
           </a>
         ) : null}
       </section>
