@@ -49,7 +49,7 @@ export async function POST(request) {
     if (userError || !user) {
       return NextResponse.json(
         {
-          error: "Your admin session has expired.",
+          error: "Your scanner session has expired.",
         },
         {
           status: 401,
@@ -58,21 +58,30 @@ export async function POST(request) {
     }
 
     /*
-      Confirm administrator permission.
+      Confirm scanner permission.
     */
     const {
-      data: adminProfile,
-      error: adminError,
+      data: profile,
+      error: profileError,
     } = await supabase
       .from("admin_users")
-      .select("user_id")
+      .select(`
+        user_id,
+        role,
+        email,
+        display_name
+      `)
       .eq("user_id", user.id)
       .maybeSingle();
 
-    if (adminError || !adminProfile) {
+    if (
+      profileError ||
+      !profile ||
+      !["scanner", "owner"].includes(profile.role)
+    ) {
       return NextResponse.json(
         {
-          error: "Administrator permission is required.",
+          error: "Scanner permission is required.",
         },
         {
           status: 403,
@@ -81,10 +90,7 @@ export async function POST(request) {
     }
 
     /*
-      Find the ticket LIVE in Supabase.
-
-      We do not depend on the registrations
-      that were loaded when the admin page opened.
+      Live ticket lookup.
     */
     const {
       data: registration,
@@ -137,10 +143,7 @@ export async function POST(request) {
     }
 
     /*
-      Email verification is NOT required.
-
-      A valid QR belonging to a confirmed
-      registration is the ticket.
+      Only confirmed registrations are valid.
     */
     if (registration.status !== "confirmed") {
       return NextResponse.json(
@@ -155,27 +158,22 @@ export async function POST(request) {
     }
 
     /*
-      Ticket was already used.
+      Duplicate scan.
     */
     if (registration.checked_in) {
-      const checkedInTime =
-        formatSydneyDateTime(
-          registration.checked_in_at,
-        );
-
       return NextResponse.json(
         {
           success: false,
-
           alreadyCheckedIn: true,
-
           registration,
 
           message:
             `${registration.full_name} has already been checked in.\n` +
             `Code: ${registration.registration_code}\n` +
             `Places: ${registration.ticket_quantity}\n` +
-            `Checked in: ${checkedInTime}\n` +
+            `Checked in: ${formatSydneyDateTime(
+              registration.checked_in_at,
+            )}\n` +
             `Staff: ${registration.checked_in_by || "Unknown"}`,
         },
         {
@@ -187,15 +185,19 @@ export async function POST(request) {
     const checkedInAt =
       new Date().toISOString();
 
+    /*
+      Use authenticated account identity.
+
+      Never accept staff identity from
+      the browser request.
+    */
     const checkedInBy =
-      user.email || user.id;
+      profile.email ||
+      user.email ||
+      user.id;
 
     /*
-      Atomic-style check-in.
-
-      The extra checked_in = false condition
-      means two scanners cannot both
-      successfully check in the same ticket.
+      Prevent simultaneous double check-in.
     */
     const {
       data: checkedInRegistration,
@@ -204,21 +206,11 @@ export async function POST(request) {
       .from("registrations")
       .update({
         checked_in: true,
-
-        checked_in_at:
-          checkedInAt,
-
-        checked_in_by:
-          checkedInBy,
+        checked_in_at: checkedInAt,
+        checked_in_by: checkedInBy,
       })
-      .eq(
-        "id",
-        registration.id,
-      )
-      .eq(
-        "checked_in",
-        false,
-      )
+      .eq("id", registration.id)
+      .eq("checked_in", false)
       .select(`
         id,
         registration_code,
@@ -243,8 +235,7 @@ export async function POST(request) {
 
       return NextResponse.json(
         {
-          error:
-            "Check-in could not be completed.",
+          error: "Check-in could not be completed.",
         },
         {
           status: 500,
@@ -253,9 +244,8 @@ export async function POST(request) {
     }
 
     /*
-      If no row was returned, another scanner
-      may have checked this attendee in between
-      the first lookup and our update.
+      Another scanner may have checked in
+      the ticket between lookup and update.
     */
     if (!checkedInRegistration) {
       const {
@@ -277,10 +267,7 @@ export async function POST(request) {
           qr_token,
           created_at
         `)
-        .eq(
-          "id",
-          registration.id,
-        )
+        .eq("id", registration.id)
         .maybeSingle();
 
       if (latestError) {
@@ -294,25 +281,19 @@ export async function POST(request) {
         latestRegistration ||
         registration;
 
-      const checkedInTime =
-        formatSydneyDateTime(
-          latest.checked_in_at,
-        );
-
       return NextResponse.json(
         {
           success: false,
-
           alreadyCheckedIn: true,
-
-          registration:
-            latest,
+          registration: latest,
 
           message:
             `${latest.full_name} has already been checked in.\n` +
             `Code: ${latest.registration_code}\n` +
             `Places: ${latest.ticket_quantity}\n` +
-            `Checked in: ${checkedInTime}\n` +
+            `Checked in: ${formatSydneyDateTime(
+              latest.checked_in_at,
+            )}\n` +
             `Staff: ${latest.checked_in_by || "Unknown"}`,
         },
         {
@@ -321,17 +302,8 @@ export async function POST(request) {
       );
     }
 
-    /*
-      Successful entry.
-    */
-    const successfulCheckInTime =
-      formatSydneyDateTime(
-        checkedInRegistration.checked_in_at,
-      );
-
     return NextResponse.json({
       success: true,
-
       registration:
         checkedInRegistration,
 
@@ -339,7 +311,9 @@ export async function POST(request) {
         `${checkedInRegistration.full_name} checked in successfully.\n` +
         `Code: ${checkedInRegistration.registration_code}\n` +
         `Places: ${checkedInRegistration.ticket_quantity}\n` +
-        `Checked in: ${successfulCheckInTime}\n` +
+        `Checked in: ${formatSydneyDateTime(
+          checkedInRegistration.checked_in_at,
+        )}\n` +
         `Staff: ${checkedInRegistration.checked_in_by}`,
     });
   } catch (error) {

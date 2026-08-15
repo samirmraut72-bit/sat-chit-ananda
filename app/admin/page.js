@@ -16,33 +16,93 @@ export default async function AdminPage() {
     redirect("/admin/login");
   }
 
-  const { data: adminProfile } = await supabase
+  const {
+    data: adminProfile,
+    error: adminError,
+  } = await supabase
     .from("admin_users")
-    .select("display_name, email")
+    .select(`
+      user_id,
+      display_name,
+      email,
+      role
+    `)
     .eq("user_id", user.id)
     .maybeSingle();
 
-  if (!adminProfile) {
+  if (
+    adminError ||
+    !adminProfile
+  ) {
     await supabase.auth.signOut();
-    redirect("/admin/login?error=unauthorized");
+
+    redirect(
+      "/admin/login?error=unauthorized",
+    );
   }
 
-  const { data: registrations, error } = await supabase
+  /*
+    Only the owner can access
+    the complete admin dashboard.
+
+    Scanner volunteers use /scanner.
+  */
+  if (
+    adminProfile.role !==
+    "owner"
+  ) {
+    redirect("/scanner");
+  }
+
+  const {
+    data: registrations,
+    error,
+  } = await supabase
     .from("registrations")
-    .select(
-      "id, registration_code, full_name, email, phone, ticket_quantity, status, checked_in, created_at, email_verified, qr_token",
-    )
-    .order("created_at", { ascending: false });
+    .select(`
+      id,
+      registration_code,
+      full_name,
+      email,
+      phone,
+      ticket_quantity,
+      status,
+      checked_in,
+      checked_in_at,
+      checked_in_by,
+      created_at,
+      qr_token
+    `)
+    .order(
+      "created_at",
+      {
+        ascending: false,
+      },
+    );
 
   if (error) {
-    console.error("Admin registration query failed:", error);
+    console.error(
+      "Admin registration query failed:",
+      error,
+    );
   }
 
   return (
     <AdminDashboard
-      initialRegistrations={registrations || []}
-      adminName={adminProfile.display_name || adminProfile.email}
-      adminEmail={adminProfile.email}
+      initialRegistrations={
+        registrations || []
+      }
+      adminName={
+        adminProfile.display_name ||
+        adminProfile.email ||
+        user.email ||
+        "Owner"
+      }
+      adminEmail={
+        adminProfile.email ||
+        user.email ||
+        ""
+      }
     />
   );
 }
