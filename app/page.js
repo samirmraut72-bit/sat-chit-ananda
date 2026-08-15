@@ -372,23 +372,26 @@ export default function HomePage() {
             <div>
               <small>
                 {soldOut
-                  ? "Registration status"
+                  ? "Sat-Chit-Ānanda"
                   : "Live availability"}
               </small>
 
               {availability ? (
-                <>
-                  <strong>
-                    {soldOut
-                      ? "Registration Full"
-                      : `Available spots: ${availability.available}`}
-                  </strong>
+                soldOut ? (
+                  <>
+                    <strong>
+                      Thank you for being part of this beautiful gathering.
+                    </strong>
 
-                  {soldOut && (
                     <p className="finalRegistrationNotice">
+                      Stay connected with us for the next journey. ✨
                     </p>
-                  )}
-                </>
+                  </>
+                ) : (
+                  <strong>
+                    Available spots: {availability.available}
+                  </strong>
+                )
               ) : (
                 <strong>
                   Checking available spots...
@@ -417,7 +420,7 @@ export default function HomePage() {
               }}
             >
               {soldOut
-                ? "Registration Full"
+                ? "Event Closed"
                 : "Reserve a Spot"}
             </Link>
 
@@ -606,7 +609,7 @@ export default function HomePage() {
 
           <h2>
             {soldOut
-              ? "All available places have been reserved"
+              ? "Thank you for being part of this beautiful gathering."
               : "Reserve your free place today"}
           </h2>
 
@@ -614,7 +617,7 @@ export default function HomePage() {
             {availability && !soldOut
               ? `${availability.available} places currently available.`
               : soldOut
-                ? "Final registration will be opening soon."
+                ? "Stay connected with us for the next journey. ✨"
                 : "One registration reserves one place only."}
           </p>
         </div>
@@ -634,7 +637,7 @@ export default function HomePage() {
           }}
         >
           {soldOut
-            ? "Registration Full"
+            ? "Event Closed"
             : "Reserve a Spot"}
         </Link>
       </section>
