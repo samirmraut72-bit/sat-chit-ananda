@@ -313,7 +313,7 @@ export default function HomePage() {
           </div>
 
           <p className="eyebrow">
-            An Intimate Kirtan Gathering Session
+            An Intimate Kirtan Gathering Session TEST
           </p>
 
           <div className="ornament">
