@@ -277,49 +277,29 @@ Project Beyond
                   border-radius:12px;
                 "
               >
-                <p
-                  style="
-                    margin:0 0 8px;
-                  "
-                >
+                <p style="margin:0 0 8px;">
                   <strong>
                     Registration code:
                   </strong>
                   ${safeRegistrationCode}
                 </p>
 
-                <p
-                  style="
-                    margin:8px 0;
-                  "
-                >
+                <p style="margin:8px 0;">
                   <strong>Date:</strong>
                   Friday, 14 August 2026
                 </p>
 
-                <p
-                  style="
-                    margin:8px 0;
-                  "
-                >
+                <p style="margin:8px 0;">
                   <strong>Time:</strong>
                   6:45 PM–9:00 PM
                 </p>
 
-                <p
-                  style="
-                    margin:8px 0;
-                  "
-                >
+                <p style="margin:8px 0;">
                   <strong>Venue:</strong>
                   The Granville Centre
                 </p>
 
-                <p
-                  style="
-                    margin:8px 0 0;
-                  "
-                >
+                <p style="margin:8px 0 0;">
                   <strong>Address:</strong>
                   1 Memorial Drive,
                   Granville NSW 2142
@@ -378,7 +358,8 @@ Project Beyond
 
         attachments: [
           {
-            content: qrBase64,
+            content:
+              qrBase64,
 
             filename:
               "sat-chit-ananda-ticket.png",
@@ -475,6 +456,9 @@ export async function POST(
         parsed.data.phone,
       );
 
+    /*
+      EMAIL VALIDATION
+    */
     if (
       !isValidEmailFormat(
         email,
@@ -508,6 +492,9 @@ export async function POST(
       );
     }
 
+    /*
+      MOBILE VALIDATION
+    */
     if (
       !isValidAustralianMobile(
         phone,
@@ -533,6 +520,9 @@ export async function POST(
     const qrToken =
       makeQrToken();
 
+    /*
+      CREATE REGISTRATION
+    */
     const {
       data,
       error,
@@ -640,10 +630,12 @@ export async function POST(
     }
 
     /*
-      QR is created immediately.
+      IMPORTANT:
 
-      Email verification is no longer
-      part of ticket validity.
+      The new system does NOT use email verification.
+
+      All we need to do after registration is
+      store the QR token.
     */
     const {
       data:
@@ -655,21 +647,6 @@ export async function POST(
       .update({
         qr_token:
           qrToken,
-
-        verification_token:
-          null,
-
-        verification_expires_at:
-          null,
-
-        email_verification_code_hash:
-          null,
-
-        email_verification_code_expires_at:
-          null,
-
-        email_verification_attempts:
-          0,
       })
       .eq(
         "registration_code",
@@ -710,8 +687,8 @@ export async function POST(
     }
 
     /*
-      Automatically uses localhost,
-      preview domain, or production domain.
+      Automatically generates the correct
+      domain for localhost, Preview or production.
     */
     const baseUrl =
       new URL(
@@ -725,9 +702,8 @@ export async function POST(
       );
 
     /*
-      Generate exactly the same ticket URL
-      into the QR image that the scanner
-      will later read.
+      Generate the QR image using the
+      exact ticket URL.
     */
     const qrBase64 =
       await makeQrPngBase64(
@@ -735,8 +711,8 @@ export async function POST(
       );
 
     /*
-      Email failure must not invalidate
-      the registration.
+      Registration stays valid even if
+      email delivery fails.
     */
     let emailSent =
       false;
