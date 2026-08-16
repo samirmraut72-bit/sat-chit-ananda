@@ -1,99 +1,120 @@
-# Sat-Chit-Ananda Production Build
+<div align="center">
 
-This is the database-connected version of the approved demo.
+# 🎵 Sat-Chit-Ananda Event Platform
 
-## Included
+### Full-stack event registration & administration system
+
+![Next.js](https://img.shields.io/badge/Next.js-000000?style=for-the-badge&logo=nextdotjs&logoColor=white)
+![Supabase](https://img.shields.io/badge/Supabase-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white)
+![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)
+![Vercel](https://img.shields.io/badge/Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white)
+
+A production-focused event platform built for **Sat-Chit-Ananda**, combining a public event website with secure registration storage and an authenticated administration workflow.
+
+</div>
+
+---
+
+## ✨ Project Highlights
+
+| Area | Implementation |
+|---|---|
+| 🌐 Public experience | Responsive event website and registration flow |
+| 🗃️ Data layer | Permanent Supabase registration storage |
+| 👥 Capacity | Event capacity enforcement for 350 attendees |
+| 🔐 Admin security | Supabase Auth + approved-admin database access |
+| 📋 Operations | Registration dashboard, search and attendee management |
+| ✅ Check-in | Check-in and undo check-in workflow |
+| 📤 Reporting | CSV attendee export |
+| 🛡️ Database security | Row Level Security policies |
+| ☁️ Deployment | Vercel-ready Next.js application |
+
+## 🏗️ Architecture
+
+```text
+Visitor
+   │
+   ▼
+Next.js Public Website
+   │
+   ├── Registration Flow
+   │        │
+   │        ▼
+   │    Server Route
+   │        │
+   │        ▼
+   │     Supabase
+   │
+   └── Admin Login
+            │
+            ▼
+      Protected Dashboard
+            │
+            ▼
+       Supabase Auth + RLS
+```
+
+## 🔐 Security Design
+
+The application was designed so privileged database credentials are not exposed to attendees or browser-side code.
+
+- Attendees never receive database credentials.
+- The Supabase secret key is used only by server-side registration logic.
+- Secret values are never given a `NEXT_PUBLIC_` prefix.
+- Admin sessions use Supabase authentication cookies.
+- Protected pages and API operations verify the signed-in user.
+- Row Level Security restricts registration data to approved administrators.
+- There is no public admin-signup page.
+
+## 🧩 Core Features
 
 - Premium public event website
-- Public registration without attendee login
-- Permanent Supabase registration storage
-- Capacity enforcement at 350 attendees
+- Public registration without attendee accounts
+- Supabase-backed registration storage
+- Capacity enforcement
 - Maximum six places per registration
-- Duplicate email prevention
-- Free ticket value of `$0.00`
-- Supabase email/password admin authentication
-- Approved-admin database privileges
+- Duplicate-email prevention
+- Secure administrator authentication
 - Protected registration dashboard
-- Search, check-in and undo check-in
+- Attendee search
+- Check-in / undo check-in
 - CSV attendee export
 - Secure sign-out
 - Row Level Security policies
 
-## Security design
+## 🛠️ Technology Stack
 
-- Attendees never receive database credentials.
-- The Supabase secret key is used only by the server registration route.
-- The secret key must never use a `NEXT_PUBLIC_` prefix.
-- Admin sessions use Supabase Auth cookies.
-- `proxy.js` refreshes authentication cookies.
-- Every protected page and API operation verifies the signed-in user again.
-- Row Level Security allows registration access only to users listed in
-  `public.admin_users`.
-- There is no public admin signup page.
+**Frontend / Application**
 
-## 1. Install software
+`Next.js` · `JavaScript` · `React`
 
-Install Node.js 20.9 or later, Git and Visual Studio Code.
+**Backend / Data**
 
-Open PowerShell in this folder and run:
+`Supabase` · `PostgreSQL` · `Supabase Auth` · `Row Level Security`
+
+**Deployment**
+
+`Vercel` · `GitHub`
+
+## 🚀 Local Setup
+
+### 1. Install dependencies
+
+Requires Node.js 20.9+.
 
 ```powershell
 npm install
 ```
 
-## 2. Create Supabase project
+### 2. Configure Supabase
 
-Create a new Supabase project.
-
-Open **SQL Editor**, paste the complete contents of:
+Run the database schema from:
 
 ```text
 supabase/schema.sql
 ```
 
-Run the query.
-
-This creates the event, registration system, admin list, database function,
-capacity protection and security policies.
-
-## 3. Create the first admin account
-
-Open:
-
-```text
-Supabase Dashboard
-Authentication
-Users
-Add user
-```
-
-Create:
-
-```text
-Email: Samir.m.raut72@gmail.com
-Password: choose a strong private password
-Auto Confirm User: enabled
-```
-
-Copy the user's UUID.
-
-Open:
-
-```text
-supabase/create-first-admin.sql
-```
-
-Replace:
-
-```text
-YOUR_AUTH_USER_UUID
-```
-
-with the copied UUID, then run the SQL in Supabase SQL Editor.
-
-Only users present in `public.admin_users` receive dashboard access.
-
-## 4. Add environment variables
+### 3. Configure environment variables
 
 Copy:
 
@@ -107,7 +128,7 @@ to:
 .env.local
 ```
 
-In Supabase, open the project's **Connect** or **API Keys** section and enter:
+Then configure:
 
 ```env
 NEXT_PUBLIC_SUPABASE_URL=https://YOUR_PROJECT.supabase.co
@@ -115,11 +136,9 @@ NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=sb_publishable_YOUR_KEY
 SUPABASE_SECRET_KEY=sb_secret_YOUR_SECRET_KEY
 ```
 
-Never commit `.env.local`.
+> Never commit `.env.local` or expose the Supabase secret key in browser code.
 
-Never expose `SUPABASE_SECRET_KEY` in browser code.
-
-## 5. Start locally
+### 4. Start locally
 
 ```powershell
 npm run dev
@@ -131,83 +150,42 @@ Open:
 http://localhost:3000
 ```
 
-Admin login:
+## 🧪 Validation Workflow
 
-```text
-http://localhost:3000/admin/login
-```
+Public flow testing includes:
 
-## 6. Test
+- submitting a registration
+- confirming capacity behaviour
+- confirming duplicate-email prevention
 
-### Public test
+Admin testing includes:
 
-1. Open `/register`.
-2. Submit a real test registration.
-3. Confirm the registration code appears.
-4. Register again with the same email and confirm it is blocked.
+- authenticated dashboard access
+- attendee search
+- check-in and undo check-in
+- CSV export
+- sign-out and access protection
 
-### Admin test
+Permission testing confirms that a Supabase Auth user who is **not** listed in `public.admin_users` cannot access protected registration data.
 
-1. Open `/admin`.
-2. Sign in using the admin account created in Supabase.
-3. Confirm the test attendee appears.
-4. Search for the attendee.
-5. Mark the attendee as checked in.
-6. Undo check-in.
-7. Export the CSV.
-8. Sign out.
-9. Confirm `/admin` returns to the login screen.
+## ☁️ Deployment
 
-### Permission test
+The application is designed for deployment through Vercel using GitHub as the source repository and Supabase as the backend platform.
 
-Create another Supabase Auth user but do not insert that UUID into
-`public.admin_users`. That account must not receive dashboard access.
+Production environment variables must be configured securely in Vercel and never committed to source control.
 
-## 7. Deploy to Vercel
+## 🔭 Ongoing Development
 
-1. Upload the project to a private or public GitHub repository.
-2. Import the repository into Vercel.
-3. Add all three environment variables in Vercel Project Settings.
-4. Deploy.
-5. Test registration and admin login on the deployed address.
+The platform is being iterated as operational requirements evolve. Future or production-stage improvements can include stronger anti-bot controls, privacy tooling, additional admin security and expanded attendee-management workflows.
 
-After changing environment variables, redeploy.
+---
 
-## Adding another admin
+<div align="center">
 
-Create the person in Supabase Authentication, copy their UUID and run:
+### Skills Demonstrated
 
-```sql
-insert into public.admin_users (
-  user_id,
-  email,
-  display_name
-)
-values (
-  'THEIR_AUTH_USER_UUID',
-  'their@email.com',
-  'Their Name'
-);
-```
+**Next.js · React · JavaScript · Supabase · PostgreSQL · Authentication · Row Level Security · Event Operations · Full-Stack Development · Deployment**
 
-## Removing admin access
+**Built by Sameer Raut**
 
-```sql
-delete from public.admin_users
-where email = 'their@email.com';
-```
-
-Their Auth account may still exist, but the database policies and dashboard
-will deny access.
-
-## Before the public launch
-
-Recommended next additions:
-
-- Confirmation email through Resend
-- Cloudflare Turnstile or another anti-bot control
-- Privacy policy page
-- Artist photographs
-- Venue map and transport details
-- Password-reset flow for admins
-- Optional multi-factor authentication for admin accounts
+</div>
