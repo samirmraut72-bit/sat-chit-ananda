@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 
 import AdminDashboard from "./AdminDashboard";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 
 export const dynamic = "force-dynamic";
 
@@ -16,48 +17,29 @@ export default async function AdminPage() {
     redirect("/admin/login");
   }
 
+  const admin = createAdminClient();
+
   const {
     data: adminProfile,
     error: adminError,
-  } = await supabase
+  } = await admin
     .from("admin_users")
-    .select(`
-      user_id,
-      display_name,
-      email,
-      role
-    `)
+    .select("user_id, display_name, email, role")
     .eq("user_id", user.id)
     .maybeSingle();
 
-  if (
-    adminError ||
-    !adminProfile
-  ) {
-    await supabase.auth.signOut();
-
-    redirect(
-      "/admin/login?error=unauthorized",
-    );
+  if (adminError || !adminProfile) {
+    redirect("/admin/login?error=unauthorized");
   }
 
-  /*
-    Only the owner can access
-    the complete admin dashboard.
-
-    Scanner volunteers use /scanner.
-  */
-  if (
-    adminProfile.role !==
-    "owner"
-  ) {
+  if (adminProfile.role !== "owner") {
     redirect("/scanner");
   }
 
   const {
     data: registrations,
     error,
-  } = await supabase
+  } = await admin
     .from("registrations")
     .select(`
       id,
@@ -73,12 +55,9 @@ export default async function AdminPage() {
       created_at,
       qr_token
     `)
-    .order(
-      "created_at",
-      {
-        ascending: false,
-      },
-    );
+    .order("created_at", {
+      ascending: false,
+    });
 
   if (error) {
     console.error(
@@ -89,9 +68,7 @@ export default async function AdminPage() {
 
   return (
     <AdminDashboard
-      initialRegistrations={
-        registrations || []
-      }
+      initialRegistrations={registrations || []}
       adminName={
         adminProfile.display_name ||
         adminProfile.email ||
